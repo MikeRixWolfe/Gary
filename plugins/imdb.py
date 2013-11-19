@@ -7,7 +7,10 @@ from util import hook, http
 def imdb(inp):
     '''.imdb <movie> - gets information about <movie> from IMDb'''
 
-    content = http.get_json("http://www.omdbapi.com/", t=inp)
+    try:
+        content = http.get_json("http://www.omdbapi.com/", t=inp)
+    except:
+        return "API timeout, please try again in a few seconds"
 
     if content['Response'] == 'Movie Not Found':
         return 'movie not found'

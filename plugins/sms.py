@@ -192,10 +192,6 @@ def pingparsesms(paraml, conn=None, bot=None, db=None):
             print(">>> u'Outputting "+ str(messagecounter) +" message complete  "+paraml[0]+"'")
         else:
             print(">>> u'Outputting "+ str(messagecounter) +" messages complete  "+paraml[0]+"'")
-        #Cleanup inbox
-        #for message in voice.sms().messages:
-        #    if message.isRead and message.phoneNumber not in privatelist:
-        #        message.delete()
 
 
 @hook.command(adminonly=True, autohelp=False)
@@ -240,10 +236,6 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
             say(">>> u'Outputting "+ str(messagecounter) +" message complete'")
         else:
             say(">>> u'Outputting "+ str(messagecounter) +" messages complete'")
-        #Cleanup inbox
-        #for message in voice.sms().messages: 
-        #    if message.isRead and message.phoneNumber not in privatelist:
-        #        message.delete()
 
 
 @hook.command

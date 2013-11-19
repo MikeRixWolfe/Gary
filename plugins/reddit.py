@@ -107,3 +107,19 @@ def fiftyfifty(inp):
             item = tempitem["data"]
     return "%s %s" % (item["title"], item["url"])
 
+@hook.command(autohelp=False)
+def jl(inp):
+    ".jl - Returns random imgur link from r/jenniferlawrence"
+
+    try:
+        data = http.get_json("http://reddit.com/r/jenniferlawrence/.json")
+    except Exception as e:
+        return "Error: " + str(e)
+    data = data["data"]["children"]
+    item = None
+    while not item:
+        tempitem = random.choice(data)
+        if tempitem["data"]["domain"] == "i.imgur.com":
+            item = tempitem["data"]
+    return "%s %s" % (item["title"], item["url"])
+
