@@ -19,7 +19,7 @@ def get_version():
     
     shorthash = stdout.split(None, 1)[0]
 
-    http.ua_gary = 'Gary/r%d %s (http://github.com/michaelrixwolfe/gary)' \
+    http.ua_gary = 'Gary/r%d %s (http://github.com/MikeRixWolfe/gary)' \
                         % (revnumber, shorthash)
 
     return shorthash, revnumber
@@ -66,5 +66,5 @@ def onjoin(paraml, conn=None):
 @hook.regex(r'^\x01VERSION\x01$')
 def version(inp, notice=None):
     ident, rev = get_version()
-    notice('\x01VERSION Gary %s r%d - http://github.com/michaelrixwolfe/'
+    notice('\x01VERSION Gary %s r%d - http://github.com/MikeRixWolfe/'
            'Gary/\x01' % (ident, rev))
