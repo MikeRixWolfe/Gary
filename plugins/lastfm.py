@@ -8,10 +8,10 @@ from util import hook, http
 api_url = "http://ws.audioscrobbler.com/2.0/?format=json"
 
 @hook.api_key('lastfm')
-@hook.command('nowplaying')
+@hook.command('np')
 @hook.command(autohelp=False)
-def lastfm(inp, nick='', say=None, api_key=None):
-    ".lastfm <user> - gets a lastfm user's last played track"
+def nowplaying(inp, nick='', say=None, api_key=None):
+    ".np/.nowplaying <user> - gets a lastfm user's last played track"
     if inp:
         user = inp
     else:
