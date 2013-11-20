@@ -149,52 +149,57 @@ def call(inp, say='', nick='', input=None, db=None, bot=None):
     else:
         return "Your number needs to be in my phonebook to use this function"
 
+
 @hook.singlethread
-@hook.event('PING')
+@hook.event('JOIN')
 def pingparsesms(paraml, conn=None, bot=None, db=None):
-    if paraml[0] == ':dot.cs.wmich.edu': #dont want it in every server
+    if paraml[0] == '#geekboy' and conn.port == 7666: #dont want it in every channel/server
+        print(">>> u'Beginning SMS parse loop'")
         db_init(db)
         privatelist = bot.config["gvoice"]["private"]
         voice = Voice()
         try:
             voice.login()
         except:
-            print(">>> u'Error logging in to Google Voice "+paraml[0]+"'")
+            print(">>> u'Error logging in to Google Voice'")
             return
-        print(">>> u'Checking for unread sms "+paraml[0]+"'")
-        messagecounter=0
-        
         try:
-            voice.sms()
-        except:
-            print(">>> u'Error parsing data from Google Voice "+paraml[0]+"'")
-            return
-        for message in extractsms(voice.sms.html):
-            if check_smslog(db, message['id']) == None and message['from'][:-1] not in privatelist:
-                messagecounter=messagecounter+1
-                number = message['from'][2:-1] #slice off "+1" and ":"
-                recip_nick = get_name(db, number)
-                if recip_nick != None:
-                    text="<"+recip_nick+"> "+message['text']
-                    for chn in conn.channels:
-                        out = "PRIVMSG {} :{}".format(chn, text)
-                        conn.send(out)
-                    mark_as_read(db, str(message['id']))
+            while voice.sms():
+                #voice.sms()
+                print(">>> u'Checking for unread sms'")
+                messagecounter=0
+                for message in extractsms(voice.sms.html):
+                    if check_smslog(db, message['id']) == None and message['from'][:-1] not in privatelist:
+                        messagecounter=messagecounter+1
+                        number = message['from'][2:-1] #slice off "+1" and ":"
+                        recip_nick = get_name(db, number)
+                        if recip_nick != None:
+                            text="<"+recip_nick+"> "+message['text']
+                            for chn in conn.channels:
+                                out = "PRIVMSG {} :{}".format(chn, text)
+                                conn.send(out)
+                            mark_as_read(db, str(message['id']))
+                        else:
+                            text="<"+number+"> "+message['text']
+                            for chn in conn.channels:
+                                out = "PRIVMSG {} :{}".format(chn, text)
+                                conn.send(out)
+                            mark_as_read(db, str(message['id']))
+                if messagecounter == 0:
+                    print(">>> u'No new SMS found'")
+                elif messagecounter == 1:
+                    print(">>> u'Outputting "+ str(messagecounter) +" message complete'")
                 else:
-                    text="<"+number+"> "+message['text']
-                    for chn in conn.channels:
-                        out = "PRIVMSG {} :{}".format(chn, text)
-                        conn.send(out)
-                    mark_as_read(db, str(message['id']))
-        if messagecounter == 0:
-            print(">>> u'No new SMS found "+paraml[0]+"'")
-        elif messagecounter == 1:
-            print(">>> u'Outputting "+ str(messagecounter) +" message complete  "+paraml[0]+"'")
-        else:
-            print(">>> u'Outputting "+ str(messagecounter) +" messages complete  "+paraml[0]+"'")
+                    print(">>> u'Outputting "+ str(messagecounter) +" messages complete'")
+                time.sleep(60)
+        except:
+            print(">>> u'Error parsing data from Google Voice'")
+            for chan in conn.channels:
+                conn.send("PRIVMSG {} :{}".format(chn, "bears: My SMS parse loop died; code: 'GoogleVoice.ParseError'. Please cycle me." ))
+            return 
 
 
-@hook.command(adminonly=True, autohelp=False)
+@hook.command(adminonly=False, autohelp=False)
 def parsesms(inp, say='', conn=None, bot=None, db=None):
         ".parsesms - force an sms check from Google Voice"
         db_init(db)
@@ -205,14 +210,14 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
         except:
             say(">>> u'Error logging in to Google Voice, please try again in a few minutes.'")
             return
-        say(">>> u'Checking for unread sms'")
-        messagecounter=0
 
         try:
             voice.sms()
         except:
             say(">>> u'Error parsing data from Google Voice'")
             return
+        say(">>> u'Checking for unread sms'")
+        messagecounter=0
         for message in extractsms(voice.sms.html):
             if check_smslog(db, message['id']) == None and message['from'][:-1] not in privatelist:
                 messagecounter=messagecounter+1
