@@ -71,7 +71,7 @@ def opers(inp, bot=None, say=None):
     opers = bot.config["opers"]
     admins = bot.config["admins"]
     allows = admins + opers
-    if mergelist:
+    if allows:
         say("Bot operators are: %s" % format(", ".join(allows)))
     else:
         say("There are currently no bot operators.")
