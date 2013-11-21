@@ -161,12 +161,12 @@ def parseloop(inp, say='', conn=None, bot=None, db=None):
         try:
             voice.login()
         except:
-            print(">>> u'Error logging in to Google Voice :%s:$s'" % (conn.server, conn.port))
+            print(">>> u'Error logging in to Google Voice :%s:%s'" % (conn.server, conn.port))
             return
         try:
             while voice.sms():
                 #voice.sms()
-                print(">>> u'Checking for unread sms'")
+                print(">>> u'Checking for unread sms :%s:%s'" % (conn.server, conn.port))
                 messagecounter=0
                 for message in extractsms(voice.sms.html):
                     if check_smslog(db, message['id']) == None and message['from'][:-1] not in privatelist:
@@ -186,16 +186,17 @@ def parseloop(inp, say='', conn=None, bot=None, db=None):
                                 conn.send(out)
                             mark_as_read(db, str(message['id']))
                 if messagecounter == 0:
-                    print(">>> u'No new SMS found'")
+                    print(">>> u'No new SMS found :%s:%s'" % (conn.server, conn.port))
                 elif messagecounter == 1:
-                    print(">>> u'Outputting "+ str(messagecounter) +" message complete :%s:$s'" % (conn.server, conn.port))
+                    print(">>> u'Outputting "+ str(messagecounter) +" message complete :%s:%s'" % (conn.server, conn.port))
                 else:
-                    print(">>> u'Outputting "+ str(messagecounter) +" messages complete :%s:$s'" % (conn.server, conn.port))
+                    print(">>> u'Outputting "+ str(messagecounter) +" messages complete :%s:%s'" % (conn.server, conn.port))
                 time.sleep(60)
         except:
-            print(">>> u'Error parsing data from Google Voice :%s:$s'" % (conn.server, conn.port))
+            print(">>> u'Error parsing data from Google Voice :%s:%s'" % (conn.server, conn.port))
             for chan in conn.channels:
-                conn.send("PRIVMSG {} :{}".format(chn, "%s: My SMS parse loop died; please restart parseloop :%s:$s" % (", ".join(bot.config["admins"]), conn.server, conn.port)))
+                notified_admins = ", ".join(bot.config["admins"])
+                conn.send("PRIVMSG {} :{}".format(chn, "%s: My SMS parse loop died; please restart parseloop :%s:%s" % (notified_admins, conn.server, conn.port)))
             return 
 
 
