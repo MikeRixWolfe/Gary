@@ -246,7 +246,7 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
 
 @hook.command
 def phonebook(inp, nick='', input=None, db=None):
-    ".phonebook <name|10 digit number> - gets or sets phone number"
+    ".phonebook <name|10 digit number|delete> - gets a users phone number, or sets/deletes your phone number"
     db_init(db)
     name_or_num = inp.strip()
     if name_or_num == '2692053877':
@@ -256,6 +256,10 @@ def phonebook(inp, nick='', input=None, db=None):
             "values(?, ?)", (nick.lower(), name_or_num))
         db.commit()
         return "Number saved!"
+    if name_or_num == 'delete':
+        db.execute("delete from phonebook where "
+            "name = (?)", (nick.lower(),))
+        return "Your number has been removed from my phonebook."
     else:
         num_from_db = get_phonenumber(db, name_or_num.lower())
         if num_from_db != None:
