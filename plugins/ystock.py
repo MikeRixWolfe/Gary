@@ -10,8 +10,10 @@ def stock(inp):
     url = ('http://query.yahooapis.com/v1/public/yql?format=json&'
            'env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys')
 
-    parsed = http.get_json(url, q='select * from yahoo.finance.quote '
-                           'where symbol in ("%s")' % inp)  # heh, SQLI
+    try:
+        parsed = http.get_json(url, q='select * from yahoo.finance.quote where symbol in ("%s")' % inp)  # heh, SQLI
+    except:
+        return "Error parsing Yahoo Fianance API, please try again in a few minutes"
 
     quote = parsed['query']['results']['quote']
 

@@ -150,18 +150,18 @@ def call(inp, say='', nick='', input=None, db=None, bot=None):
         return "Your number needs to be in my phonebook to use this function"
 
 
-@hook.singlethread
-@hook.event('JOIN')
-def pingparsesms(paraml, conn=None, bot=None, db=None):
-    if paraml[0] == '#geekboy' and conn.port == 7666: #dont want it in every channel/server
-        print(">>> u'Beginning SMS parse loop'")
+#@hook.singlethread
+@hook.command(adminonly=True, autohelp=False)
+def parseloop(inp, say='', conn=None, bot=None, db=None):
+        #if paraml[0] == '#geekboy' and conn.port == 7666: #dont want it in every channel/server
+        say("Ok, beginning SMS parse loop for %s:%s" % (conn.server, conn.port)) #say(">>> u'Beginning SMS parse loop'")
         db_init(db)
         privatelist = bot.config["gvoice"]["private"]
         voice = Voice()
         try:
             voice.login()
         except:
-            print(">>> u'Error logging in to Google Voice'")
+            print(">>> u'Error logging in to Google Voice :%s:$s'" % (conn.server, conn.port))
             return
         try:
             while voice.sms():
@@ -188,14 +188,14 @@ def pingparsesms(paraml, conn=None, bot=None, db=None):
                 if messagecounter == 0:
                     print(">>> u'No new SMS found'")
                 elif messagecounter == 1:
-                    print(">>> u'Outputting "+ str(messagecounter) +" message complete'")
+                    print(">>> u'Outputting "+ str(messagecounter) +" message complete :%s:$s'" % (conn.server, conn.port))
                 else:
-                    print(">>> u'Outputting "+ str(messagecounter) +" messages complete'")
+                    print(">>> u'Outputting "+ str(messagecounter) +" messages complete :%s:$s'" % (conn.server, conn.port))
                 time.sleep(60)
         except:
-            print(">>> u'Error parsing data from Google Voice'")
+            print(">>> u'Error parsing data from Google Voice :%s:$s'" % (conn.server, conn.port))
             for chan in conn.channels:
-                conn.send("PRIVMSG {} :{}".format(chn, "bears: My SMS parse loop died; code: 'GoogleVoice.ParseError'. Please cycle me." ))
+                conn.send("PRIVMSG {} :{}".format(chn, "%s: My SMS parse loop died; please restart parseloop :%s:$s" % (", ".join(bot.config["admins"]), conn.server, conn.port)))
             return 
 
 

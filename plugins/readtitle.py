@@ -10,13 +10,14 @@ v0.5    if any(): return used to handle the keywords to not match urls against
 v0.6    changed regex again!
 	2013-09-25 - modified by MikeFightsBears to add a tinyurl to beginning of name
 '''
-import re
-
-from util import hook, http,web
+import re, time, locale, random
+from bs4 import BeautifulSoup
+from util import hook, http, web, text
+from random import choice
 
 html_re = (r'https?\://(www\.)?\w+\.[a-zA-Z]{2,5}(\S)+', re.I)
 
-skipurls = ["youtube","youtu.be","tinyurl"]
+skipurls = ["youtube","youtu.be","tinyurl", "rd.io", "rdio", "reddit", "spotify", "open.spotify.com", "steam"]
 
 @hook.regex(*html_re)
 def readtitle(match, say=None, nick=None):
@@ -93,4 +94,102 @@ def tinyurl(inp, say=''):
         say (http.open(inp.group()).url.strip())
     except http.URLError, e:
         pass
+
+
+rdio_re = (r'(.*:)//(rd.io|www.rdio.com|rdio.com)(:[0-9]+)?(.*)', re.I)
+
+
+@hook.regex(*rdio_re)
+def rdio_url(match, bot=None):
+    api_key = bot.config.get("api_keys", {}).get("rdio_key")
+    api_secret = bot.config.get("api_keys", {}).get("rdio_secret")
+    if not api_key:
+        return None
+    url = match.group(1) + "//" + match.group(2) + match.group(4)
+    consumer = oauth.Consumer(api_key, api_secret)
+    client = oauth.Client(consumer)
+    response = client.request('http://api.rdio.com/1/', 'POST',
+                              urllib.urlencode({'method': 'getObjectFromUrl', 'url': url}))
+    data = json.loads(response[1])
+    info = data['result']
+    if 'name' in info:
+        if 'artist' in info and 'album' in info:  #Track
+            name = info['name']
+            artist = info['artist']
+            album = info['album']
+            return u"Rdio track: \x02{}\x02 by \x02{}\x02 - {}".format(name, artist, album)
+        elif 'artist' in info and not 'album' in info:  #Album
+            name = info['name']
+            artist = info['artist']
+            return u"Rdio album: \x02{}\x02 by \x02{}\x02".format(name, artist)
+        else:  #Artist
+            name = info['name']
+            return u"Rdio artist: \x02{}\x02".format(name)
+
+
+reddit_re = (r'.*((www\.)?reddit\.com/r[^ ]+)', re.I)
+
+@hook.regex(*reddit_re)
+def reddit_url(match):
+    thread = http.get_html(match.group(0))
+
+    title = thread.xpath('//title/text()')[0]
+    upvotes = thread.xpath("//span[@class='upvotes']/span[@class='number']/text()")[0]
+    downvotes = thread.xpath("//span[@class='downvotes']/span[@class='number']/text()")[0]
+    author = thread.xpath("//div[@id='siteTable']//a[contains(@class,'author')]/text()")[0]
+    timeago = thread.xpath("//div[@id='siteTable']//p[@class='tagline']/time/text()")[0]
+    comments = thread.xpath("//div[@id='siteTable']//a[@class='comments']/text()")[0]
+
+    return '\x02{}\x02 - posted by \x02{}\x02 {} ago - {} upvotes, {} downvotes - {}'.format(
+        title, author, timeago, upvotes, downvotes, comments)
+
+
+@hook.regex(r"(http://open\.spotify\.com/track/\S*)", re.I)
+def spotify_parse(inp, say=None):
+  url = inp.group(0)
+  response = http.get_html(url)
+
+  title_parse = response.xpath("//h1[@itemprop='name']")
+  artist_parse = response.xpath("//h2/a")
+  title = title_parse[0].text_content()
+  artist = artist_parse[0].text_content()
+
+  say("Spotify: %s - %s" % (artist, title))
+
+@hook.regex(r"spotify:track:(\S*)", re.I)
+def spotify_parse_uri(inp, say=None):
+  url = "http://open.spotify.com/track/%s" % inp.group(1)
+  response = http.get_html(url)
+
+  title_parse = response.xpath("//h1[@itemprop='name']")
+  artist_parse = response.xpath("//h2/a")
+  title = title_parse[0].text_content()
+  artist = artist_parse[0].text_content()
+
+  say("Spotify: %s - %s" % (artist, title))
+
+steam_re = (r'(.*:)//(store.steampowered.com)(:[0-9]+)?(.*)', re.I)
+
+@hook.regex(*steam_re)
+def steam_url(match):
+    return get_steam_info("http://store.steampowered.com" + match.group(4))
+
+def get_steam_info(url):
+    # we get the soup manually because the steam pages have some odd encoding troubles
+    page = http.get(url)
+    soup = BeautifulSoup(page, 'lxml', from_encoding="utf-8")
+
+    name = soup.find('div', {'class': 'apphub_AppName'}).text
+    desc = ": " + text.truncate_str(soup.find('div', {'class': 'game_description_snippet'}).text.strip())
+
+    # the page has a ton of returns and tabs
+    details = soup.find('div', {'class': 'glance_details'}).text.strip().split(u"\n\n\r\n\t\t\t\t\t\t\t\t\t")
+    genre = " - Genre: " + details[0].replace(u"Genre: ", u"")
+    date = " - Release date: " + details[1].replace(u"Release Date: ", u"")
+    price = ""
+    if not "Free to Play" in genre:
+        price = " - Price: " + soup.find('div', {'class': 'game_purchase_price price'}).text.strip()
+
+    return name + desc + genre + date + price
+
 

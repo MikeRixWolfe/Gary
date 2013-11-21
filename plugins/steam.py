@@ -3,9 +3,6 @@ from util import hook, http, web, text
 from bs4 import BeautifulSoup
 
 
-steam_re = (r'(.*:)//(store.steampowered.com)(:[0-9]+)?(.*)', re.I)
-
-
 def get_steam_info(url):
     # we get the soup manually because the steam pages have some odd encoding troubles
     page = http.get(url)
@@ -23,11 +20,6 @@ def get_steam_info(url):
         price = " - Price: " + soup.find('div', {'class': 'game_purchase_price price'}).text.strip()
 
     return name + desc + genre + date + price
-
-
-#@hook.regex(*steam_re)
-def steam_url(match):
-    return get_steam_info("http://store.steampowered.com" + match.group(4))
 
 
 @hook.command
