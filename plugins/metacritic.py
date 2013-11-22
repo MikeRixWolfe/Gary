@@ -8,14 +8,14 @@ from util import hook, http
 
 @hook.command('mc')
 def metacritic(inp):
-    '.mc [all|movie|tv|album|x360|ps3|pc|ds|3ds|wii|psv] <title> - gets rating for'\
+    '.mc [all|movie|tv|album|x360|ps3|pc|ds|3ds|wii|psv|xbone|ps4] <title> - gets rating for'\
     ' <title> from metacritic on the specified medium'
 
     # if the results suck, it's metacritic's fault
 
     args = inp.strip()
 
-    game_platforms = ('x360', 'ps3', 'pc', 'ds', 'wii', '3ds', 'gba', 'psv')
+    game_platforms = ('x360', 'ps3', 'pc', 'ds', 'wii', '3ds', 'gba', 'psv', 'xbone', 'ps4')
     all_platforms = game_platforms + ('all', 'movie', 'tv', 'album')
 
     try:
@@ -41,8 +41,8 @@ def metacritic(inp):
         return 'error fetching results'
 
     ''' result format:
-    - game result, with score
-    - subsequent results are the same structure, without first_result class
+    -- game result, with score
+    -- subsequent results are the same structure, without first_result class
     <li class="result first_result">
         <div class="result_type">
             <strong>Game</strong>
@@ -64,9 +64,9 @@ def metacritic(inp):
         </div>
     </li>
 
-    - other platforms are the same basic layout
-    - if it doesn't have a score, there is no div.basic_score
-    - the <div class="result_type"> changes content for non-games:
+    -- other platforms are the same basic layout
+    -- if it doesn't have a score, there is no div.basic_score
+    -- the <div class="result_type"> changes content for non-games:
     <div class="result_type"><strong>Movie</strong></div>
     '''
 
@@ -125,11 +125,11 @@ def metacritic(inp):
         release = None
 
     try:
-        score = result.find_class('metascore')[0].text_content()
+        score = result.find_class('metascore_w')[0].text_content()
     except IndexError:
         score = None
 
-    return '[%s] %s - %s, %s - %s' % (plat.upper(), name,
+    return '[%s] %s - %s, %s -- %s' % (plat.upper(), name,
             score or 'no score',
             'release: %s' % release if release else 'unreleased',
             link)

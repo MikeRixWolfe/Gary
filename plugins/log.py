@@ -39,12 +39,12 @@ def db_init(db):
 
 
 def get_log_filename(dir, server, chan):
-    return os.path.join(dir, 'log', gmtime('%Y'), server,
-            (gmtime('%%s.%m-%d.log') % chan).lower())
+    return os.path.join(dir, 'log',  localtime('%Y'), server,
+            (localtime('%%s.%m-%d.log') % chan).lower())
 
 
-def gmtime(format):
-    return time.strftime(format, time.gmtime())
+def localtime(format):
+    return time.strftime(format, time.localtime())
 
 
 def beautify(input):
@@ -92,7 +92,7 @@ def get_log_fd(dir, server, chan):
 @hook.singlethread
 @hook.event('*')
 def log(paraml, input=None, bot=None, db=None):
-    timestamp = gmtime(timestamp_format)
+    timestamp = localtime(timestamp_format)
 
     fd = get_log_fd(bot.persist_dir, input.server, 'raw')
     fd.write(timestamp + ' ' + input.raw + '\n')
