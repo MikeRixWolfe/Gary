@@ -151,7 +151,17 @@ def call(inp, say='', nick='', input=None, db=None, bot=None):
         return "Your number needs to be in my phonebook to use this function"
 
 
-@hook.command(adminonly=True, autohelp=False)
+#@hook.command(autohelp=False)
+def parsestatus(inp, conn=None)
+    server = "%s:%s" % (conn.server,conn.port)
+    if server in running_parseloop_threads:
+        return "I am already parsing SMS for %s" % server
+    else:
+        return "I am not parsing SMS for this server"
+
+
+#@hook.command(adminonly=True, autohelp=False)
+@hook.command(autohelp=False)
 def parseloop(inp, say='', conn=None, bot=None, db=None):
     server = "%s:%s" % (conn.server,conn.port)
     global running_parseloop_threads
