@@ -156,7 +156,7 @@ def call(inp, say='', nick='', input=None, db=None, bot=None):
 def parseloop(inp, say='', conn=None, bot=None, db=None):
     server = "%s:%s" % (conn.server,conn.port)
     global running_parseloop_threads
-    if server == "localhost:6667":
+    if server != "localhost:7666":
         return
     if server in running_parseloop_threads:
         print(">>> u'I am already parsing SMS for :%s'" % server)
