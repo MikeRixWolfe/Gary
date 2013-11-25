@@ -111,7 +111,7 @@ def sms(inp, nick='', say='', input=None, db=None, bot=None):
     	    voice.send_sms(phoneNumber, text)
     	    return "SMS sent"
         except:
-            return "Google voice api error, please try again in a few minutes."
+            return "Google Voice API error, please try again in a few minutes."
     else:
         return "Can only SMS from public channels to control abuse."
 
@@ -143,7 +143,7 @@ def call(inp, say='', nick='', input=None, db=None, bot=None):
         try:
             voice.login()
         except:
-            return "Google voice login error, please try again in a few minutes."
+            return "Google Voice login error, please try again in a few minutes."
 
         voice.call(outgoingNumber, forwardingNumber)
         say("Calling %s from %s..." % (outgoingNumber, forwardingNumber))
@@ -151,25 +151,19 @@ def call(inp, say='', nick='', input=None, db=None, bot=None):
         return "Your number needs to be in my phonebook to use this function"
 
 
-#@hook.command(autohelp=False)
-def parsestatus(inp, conn=None)
-    server = "%s:%s" % (conn.server,conn.port)
-    if server in running_parseloop_threads:
-        return "I am already parsing SMS for %s" % server
-    else:
-        return "I am not parsing SMS for this server"
-
-
 #@hook.command(adminonly=True, autohelp=False)
-@hook.command(autohelp=False)
+@hook.event('JOIN')
 def parseloop(inp, say='', conn=None, bot=None, db=None):
     server = "%s:%s" % (conn.server,conn.port)
     global running_parseloop_threads
+    if server == "localhost:6667":
+        return
     if server in running_parseloop_threads:
-        return "I am already parsing SMS for %s" % server
+        print(">>> u'I am already parsing SMS for :%s'" % server)
+        return
     else:
         running_parseloop_threads.append(server)
-        say("Ok, beginning SMS parse loop for %s" % server) #say(">>> u'Beginning SMS parse loop'")i
+        print(">>> u'Beginning SMS parse loop for %s'" % server)
     db_init(db)
     privatelist = bot.config["gvoice"]["private"]
     voice = Voice()
@@ -262,17 +256,21 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
 
 
 @hook.command
-def phonebook(inp, nick='', input=None, db=None):
+def phonebook(inp, nick='', input=None, db=None, bot=None):
     ".phonebook <name|10 digit number|delete> - gets a users phone number, or sets/deletes your phone number"
     db_init(db)
+    privatelist = bot.config["gvoice"]["private"]
     name_or_num = inp.strip()
-    if name_or_num == '2692053877':
-        return "Fuck you."
-    if re.match("[0-9]{10}", name_or_num):
-        db.execute("insert or replace into phonebook(name, phonenumber)"
-            "values(?, ?)", (nick.lower(), name_or_num))
-        db.commit()
-        return "Number saved!"
+    if name_or_num in privatelist:
+        return "Nope."
+    if name_or_num.isdigit():
+        if len(name_or_num) == 10:
+            db.execute("insert or replace into phonebook(name, phonenumber)"
+                "values(?, ?)", (nick.lower(), name_or_num))
+            db.commit()
+            return "Number saved!"
+        else:
+            return "Please be sure your are inputting a 10 digit number."
     if name_or_num == 'delete':
         db.execute("delete from phonebook where "
             "name = (?)", (nick.lower(),))
