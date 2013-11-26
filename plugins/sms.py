@@ -88,9 +88,9 @@ def sms(inp, nick='', say='', input=None, db=None, bot=None):
 
     	operands = inp.split(' ', 1)
     	name_or_num = operands[0].strip()
-    	text = "<"+ nick + "> " + operands[1].strip() #nfixme?
+    	text = "<"+ nick + "> " + operands[1].strip()
         
-        if re.match("[0-9]{10}", name_or_num):
+        if len(name_or_num) == 10 and name_or_num.isdigit():
             phoneNumber = name_or_num
     	else:
             num_from_db = get_phonenumber(db, name_or_num.lower())
@@ -116,42 +116,44 @@ def sms(inp, nick='', say='', input=None, db=None, bot=None):
         return "Can only SMS from public channels to control abuse."
 
 
-@hook.command
-def call(inp, say='', nick='', input=None, db=None, bot=None):
-    ".call <10 digit phone number|user in phonebook> - calls specified <number|user> and connects the call to your number from .phonebook via Google Voice"
+#@hook.command(adminonly=True, autohelp=False)
+#def ring(inp, say='', nick='', input=None, db=None, bot=None):
+#    ".call <10 digit number|user in phonebook> - calls specified <number|user> and connects the call to your number from .phonebook via Google Voice"
+#    return "Your number needs to be in my phonebook to use this function"
+
+
+@hook.command(adminonly=True, autohelp=False)
+def ring(inp, say='', nick='', input=None, db=None, bot=None):
+    ".ring <10 digit number|user in phonebook> - calls specified <number|user> and connects the call to your number from .phonebook via Google Voice"
     db_init(db)
     privatelist = bot.config["gvoice"]["private"]
     forwardingNumber = get_phonenumber(db, nick)
     if forwardingNumber != None:
         voice = Voice()
-        
         name_or_num = inp.strip(' ').decode('utf8', 'ignore')
         if not name_or_num.isdigit():
             outgoingNumber = get_phonenumber(db, name_or_num)
             if outgoingNumber == None:
                 return "That user isn't in my phonebook."
         else:
-            if re.match("[0-9]{10}", name_or_num):
+            if len(name_or_num) == 10 and name_or_num.isdigit():
                 outgoingNumber = name_or_num
             else:
                 "Plese make sure the number is a 10 digit numeric."   
-
         if outgoingNumber in privatelist:
             say("I'm sorry %s, I'm afraid I caan't do that." % nick)
             return
-
         try:
             voice.login()
         except:
             return "Google Voice login error, please try again in a few minutes."
-
         voice.call(outgoingNumber, forwardingNumber)
         say("Calling %s from %s..." % (outgoingNumber, forwardingNumber))
     else:
         return "Your number needs to be in my phonebook to use this function"
 
 
-#@hook.command(adminonly=True, autohelp=False)
+@hook.command(adminonly=True, autohelp=False)
 @hook.event('JOIN')
 def parseloop(inp, say='', conn=None, bot=None, db=None):
     server = "%s:%s" % (conn.server,conn.port)

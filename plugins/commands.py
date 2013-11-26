@@ -29,7 +29,7 @@ def disable_command(inp, say=None, notice=None, bot=None, config=None):
     if target in commandlist:
         say("%s is already disabled." % format(target))
     else:
-        say("%s has been diabled." % format(target))
+        say("%s has been disabled." % format(target))
         commandlist.append(target)
         commandlist.sort()
         json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
