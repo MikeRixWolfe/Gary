@@ -116,12 +116,6 @@ def sms(inp, nick='', say='', input=None, db=None, bot=None):
         return "Can only SMS from public channels to control abuse."
 
 
-#@hook.command(adminonly=True, autohelp=False)
-#def ring(inp, say='', nick='', input=None, db=None, bot=None):
-#    ".call <10 digit number|user in phonebook> - calls specified <number|user> and connects the call to your number from .phonebook via Google Voice"
-#    return "Your number needs to be in my phonebook to use this function"
-
-
 @hook.command(adminonly=True, autohelp=False)
 def ring(inp, say='', nick='', input=None, db=None, bot=None):
     ".ring <10 digit number|user in phonebook> - calls specified <number|user> and connects the call to your number from .phonebook via Google Voice"
