@@ -147,6 +147,7 @@ def ring(inp, say='', nick='', input=None, db=None, bot=None):
         return "Your number needs to be in my phonebook to use this function"
 
 
+@hook.singlethread
 @hook.command(adminonly=True, autohelp=False)
 @hook.event('JOIN')
 def parseloop(inp, say='', conn=None, bot=None, db=None):
@@ -199,11 +200,11 @@ def parseloop(inp, say='', conn=None, bot=None, db=None):
             time.sleep(60)
     except:
         print(">>> u'Error parsing data from Google Voice :%s'" % server)
-        running_parseloop_threads.remove(server)
+        #running_parseloop_threads.remove(server)
         # state error in public channels rather than PMs so non admins know the loop is down
-        for chan in conn.channels:
-            notified_admins = ", ".join(bot.config["admins"])
-            conn.send("PRIVMSG {} :{}".format(chn, "%s: My SMS parse loop died; please restart parseloop :%s" % (notified_admins, server)))
+        #for chan in conn.channels:
+        #    notified_admins = ", ".join(bot.config["admins"])
+        #    conn.send("PRIVMSG {} :{}".format(chn, "%s: My SMS parse loop died; please restart parseloop :%s" % (notified_admins, server)))
         return 
 
 
