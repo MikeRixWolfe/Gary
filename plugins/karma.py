@@ -47,3 +47,14 @@ def karma(inp, chan='', say=None, db=None, input=None):
         say("%s has %s karma" % (input.msg[7:].strip('()? '), karma))
     else:
         say("%s has neutral karma" % input.msg[7:].strip('()? '))
+
+@hook.command(autohelp=False)
+def topkarma(inp, chan='', say=None, db=None):
+    ".topkarma - returns top 3 karma'd items"
+    db_init(db)
+    items = db.execute("select word, karma from karma where chan=? order by karma desc limit 3",
+        (chan,)).fetchall()
+    message = "Top karma'd items: "
+    for item in items:
+        message = message + item[0] + " with " + str(item[1]) + ", "
+    say(message[:-2])
