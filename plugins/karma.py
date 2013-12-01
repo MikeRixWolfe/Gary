@@ -60,7 +60,7 @@ def setkarma(inp, chan='', db=None):
     karma = inp.group(2)
     db.execute("insert or replace into karma(chan, word, karma)"
         "values(?,?,?)", (chan, word.lower(), karma))
-    print ">>> u'Value of %s has been set to %s'" % (word, karma)
+    print ">>> u'Karma of %s set to %s :%s'" % (word, karma, chan)
 
 
 @hook.command(autohelp=False)
