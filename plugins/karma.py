@@ -48,6 +48,7 @@ def karma(inp, chan='', say=None, db=None, input=None):
     else:
         say("%s has neutral karma" % input.msg[7:].strip('()? '))
 
+
 @hook.command(autohelp=False)
 def topkarma(inp, chan='', say=None, db=None):
     ".topkarma - returns top 3 karma'd items"
@@ -58,3 +59,16 @@ def topkarma(inp, chan='', say=None, db=None):
     for item in items:
         message = message + item[0] + " with " + str(item[1]) + ", "
     say(message[:-2])
+
+
+@hook.command(autohelp=False)
+def botkarma(inp, chan='', say=None, db=None):
+    ".botkarma - returns top 3 karma'd items"
+    db_init(db)
+    items = db.execute("select word, karma from karma where chan=? order by karma limit 3",
+        (chan,)).fetchall()
+    message = "Lowest karma'd items: "
+    for item in items:
+        message = message + item[0] + " with " + str(item[1]) + ", "
+    say(message[:-2])
+
