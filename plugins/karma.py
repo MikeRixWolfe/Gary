@@ -26,19 +26,19 @@ def karma_edit(inp, chan='', nick='', say=None, db=None):
     db_init(db)
     word = inp.group(1)[:-2].strip('() ')
     if word.lower() == nick.lower():
-	say("Please do not karma yourself.")
+        say("Please do not karma yourself.")
     else:
-	karma = get_karma(db, chan, word)
-	delta = inp.group(1)[-2:].strip()
-	if delta == "++":
-	    karma = karma + 1
-	elif delta == "--":
-	    karma = karma - 1
+        karma = int(get_karma(db, chan, word))
+        delta = inp.group(1)[-2:].strip()
+        if delta == "++":
+            karma = karma + 1
+        elif delta == "--":
+            karma = karma - 1
         else:
-	    karma = karma
-	db.execute("insert or replace into karma(chan, word, karma)"
-	    "values(?,?,?)", (chan, word.lower(), karma))
-	db.commit()
+            karma = karma
+        db.execute("insert or replace into karma(chan, word, karma)"
+            "values(?,?,?)", (chan, word.lower(), karma))
+        db.commit()
 
 
 @hook.command
@@ -53,19 +53,25 @@ def karma(inp, chan='', say=None, db=None, input=None):
         say("%s has neutral karma" % inp.strip('()? '))
 
 
-@hook.regex(r'^(.+)(?: has an all-time net karma of )(\d+)(?:.+)')
-def setkarma(inp, chan='', db=None):
+@hook.regex(r'^(.+)(?: has an all-time net karma of )(-)?(\d+)(?:\ .+)?')
+def setkarma(inp, nick='', chan='', db=None):
     db_init(db)
     word = inp.group(1)
-    karma = inp.group(2)
-    db.execute("insert or replace into karma(chan, word, karma)"
-        "values(?,?,?)", (chan, word.lower(), karma))
-    print ">>> u'Karma of %s set to %s :%s'" % (word, karma, chan)
+    karma = int(inp.group(3))
+    if inp.group(2) != None:
+        karma = -karma
+    karma_from_db = int(get_karma(db, chan, word))
+    if nick != "extrastout":
+        return #"Please don't impersonate others." 
+    else:
+        db.execute("insert or replace into karma(chan, word, karma)"
+            "values(?,?,?)", (chan, word.lower(), karma))
+        print ">>> u'Karma of %s set to %s :%s'" % (word, karma, chan)
 
 
 @hook.command(autohelp=False)
 def topkarma(inp, chan='', say=None, db=None):
-    ".topkarma - returns top 3 karma'd items"
+    ".topkarma - returns 3 top karma'd items"
     db_init(db)
     items = db.execute("select word, karma from karma where chan=? order by karma desc limit 3",
         (chan,)).fetchall()
@@ -77,7 +83,7 @@ def topkarma(inp, chan='', say=None, db=None):
 
 @hook.command(autohelp=False)
 def botkarma(inp, chan='', say=None, db=None):
-    ".botkarma - returns top 3 karma'd items"
+    ".botkarma - returns 3 lowest karma'd items"
     db_init(db)
     items = db.execute("select word, karma from karma where chan=? order by karma limit 3",
         (chan,)).fetchall()
