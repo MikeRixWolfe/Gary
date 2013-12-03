@@ -147,9 +147,9 @@ def ring(inp, say='', nick='', input=None, db=None, bot=None):
         return "Your number needs to be in my phonebook to use this function"
 
 
-@hook.singlethread
+#@hook.singlethread
 @hook.command(adminonly=True, autohelp=False)
-@hook.event('JOIN')
+#@hook.event('JOIN')
 def parseloop(inp, say='', conn=None, bot=None, db=None):
     server = "%s:%s" % (conn.server,conn.port)
     global running_parseloop_threads
