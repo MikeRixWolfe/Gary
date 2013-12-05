@@ -116,9 +116,9 @@ def sms(inp, nick='', say='', input=None, db=None, bot=None):
         return "Can only SMS from public channels to control abuse."
 
 
-@hook.command(adminonly=True, autohelp=False)
-def ring(inp, say='', nick='', input=None, db=None, bot=None):
-    ".ring <10 digit number|user in phonebook> - calls specified <number|user> and connects the call to your number from .phonebook via Google Voice"
+@hook.command(adminonly=True)
+def call(inp, say='', nick='', input=None, db=None, bot=None):
+    ".call <10 digit number|user in phonebook> - calls specified <number|user> and connects the call to your number from .phonebook via Google Voice"
     db_init(db)
     privatelist = bot.config["gvoice"]["private"]
     forwardingNumber = get_phonenumber(db, nick)
@@ -155,7 +155,7 @@ def parseloop(inp, say='', conn=None, bot=None, db=None):
     global running_parseloop_threads
     if server != "localhost:7666":
         return
-    if server in running_parseloop_threads:
+    if len(running_parseloop_threads) > 0:
         print(">>> u'I am already parsing SMS for :%s'" % server)
         return
     else:
@@ -169,8 +169,8 @@ def parseloop(inp, say='', conn=None, bot=None, db=None):
     except:
         print(">>> u'Error logging in to Google Voice :%s'" % server)
         return
-    try:
-        while voice.sms():
+    while voice.sms():
+        try:
             #voice.sms()
             print(">>> u'Checking for unread sms :%s'" % server)
             messagecounter=0
@@ -198,15 +198,16 @@ def parseloop(inp, say='', conn=None, bot=None, db=None):
             else:
                 print(">>> u'Outputting "+ str(messagecounter) +" messages complete :%s'" % server)
             time.sleep(60)
-    except:
-        print(">>> u'Error parsing data from Google Voice :%s'" % server)
-        #running_parseloop_threads.remove(server)
-        # state error in public channels rather than PMs so non admins know the loop is down
-        #for chan in conn.channels:
-        #    notified_admins = ", ".join(bot.config["admins"])
-        #    conn.send("PRIVMSG {} :{}".format(chn, "%s: My SMS parse loop died; please restart parseloop :%s" % (notified_admins, server)))
-        return 
-
+        except:
+            print(">>> u'Error parsing data from Google Voice :%s'" % server)
+            return
+            #running_parseloop_threads.remove(server)
+            # state error in public channels rather than PMs so non admins know the loop is down
+            #for chan in conn.channels:
+            #    notified_admins = ", ".join(bot.config["admins"])
+            #    conn.send("PRIVMSG {} :{}".format(chn, "%s: My SMS parse loop died; please restart parseloop :%s" % (notified_admins, server)))
+            #break
+        
 
 @hook.command(adminonly=False, autohelp=False)
 def parsesms(inp, say='', conn=None, bot=None, db=None):
@@ -219,7 +220,6 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
         except:
             say(">>> u'Error logging in to Google Voice, please try again in a few minutes.'")
             return
-
         try:
             voice.sms()
         except:

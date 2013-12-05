@@ -27,13 +27,16 @@ def parse_html(document):
 
 @hook.command
 def ruby(inp, say=None):
-  '''.rb / .ruby <code> - Executes Ruby code.'''
+    '''.rb / .ruby <code> - Executes Ruby code.'''
+    
+    code = inp.split(" ")[0:]
+    code = " ".join(code)
 
-  code = inp.split(" ")[0:]
-  code = " ".join(code)
+    response = get_response(code)
+    document, url = response
+    output = parse_html(document)
 
-  response = get_response(code)
-  document, url = response
-  output = parse_html(document)
-
-  return url
+    message = ""
+    for line in output:
+        message += line[-1].decode('utf-8') + " "
+    return message
