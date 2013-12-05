@@ -1,7 +1,7 @@
 from util import hook
 
-@hook.command('hello')
+@hook.command('test', autohelp=False)
 @hook.command(autohelp=False)
-def test(inp, nick='', say=None):
+def hello(inp, nick='', say=None):
     ".test - tests your hilight window"
     say("Hello %s" % nick)
