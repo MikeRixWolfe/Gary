@@ -8,7 +8,8 @@ v0.4    cant write regex to save my life so used split to break match at whitesp
         in case someone posts a URL and also says something about it afterwards
 v0.5    if any(): return used to handle the keywords to not match urls against
 v0.6    changed regex again!
-	2013-09-25 - modified by MikeFightsBears to add a tinyurl to beginning of name
+v0.7    inserted isgd link to beginning of each title
+v0.8    added url hooks from all other plugins
 '''
 import re, time, locale, random
 from bs4 import BeautifulSoup
