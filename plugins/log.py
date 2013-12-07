@@ -8,7 +8,6 @@ import codecs
 import time
 import re
 import datetime
-import time
 
 from util import hook
 
