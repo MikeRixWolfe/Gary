@@ -148,8 +148,8 @@ def call(inp, say='', nick='', input=None, db=None, bot=None):
 
 
 #@hook.singlethread
-@hook.command(adminonly=True, autohelp=False)
-#@hook.event('JOIN')
+#@hook.command(adminonly=True, autohelp=False)
+@hook.event('JOIN')
 def parseloop(inp, say='', conn=None, bot=None, db=None):
     server = "%s:%s" % (conn.server,conn.port)
     global running_parseloop_threads

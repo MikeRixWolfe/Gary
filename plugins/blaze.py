@@ -14,6 +14,6 @@ def localtime(format):
 def blaze(inp, say=''):
     while True:
         timestamp = localtime(timestamp_format)
-        if timestamp == '03:17': # my IRC server is in  a different time zone and off by 3 minutes, dont  judge me lol
+        if timestamp == '03:20': # my IRC server is in  a different time zone lol
             say("4:20 BLAZE IT!")
         time.sleep(60)
