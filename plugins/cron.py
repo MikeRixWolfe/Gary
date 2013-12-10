@@ -51,6 +51,13 @@ def remove_event(db, time, chan, msg, set_by):
     return
 
 
+def clean_db(db, time, chan):
+    db.execute("delete from cron where time<? and chan=lower(?)",
+        (time, chan.lower()))
+    db.commit()
+    return
+
+
 @hook.event('JOIN')
 def cron(inp, say='', chan='', db=None):
     db_init(db)
@@ -59,7 +66,8 @@ def cron(inp, say='', chan='', db=None):
         rows = get_events(db, datestamp, chan)
         for row in rows:
             say("%s: %s" % (row[1], row[0]))
-            remove_event(db, datestamp, row[2], row[0], row[1])
+            #remove_event(db, datestamp, row[2], row[0], row[1])
+        clean_db(db, datestamp, chan)
         time.sleep(30)
 
 
