@@ -75,7 +75,7 @@ def cron(inp, say='', chan='', db=None):
 
 
 @hook.event('JOIN')
-def blaze(inp, say=''):
+def blaze(inp, say='', chan=''):
     if chan[0] != '#':
         return
     print ">>> u'Beginning blaze loop :%s'" % chan

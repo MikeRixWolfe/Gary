@@ -8,6 +8,8 @@ import json
 from util import hook, http, text
 from datetime import datetime
 
+running_sale_loops = []
+
 def get_frontpage():
     sales_url = "http://store.steampowered.com/api/featured/"
     sales = http.get_json(sales_url)
@@ -23,7 +25,7 @@ def get_sales():
 @hook.command()
 def steamsales(inp, say=''):
         ".steamsales <flash|specials|top_sellers|daily> - Check Steam for specified sales; Displays special event deals on top of chosen deals."
-        options={"flash": "Flash/Featured Sales", "specials" : "Specials", "top_sellers" : "Top Sellers", "daily" : "Daily Deal"}
+        options={"flash": "Flash Sales", "specials" : "Specials", "top_sellers" : "Top Sellers", "daily" : "Daily Deal"}
     
         # Verify and stage input data
         inp = inp.lower().split()
@@ -36,7 +38,7 @@ def steamsales(inp, say=''):
         data = get_sales()
         flash_data = get_frontpage()
         data["flash"] = {}
-        data["flash"]["name"] = "Flash/Featured Sales"
+        data["flash"]["name"] = "Flash Sales"
         data["flash"]["items"] = flash_data["large_capsules"]
 
         # Clean trash data
@@ -88,21 +90,22 @@ def steamsales(inp, say=''):
 @hook.event('JOIN')
 def saleloop(inp, say='', chan=''):
     # Don't spawn threads for private messages
-    if chan[0] != '#':
-        return
+    global running_sale_loops
+    if chan[0] != '#' or chan in running_sale_loops:
+        return 
+    running_sale_loops.append(chan)
+    prev_sales = {}
 
     print(">>> u'Beginning check for new Steam sales :%s'" % chan)
-    prev_sales = {}
     while True:
         # Fetch data
         data = get_sales()
         flash_data = get_frontpage()
         data["flash"] = {}
-        data["flash"]["name"] = "Flash/Featured"
+        data["flash"]["name"] = "Flash Sales"
         data["flash"]["items"] = flash_data["large_capsules"]
         
         # Mask data
-        #del data["flash"]
         del data["specials"], data["coming_soon"], data["top_sellers"], data["new_releases"], data["genres"], data["trailerslideshow"], data["status"]
 
         # Format data
@@ -146,6 +149,7 @@ def saleloop(inp, say='', chan=''):
             message = message.strip(':; ')
             if message != "\x02New " + category + "\x0F":
                 say(message)
+        
         prev_sales = sales
         time.sleep(1200)
 
