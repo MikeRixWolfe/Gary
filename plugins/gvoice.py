@@ -77,43 +77,39 @@ def extractsms(htmlsms):
 @hook.command
 def sms(inp, nick='', say='', input=None, db=None, bot=None):
     ".sms <10 digit number|name in phonebook> <message> - sends a text message to a specified number or recipient via Google Voice"
-    if input.chan[0] == '#':
-    	db_init(db)
-        voice = Voice()
-        privatelist = bot.config["gvoice"]["private"]
-        try:
-            inp=inp.strip().decode('utf8','ignore')
-        except:
-            return "Error sending SMS; message contains unsupported characters"
-
-    	operands = inp.split(' ', 1)
-    	name_or_num = operands[0].strip()
-    	text = "<"+ nick + "> " + operands[1].strip()
-        
-        if len(name_or_num) == 10 and name_or_num.isdigit():
-            phoneNumber = name_or_num
-    	else:
-            num_from_db = get_phonenumber(db, name_or_num.lower())
-            if num_from_db != None:
-        	    phoneNumber = num_from_db
-            else:
-        	    return "Sorry, I don't have that user in my phonebook."
-
-        if phoneNumber in privatelist:
-            say("I'm sorry %s, I'm afraid I can't do that." % nick)
-            return
-
-        try:
-            voice.login()
-        except:
-            return "Google voice login error, please try again in a few minutes."
-        try:
-    	    voice.send_sms(phoneNumber, text)
-    	    return "SMS sent"
-        except:
-            return "Google Voice API error, please try again in a few minutes."
-    else:
+    if input.chan[0] != '#':
         return "Can only SMS from public channels to control abuse."
+    db_init(db)
+    voice = Voice()
+    privatelist = bot.config["gvoice"]["private"]
+    try:
+        inp=inp.strip().decode('utf8','ignore')
+    except:
+        return "Error sending SMS; message contains unsupported characters"
+
+    operands = inp.split(' ', 1)
+    name_or_num = operands[0].strip()
+    text = "<"+ nick + "> " + operands[1].strip()
+        
+    if len(name_or_num) == 10 and name_or_num.isdigit():
+        phoneNumber = name_or_num
+    else:
+        num_from_db = get_phonenumber(db, name_or_num.lower())
+        if num_from_db != None:
+            phoneNumber = num_from_db
+        else:
+            return "Sorry, I don't have that user in my phonebook."
+
+    if phoneNumber in privatelist:
+        say("I'm sorry %s, I'm afraid I can't do that." % nick)
+    return
+
+    try:
+        voice.login()
+        voice.send_sms(phoneNumber, text)
+        return "SMS sent"
+    except:
+        return "Google Voice API error, please try again in a few minutes."
 
 
 @hook.command(adminonly=True)

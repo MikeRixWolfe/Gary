@@ -58,8 +58,11 @@ def clean_db(db, time, chan):
     return
 
 
-@hook.event('JOIN')
+#@hook.event('JOIN')
+@hook.command(autohelp=False, adminonly=True)
 def cron(inp, say='', chan='', db=None):
+    if chan[0] != '#':
+        return
     db_init(db)
     while True:
         datestamp = str(datetime.datetime.now(EST()))[:16]
@@ -73,6 +76,9 @@ def cron(inp, say='', chan='', db=None):
 
 @hook.event('JOIN')
 def blaze(inp, say=''):
+    if chan[0] != '#':
+        return
+    print ">>> u'Beginning blaze loop :%s'" % chan
     while True:
         timestamp = localtime(timestamp_format)
         if timestamp == '03:20': # my IRC server is in  a different time zone lol
