@@ -29,7 +29,7 @@ def get_sales(mask_items):
         
     # Aggregate data
     data["flash"] = {}
-    data["flash"]["name"] = "Flash Sales"
+    data["flash"]["name"] = "Flash/Featured Sales"
     data["flash"]["items"] = flash_data["large_capsules"]
 
     # Mask Data
@@ -50,7 +50,7 @@ def get_sales(mask_items):
                 item["discounted"] = True
                 item["discount_percent"]  = appdata[appid]["data"]["price_overview"]["discount_percent"]
             if item["discounted"]:
-                item["id"] = str(item["id"])
+                item["id"] = str(item["id"]) # The ID's steam returns are not a consistant type, wtf right?
                 if data[category]["name"] in sales.keys():
                     sales[data[category]["name"]].append(item)
                 else:
@@ -65,7 +65,7 @@ def get_sales(mask_items):
 @hook.command()
 def steamsales(inp, say=''):
     ".steamsales <flash|specials|top_sellers|daily|all> - Check Steam for specified sales; Displays special event deals on top of chosen deals."
-    options={"flash": "Flash Sales", "specials" : "Specials", "top_sellers" : "Top Sellers", "daily" : "Daily Deal", "all" : "All"}
+    options={"flash": "Flash/Featured Sales", "specials" : "Specials", "top_sellers" : "Top Sellers", "daily" : "Daily Deal", "all" : "All"}
 
     # Verify and stage input data
     inp = inp.lower().split()
@@ -143,6 +143,8 @@ def saleloop(inp, say='', chan=''):
             message = message.strip(':; ')
             if message != "\x02New " + category + "\x0F":
                 say(message)
+
+        # Update dict of previous sales if appropriate
         if sales != {}:
             prev_sales = sales
         print(">>> u'Finished check for new Steam sales :%s'" % chan)
