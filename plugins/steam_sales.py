@@ -70,7 +70,7 @@ def steamsales(inp, say=''):
 
         # Check for bad input
         if inp == []:
-            return "Please check your input and try again."
+            return steamsales.__doc__
 
         # Output appropriate data
         for category in sales:
@@ -99,8 +99,10 @@ def saleloop(inp, say='', chan=''):
         return 
     running_sale_loops.append(chan)
     prev_sales = {}
+
     while True:
         print(">>> u'Beginning check for new Steam sales :%s'" % chan)
+
         # Fetch data
         data = get_sales()
         flash_data = get_frontpage()
@@ -109,7 +111,7 @@ def saleloop(inp, say='', chan=''):
         data["flash"]["items"] = flash_data["large_capsules"]
         
         # Mask data
-        del data["coming_soon"], data["top_sellers"], data["new_releases"], data["genres"], data["trailerslideshow"], data["status"]
+        del data["specials"], data["coming_soon"], data["top_sellers"], data["new_releases"], data["genres"], data["trailerslideshow"], data["status"]
 
         # Format data
         sales = {}
@@ -155,5 +157,6 @@ def saleloop(inp, say='', chan=''):
                 say(message)
         if sales != {}:
             prev_sales = sales
+        print(">>> u'Finished check for new Steam sales :%s'" % chan)
         time.sleep(1200)
 
