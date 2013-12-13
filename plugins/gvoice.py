@@ -74,8 +74,8 @@ def extractsms(htmlsms):
     return msgitems
 
 
-@hook.command
-def sms(inp, nick='', say='', input=None, db=None, bot=None):
+@hook.command()
+def sms(inp, nick='', chan='', say='', input=None, db=None, bot=None):
     ".sms <10 digit number|name in phonebook> <message> - sends a text message to a specified number or recipient via Google Voice"
     if input.chan[0] != '#':
         return "Can only SMS from public channels to control abuse."
@@ -102,7 +102,7 @@ def sms(inp, nick='', say='', input=None, db=None, bot=None):
 
     if phoneNumber in privatelist:
         say("I'm sorry %s, I'm afraid I can't do that." % nick)
-    return
+        return
 
     try:
         voice.login()
