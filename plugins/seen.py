@@ -13,15 +13,6 @@ def db_init(db):
     db.commit()
 
 
-@hook.singlethread
-@hook.event('PRIVMSG', ignorebots=False)
-def seeninput(paraml, input=None, db=None, bot=None):
-    db_init(db)
-    db.execute("insert or replace into seen(name, time, quote, chan)"
-        "values(?,?,?,?)", (input.nick.lower(), time.time(), input.msg,
-            input.chan))
-    db.commit()
-
 @hook.command(autohelp=False)
 def around(inp, nick='', chan='', say='',  db=None, input=None):
     ".around [minutes] - Lists what nicks have been active in the last [minutes] minutes, defaults to 15"

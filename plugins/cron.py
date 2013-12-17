@@ -75,14 +75,14 @@ def cron(inp, say='', chan='', db=None):
 
 
 @hook.event('JOIN')
-def blaze(inp, say='', chan=''):
-    if chan[0] != '#':
+def blaze(paraml, say=''):
+    if paraml[0] != '#test':
         return
-    print ">>> u'Beginning blaze loop :%s'" % chan
+    print ">>> u'Beginning blaze loop :%s'" % paraml[0]
     while True:
         timestamp = localtime(timestamp_format)
         if timestamp == '03:20': # my IRC server is in  a different time zone lol
-            say("4:20 BLAZE IT!")
+            say(paraml[0], "4:20 BLAZE IT!")
         #if str(datetime.datetime.now(EST()))[:16] == 
         time.sleep(60)
 

@@ -108,16 +108,18 @@ def steamsales(inp, say=''):
     
     
 @hook.event('JOIN')
-def saleloop(inp, say='', chan=''):
+@hook.command()
+def saleloop(paraml, conn=None):
     # Don't spawn threads for private messages
     global running_sale_loops
-    if chan[0] != '#' or chan in running_sale_loops:
+    if paraml[0][0] != '#' or paraml[0] in running_sale_loops:
         return
-    running_sale_loops.append(chan)
+    running_sale_loops.append(paraml[0])
     prev_sales = {}
 
     while True:
-        print(">>> u'Beginning check for new Steam sales :%s'" % chan)
+        #time.sleep(1200)
+        print(">>> u'Beginning check for new Steam sales :%s'" % paraml[0])
 
         # Get data
         mask = ["specials","coming_soon","top_sellers","new_releases","genres","trailerslideshow","status"]
@@ -142,11 +144,12 @@ def saleloop(inp, say='', chan=''):
                     message += "; "
             message = message.strip(':; ')
             if message != "\x02New " + category + "\x0F":
-                say(message)
+                out = "PRIVMSG {} :{}".format(paraml[0], message)
+                conn.send(out)
 
         # Update dict of previous sales if appropriate
         if sales != {}:
             prev_sales = sales
-        print(">>> u'Finished check for new Steam sales :%s'" % chan)
+        print(">>> u'Finished check for new Steam sales :%s'" % paraml[0])
         time.sleep(1200)
 

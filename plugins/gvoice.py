@@ -195,7 +195,7 @@ def parseloop(inp, say='', conn=None, bot=None, db=None):
             time.sleep(60)
     except:
         print(">>> u'Error parsing data from Google Voice :%s'" % server)
-        return
+        #return
         #running_parseloop_threads.remove(server)
         # state error in public channels rather than PMs so non admins know the loop is down
         #for chan in conn.channels:
