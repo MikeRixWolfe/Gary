@@ -80,8 +80,8 @@ def cron(paraml, say='', db=None):
 
 @hook.event('JOIN')
 def blaze(paraml, conn=None):
-    global running_cron_loops:
-    if paraml[0] != '#geekboy' or  paraml[0] in running_cron_loops:
+    global running_cron_loops
+    if paraml[0] != '#geekboy' or paraml[0] in running_cron_loops:
         return
     running_cron_loops.append(paraml[0])
     print ">>> u'Beginning blaze loop :%s'" % paraml[0]
