@@ -17,7 +17,7 @@ def stock(inp):
     try:
         parsed = http.get_json(url, q='select * from yahoo.finance.quote where symbol in ("%s")' % inp)  # heh, SQLI
     except:
-        return "Error parsing Yahoo Fianance API, please try again in a few minutes"
+        return "Yahoo Fianance API error, please try again in a few minutes"
 
     quote = parsed['query']['results']['quote']
 

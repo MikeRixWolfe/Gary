@@ -39,6 +39,7 @@ def sieve_suite(bot, input, func, kind, args):
             return None
 
     ignored = bot.config.get('ignored', [])
+    admins = bot.config.get('admins', [])
     if input.host in ignored or input.nick in ignored or input.nick.lower() in ignored or input.chan in ignored:
         if input.user.strip(' ~') not in admins and input.nick not in admins:
             return None

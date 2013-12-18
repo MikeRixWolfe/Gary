@@ -62,7 +62,7 @@ def get_sales(mask_items):
                         sales[data[category]["name"]].append(item)
                     else:
                         sales[data[category]["name"]] = []
-                        sales[data[category]["name"]].append(item)
+                        sales[data[category]["name"]].append(item) 
         sales[data[category]["name"]] = sorted(sales[data[category]["name"]], key=lambda k: k["name"])
     
     # Return usable data
@@ -87,7 +87,11 @@ def steamsales(inp, say=''):
 
     # Get data
     mask = ["coming_soon","new_releases","genres","trailerslideshow","status"]
-    sales = get_sales(mask)
+    try:
+        sales = get_sales(mask)
+    except Exception as e:
+        print e.message
+        return " Steam Store API error, please try again in a few minutes"
     
     # Mask data for users request
     if "all" not in inp:
@@ -134,7 +138,10 @@ def saleloop(paraml, conn=None):
 
         # Get data
         mask = ["specials","coming_soon","top_sellers","new_releases","genres","trailerslideshow","status"]
-        sales = get_sales(mask)
+        try:
+            sales = get_sales(mask)
+        except Exception as e:
+            print(">>> u'Error getting steam sales: %s'" % e.message)
 
         # Cut down on spam on bot restarts
         if prev_sales == {}:
@@ -147,11 +154,15 @@ def saleloop(paraml, conn=None):
                 if message == "":
                     message = "\x02New " + category + "\x0F: "
                 if str(item["id"]) not in (game["id"] for category in prev_sales for game in prev_sales[category]):
-                    message += "\x02%s\x0F: $%s.%s(%s%% off)" % \
-                        (item["name"],
-                        str(item["final_price"])[:-2],
-                        str(item["final_price"])[-2:],
-                        str(item["discount_percent"]))
+                    if item["final_price"] == 'Free to Play':
+                        message += "\x02%s\x0F: %s" % (item["name"],
+                        item["final_price"])
+                    else:
+                        message += "\x02%s\x0F: $%s.%s(%s%% off)" % \
+                            (item["name"],
+                            str(item["final_price"])[:-2],
+                            str(item["final_price"])[-2:],
+                            str(item["discount_percent"]))
                     message += "; "
             message = message.strip(':; ')
             if message != "\x02New " + category + "\x0F":

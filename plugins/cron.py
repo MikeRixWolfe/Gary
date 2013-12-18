@@ -29,7 +29,7 @@ def db_init(db):
 
 
 def get_events(db, time, chan):
-    rows = db.execute("select msg, set_by, chan from cron where time=? and chan=lower(?)",
+    rows = db.execute("select msg, set_by, chan, recurring from cron where time<=? and chan=lower(?)",
         (time, chan.lower())).fetchall()
     if rows:
         return rows
@@ -37,9 +37,9 @@ def get_events(db, time, chan):
         return []
 
 
-def set_event(db, time, chan, msg, set_by):
+def set_event(db, time, chan, msg, set_by, recurring):
     db.execute("insert or replace into cron(time, chan, msg, set_by, recurring) values(?,?,?,?,?)", 
-        (time, chan.lower(), msg, set_by, 0))
+        (time, chan.lower(), msg, set_by, recurring))
     db.commit()
     return
 
@@ -52,7 +52,7 @@ def remove_event(db, time, chan, msg, set_by):
 
 
 def clean_db(db, time, chan):
-    db.execute("delete from cron where time<? and chan=lower(?)",
+    db.execute("delete from cron where time<? and chan=lower(?) and recurring!='1'",
         (time, chan.lower()))
     db.commit()
     return
@@ -71,22 +71,24 @@ def cron(paraml, say='', db=None):
         datestamp = str(datetime.datetime.now(EST()))[:16]
         rows = get_events(db, datestamp, chan)
         for row in rows:
-            say(paraml[0], "%s: %s" % (row[1], row[0]))
-            #remove_event(db, datestamp, row[2], row[0], row[1])
+            conn.send("PRIVMSG {} :{}".format(paraml[0],"%s: %s" % (row[1], row[0])))
+            if row[3] == 0:
+                remove_event(db, datestamp, row[2], row[0], row[1])
         clean_db(db, datestamp, chan)
         time.sleep(30)
 
 
 @hook.event('JOIN')
-def blaze(paraml, say=''):
-    if paraml[0] != '#test':
+def blaze(paraml, conn=None):
+    global running_cron_loops:
+    if paraml[0] != '#geekboy' or  paraml[0] in running_cron_loops:
         return
+    running_cron_loops.append(paraml[0])
     print ">>> u'Beginning blaze loop :%s'" % paraml[0]
     while True:
         timestamp = localtime(timestamp_format)
-        if timestamp == '03:20': # my IRC server is in  a different time zone lol
-            say(paraml[0], "4:20 BLAZE IT!")
-        #if str(datetime.datetime.now(EST()))[:16] == 
+        if timestamp == '03:20': # my IRC server is in  a different time zone 
+            conn.send("PRIVMSG {} :{}".format(paraml[0],"4:20 BLAZE IT!"))
         time.sleep(60)
 
 
@@ -100,7 +102,7 @@ def remindme(inp, nick='', chan='', db=None):
         message = new_event.group(2)
         
         try:
-            set_event(db, timestamp, chan, message, nick)
+            set_event(db, timestamp, chan, message, nick, False)
         except:
             return "There was an error inserting your event, please try again later."
         return "Okay, at %s I will remind you of '%s'." % (timestamp, message)
