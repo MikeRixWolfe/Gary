@@ -10,10 +10,10 @@ def imdb(inp):
     try:
         content = http.get_json("http://www.omdbapi.com/", t=inp)
     except:
-        return "API timeout, please try again in a few seconds"
+        return "API timeout, please try again in a few seconds."
 
     if content['Response'] == 'Movie Not Found':
-        return 'movie not found'
+        return 'Movie not found.'
     elif content['Response'] == 'True':
         content['URL'] = 'http://www.imdb.com/title/%(imdbID)s' % content
 
@@ -25,4 +25,4 @@ def imdb(inp):
         out += ' %(URL)s'
         return out % content
     else:
-        return 'unknown error'
+        return 'Unknown error.'

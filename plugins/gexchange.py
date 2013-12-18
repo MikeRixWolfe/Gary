@@ -1,4 +1,6 @@
-'''rate exchange from : https://rate-exchange.appspot.com/ '''
+'''
+gexchange.py - written by MikeFightsBears 2013
+'''
 
 from util import hook, http
 

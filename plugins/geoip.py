@@ -38,8 +38,8 @@ def whereis(inp):
         if content:
             out = out +  " seems to be located in " + content["city"] + ", " + content["region_name"] + " " + content["zipcode"] + " in " + content["country_name"]
         else:
-            out = out + " is located somewhere in the universe"
+            out = out + " is located somewhere in the universe."
     else: 
-        out = "Sorry, I couldn't find that user"
+        out = "Sorry, I couldn't find that user."
     return out
 

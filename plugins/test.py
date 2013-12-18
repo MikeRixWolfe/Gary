@@ -1,3 +1,7 @@
+'''
+test.py - written by MikeFightsBears 2013
+'''
+
 from util import hook
 
 @hook.command(autohelp=False)
@@ -13,3 +17,6 @@ def kitchensink(inp, nick='', say=None):
 def mulched(inp, nick='', say=None):
     say("Get mulched %s." % nick)
 
+@hook.regex(r'^bot roll call')
+def rollcall(inp, chan='', say=None):
+    say("Ah shut up ya dirty shisno")

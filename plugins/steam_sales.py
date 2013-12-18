@@ -1,6 +1,7 @@
 """
 steam_sales.py - Written by MikeRixWolfe 2013
 """
+
 import time
 from util import hook, http
 from datetime import datetime
@@ -48,12 +49,12 @@ def get_sales(mask_items):
                     item["id"] = appdata[appid]["data"]["steam_appid"]
                     try:
                         item["final_price"] = appdata[appid]["data"]["price_overview"]["final"]
-                    except:
+                    except KeyError:
                         item["final_price"] = 'Free to Play'
                     item["discounted"] = True
                     try:
                         item["discount_percent"]  = appdata[appid]["data"]["price_overview"]["discount_percent"]
-                    except:
+                    except KeyError:
                         item["discount_percent"] = '100'
                 if item["discounted"]:
                     item["id"] = str(item["id"]) # The ID's steam returns are not a consistant type, wtf right?

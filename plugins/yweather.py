@@ -1,5 +1,5 @@
 """
-weather.py written by MikeFightsBears 2013
+weather.py - written by MikeFightsBears 2013
 """
 
 import urllib2
@@ -14,11 +14,8 @@ wser = 'http://xml.weather.yahoo.com/ns/rss/1.0'
 @hook.command('w')
 def weather(inp):
     ".w[eather] <zip code> - gets the current weather conditions for a given zipcode"
-    
     url = wurl % inp +'&u=f'
-    
     parsed = http.get_xml(url)
-
     if len(parsed) != 1:
 	return "error getting weather info"
 
@@ -47,7 +44,6 @@ def weather(inp):
 @hook.command
 def forecast(inp):
     ".f[orecast] <zip code> - gets the current weather conditions for a given zipcode"  
-
     url = wurl % inp +'&u=f' 
     parsed = http.get_xml(url) 
 

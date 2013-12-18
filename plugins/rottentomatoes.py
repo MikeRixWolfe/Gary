@@ -12,7 +12,7 @@ def rt(inp, api_key=None):
 
     results = http.get_json(movie_search_url, q=inp, apikey=api_key)
     if results['total'] == 0:
-        return 'no results'
+        return 'No results.'
 
     movie = results['movies'][0]
     title = movie['title']

@@ -1,3 +1,7 @@
+'''
+quote.py - rewritten by MikeFightsBears 2013
+'''
+
 import random
 import re
 import time
@@ -45,9 +49,7 @@ def format_quote(q):
 @hook.command(autohelp=False)
 def randomquote(inp, nick='', chan='', db=None, input=None):
     ".randomquote [nick] - gets random quote by <nick> or from the current channel"
-
     db_init(db)
-
     if inp == "":
         quotes = get_quotes_by_chan(db, chan)
     else:
@@ -65,9 +67,7 @@ def randomquote(inp, nick='', chan='', db=None, input=None):
 @hook.command
 def getquote(inp, nick='', chan='', db=None):
     ".getquote <#n> - gets <#n>th quote by [nick] or from channel if no nick specified"
-    
     db_init(db)
-
     if inp.strip().isdigit():
         num = int(inp.strip())
         quote = get_quote_by_key(db, num)
@@ -82,9 +82,7 @@ def getquote(inp, nick='', chan='', db=None):
 @hook.command
 def quote(inp, nick='', chan='', db=None):
     ".quote <nick> <msg> - gets adds quote"
-
     db_init(db)
- 
     quoted_nick = inp.split(' ',1)[0].strip('<> ')
     msg = inp.split(' ',1)[1].strip(' ') 
 

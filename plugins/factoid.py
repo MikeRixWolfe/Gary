@@ -1,9 +1,8 @@
 """
-remember.py: written by MikeFightsBears 2013
+factoid.py: written by MikeFightsBears 2013
 """
 
 import datetime
-
 from util import hook
 
 
@@ -68,14 +67,10 @@ def set_factoid(inp, nick='', chan='', say=None, db=None):
 def forget(inp, chan='', say=None, db=None):
     ".forget <word|phrase> - forgets factoid"
     db_init(db)
-
     word=inp.strip()
-
     data = get_factoid(db, chan, word)
-
     #if not chan.startswith('#'):
     #    return "I won't forget anything in private."
-
     if data:
         db.execute("delete from factoids where chan=? and word=lower(?)",
                    (chan, word))

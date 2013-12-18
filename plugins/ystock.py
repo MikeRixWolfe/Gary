@@ -1,3 +1,7 @@
+'''
+ystock.py - rewritten by MikeFightsBears 2013
+'''
+
 import random
 import datetime
 from util import hook, http

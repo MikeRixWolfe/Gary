@@ -1,9 +1,9 @@
-" tell.py: written by sklnd in July 2009"
-"       2010.01.25 - modified by Scaevolus"
-"	2013.09.24 - heavily modified by MikeFightsBears"
+"""
+message.py - written by MikeFightsBears 2013
+    based on tell.py: written by sklnd, Scaevolus in July 2009-Jan 2010
+"""
 
 import time
-
 from util import hook, timesince
 
 
@@ -25,16 +25,11 @@ def get_tells(db, user_to):
 
 @hook.event('*')
 def showtells(inp, say='', nick='', chan='', db=None):
-    ".showtells - view all pending tell messages (sent in PM)."
-
     db_init(db)
-
     tells = get_tells(db, nick)
 
     if not tells:
-        #say("You have no pending tells.") #notice(
         return
-
     for tell in tells:
         user_from, message, time, chan = tell
         past = timesince.timesince(time)

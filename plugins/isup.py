@@ -1,5 +1,4 @@
 import urlparse
-
 from util import hook, http, urlnorm
 
 
@@ -25,4 +24,4 @@ def isup(inp):
     elif "is up" in content:
         return "It's just you. {} is \x02\x033up\x02\x0f.".format(url)
     else:
-        return "Huh? That doesn't look like a site on the interweb."
+        return "Huh? That doesn't look like a site on the interwebs."

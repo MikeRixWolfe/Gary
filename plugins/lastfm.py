@@ -1,5 +1,5 @@
 '''
-The Last.fm API key is retrieved from the bot config file.
+lastfm.py - rewritten by MikeFightsBears 2013
 '''
 
 from util import hook, http
@@ -77,15 +77,15 @@ def toptrack(inp, nick='', say=None, api_key=None):
 
     if 'error' in response:
         if inp:  # specified a user name
-            return "error: %s" % response["message"]
+            return "Error: %s" % response["message"]
         else:
-            return "your nick is not a Last.fm account. try '.lastfm username'."
+            return "Your nick is not a Last.fm account. try '.lastfm username'."
 
     if not "track" in response["toptracks"] or len(response["toptracks"]["track"]) == 0:
         if period == "1month":
             return "The 1month flag is currently broken in the LastFM API; a bug report has been filed."
         else:
-            return "no recent tracks for user \x02%s\x0F found" % user
+            return "No recent tracks for user \x02%s\x0F found." % user
 
     tracks = response["toptracks"]["track"]
 
@@ -98,7 +98,7 @@ def toptrack(inp, nick='', say=None, api_key=None):
         # the tracks entry is a dict representing the most recent track
         track = tracks
     else:
-        return "error parsing track listing"
+        return "Error parsing track listing."
 
     title = track["name"]
     artist = track["artist"]["name"]

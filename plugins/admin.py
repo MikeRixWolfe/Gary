@@ -245,7 +245,6 @@ def unlock(inp, conn=None, chan=None, notice=None):
     mode_cmd_no_target("-i", "unlock", inp, chan, conn, notice)
 
 
-@hook.regex(r'^Gary: say ')
 @hook.command(adminonly=True)
 def say(inp, conn=None, chan=None):
     """.say [channel] <message> - Makes the bot say <message> in [channel]. If [channel] is blank the bot will say the <message> in the channel

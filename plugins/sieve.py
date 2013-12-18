@@ -1,20 +1,18 @@
 import re
-
 from util import hook
 
 
 @hook.sieve
 def sieve_suite(bot, input, func, kind, args):
+    if kind == "event"
+        return input
+
     if kind == "command":
-        if input.trigger in bot.config.get('disabled_commands', []):
+        if input.trigger in bot.config.get('disabled', []):
             return None
 
-        ignored = bot.config.get('ignored', [])
-        if input.host in ignored or input.nick in ignored:
-            return None
-
-    fn = re.match(r'^plugins/(.+).py$', func._filename)
-    disabled = bot.config.get('disabled_plugins', [])
+    fn = re.match(r'^plugins/(.+\.py$)', func._filename)
+    disabled = bot.config.get('disabled', [])
     if fn and fn.group(1).lower() in disabled:
         return None
 
@@ -38,6 +36,16 @@ def sieve_suite(bot, input, func, kind, args):
         admins = bot.config.get('admins', [])
         opers = bot.config.get('opers', [])
         if input.nick.strip(' ~@%+') not in admins and input.nick.strip(' ~@%+') not in opers:# or input.chan[0] != "#":
+            return None
+
+    ignored = bot.config.get('ignored', [])
+    if input.host in ignored or input.nick in ignored or input.nick.lower() in ignored or input.chan in ignored:
+        if input.user.strip(' ~') not in admins and input.nick not in admins:
+            return None
+
+    if input.chan in mutelist:
+        admins = bot.config.get('admins', [])
+        if input.user.strip(' ~') not in admins and input.nick not in admins:
             return None
 
     return input

@@ -1,9 +1,15 @@
-" seen.py: written by sklnd in about two beers July 2009"
-"	2013.09.24 - modified by MikeFightsBears"
+"""
+seen.py - written by MikeFightsBears 2013
+    based on work by sklnd in about two beers July 2009
+"""
 
 import time
-
 from util import hook, timesince
+
+
+def rreplace(s, old, new, occurrence):
+    li = s.rsplit(old, occurrence)
+    return new.join(li)
 
 
 def db_init(db):
@@ -16,16 +22,11 @@ def db_init(db):
 @hook.command(autohelp=False)
 def around(inp, nick='', chan='', say='',  db=None, input=None):
     ".around [minutes] - Lists what nicks have been active in the last [minutes] minutes, defaults to 15"
-    
     db_init(db)
-
     minutes=15
-
     if inp.strip().isdigit():
         minutes = int(inp.strip())
-
     period = time.time()-(minutes*60)
-
     rows = db.execute("select name  from seen where time >= "
                            " ? and chan = ? order by name", (period,chan)).fetchall()
 
@@ -42,33 +43,22 @@ def around(inp, nick='', chan='', say='',  db=None, input=None):
             return_string = "Users around in the last %s minutes: %s" % (minutes, raw_list[:-2])
         else:
             return_string = "Users around in the last %s minutes: %s%s others." % (minutes, raw_list, overflow_counter)
-
         formatted_string = rreplace(return_string, ', ', ', and ', 1)
-
         say(formatted_string)
     else:
         say("No one!")
-
-def rreplace(s, old, new, occurrence):
-    li = s.rsplit(old, occurrence)
-    return new.join(li)
-
-
 
 
 @hook.command
 def seen(inp, nick='', chan='', db=None, input=None):
     ".seen <nick> - Tell when a nickname was last in active in irc"
-
     if input.conn.nick.lower() == inp.lower():
         # user is looking for us, being a smartass
         return "You need to get your eyes checked."
-
     if inp.lower() == nick.lower():
         return "Have you looked in a mirror lately?"
 
     db_init(db)
-
     last_seen = db.execute("select name, time, quote from seen where name"
                            " like ? and chan = ?", (inp, chan)).fetchone()
 

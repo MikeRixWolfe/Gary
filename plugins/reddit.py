@@ -1,7 +1,3 @@
-"""
-reddit.py - 
-"""
-
 from util import hook, http, text, timesince
 from datetime import datetime
 import re

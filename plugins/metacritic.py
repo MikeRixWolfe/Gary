@@ -1,5 +1,3 @@
-# metacritic.com scraper
-
 import re
 from urllib2 import HTTPError
 

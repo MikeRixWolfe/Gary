@@ -1,3 +1,7 @@
+'''
+mtg.py - rewritten by MikeFightsBears 2013
+'''
+
 import re
 
 from util import hook, http

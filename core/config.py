@@ -63,11 +63,9 @@ if not os.path.exists('config'):
               "user": "Gary"
             }
           },
-          "disabled_commands": [
-            "get_version"
-          ],
-          "disabled_plugins": [
-            "readtitle"
+          "disabled": [
+            "get_version",
+            "someplugin.py"
           ],
           "gvoice": {
             "private": [
