@@ -6,24 +6,6 @@ import json
 from util import hook
 
 
-@hook.sieve
-def restricted_sieve(bot, input, func, type, args):
-    """ Blocks input from all but allowed while in restricted mode """
-    chans = bot.config["restrictedmode"]
-    # don't block input to event hooks
-    if type == "event":
-        return input
-    if input.chan in chans:
-        voicers = bot.config["voice"]
-        opers = bot.config["opers"]
-        admins = bot.config.get('admins', [])
-        allowlist = admins + opers + voicers
-        if input.nick not in allowlist:
-            return None
-
-    return input
-
-
 @hook.command(adminonly=True, autohelp=False)
 def restrict(inp, input=None, say=None, bot=None):
     """.restrict - Sets current channel to restricted mode."""

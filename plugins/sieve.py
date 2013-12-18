@@ -4,7 +4,7 @@ from util import hook
 
 @hook.sieve
 def sieve_suite(bot, input, func, kind, args):
-    if kind == "event"
+    if kind == "event":
         return input
 
     if kind == "command":
@@ -43,9 +43,19 @@ def sieve_suite(bot, input, func, kind, args):
         if input.user.strip(' ~') not in admins and input.nick not in admins:
             return None
 
-    if input.chan in mutelist:
+    muted = bot.config.get('muted', [])
+    if input.chan in muted:
         admins = bot.config.get('admins', [])
         if input.user.strip(' ~') not in admins and input.nick not in admins:
+            return None
+
+    chans = bot.config["restrictedmode"]
+    if input.chan in chans:
+        voicers = bot.config["voice"]
+        opers = bot.config["opers"]
+        admins = bot.config.get('admins', [])
+        allowlist = admins + opers + voicers
+        if input.nick not in allowlist:
             return None
 
     return input

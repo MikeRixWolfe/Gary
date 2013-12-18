@@ -41,7 +41,7 @@ def enable(inp, say=None, notice=None, bot=None, config=None):
     """.enable <command> - Enables <commmand/plugin>."""
     target = inp.lower()
 
-    disabled = bot.config["disabled_commands"]
+    disabled = bot.config["disabled"]
 
     if target in disabled:
         say("%s has been enabled." % format(target))

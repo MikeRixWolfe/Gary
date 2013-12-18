@@ -8,12 +8,11 @@ def help(inp, bot=None, say=None):
     ".help [command] - gives a list of commands/help for a command"
 
     funcs = {}
-    disabled = bot.config.get('disabled_plugins', [])
-    disabled_comm = bot.config.get('disabled_commands', [])
+    disabled = bot.config.get('disabled', [])
     for command, (func, args) in bot.commands.iteritems():
-        fn = re.match(r'^plugins.(.+).py$', func._filename)
+        fn = re.match(r'^plugins.(.+\.py)$', func._filename)
         if fn.group(1).lower() not in disabled:
-            if command not in disabled_comm:
+            if command not in disabled:
                 if func.__doc__ is not None:
                     if args.get('adminonly') != True:
                         if func in funcs:
@@ -45,12 +44,11 @@ def adminhelp(inp, bot=None, say=None):
     ".adminhelp [command] - gives a list of admin commands/help for a command"
 
     funcs = {}
-    disabled = bot.config.get('disabled_plugins', [])
-    disabled_comm = bot.config.get('disabled_commands', [])
+    disabled = bot.config.get('disabled', [])
     for command, (func, args) in bot.commands.iteritems():
-        fn = re.match(r'^plugins.(.+).py$', func._filename)
+        fn = re.match(r'^plugins.(.+\.py)$', func._filename)
         if fn.group(1).lower() not in disabled:
-            if command not in disabled_comm:
+            if command not in disabled:
                 if func.__doc__ is not None:
                     if args.get('adminonly') == True:
                         if func in funcs:
