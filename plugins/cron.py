@@ -57,18 +57,21 @@ def clean_db(db, time, chan):
     db.commit()
     return
 
+running_cron_loops = []
 
 #@hook.event('JOIN')
 @hook.command(autohelp=False, adminonly=True)
-def cron(inp, say='', chan='', db=None):
-    if chan[0] != '#':
+def cron(paraml, say='', db=None):
+    global running_cron_loops
+    if paraml[0][0] != '#' or paraml[0] in running_cron_loops:
         return
+    running_cron_loops.append(paraml[0])
     db_init(db)
     while True:
         datestamp = str(datetime.datetime.now(EST()))[:16]
         rows = get_events(db, datestamp, chan)
         for row in rows:
-            say("%s: %s" % (row[1], row[0]))
+            say(paraml[0], "%s: %s" % (row[1], row[0]))
             #remove_event(db, datestamp, row[2], row[0], row[1])
         clean_db(db, datestamp, chan)
         time.sleep(30)

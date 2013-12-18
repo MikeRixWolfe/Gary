@@ -40,22 +40,28 @@ def get_sales(mask_items):
     sales = {}
     for category in data:
         for item in data[category]["items"]:
-            if "url" in item.keys() and item["url"] != "":
-                data[category]["name"] = item["name"]
-                appid = str(item["url"])[34:-1]
-                appdata = http.get_json("http://store.steampowered.com/api/appdetails/?appids=%s" % appid)
-                item["name"] = appdata[appid]["data"]["name"]
-                item["id"] = appdata[appid]["data"]["steam_appid"]
-                item["final_price"] = appdata[appid]["data"]["price_overview"]["final"]
-                item["discounted"] = True
-                item["discount_percent"]  = appdata[appid]["data"]["price_overview"]["discount_percent"]
-            if item["discounted"]:
-                item["id"] = str(item["id"]) # The ID's steam returns are not a consistant type, wtf right?
-                if data[category]["name"] in sales.keys():
-                    sales[data[category]["name"]].append(item)
-                else:
-                    sales[data[category]["name"]] = []
-                    sales[data[category]["name"]].append(item)
+                if "url" in item.keys() and item["url"] != "":
+                    data[category]["name"] = item["name"]
+                    appid = str(item["url"])[34:-1]
+                    appdata = http.get_json("http://store.steampowered.com/api/appdetails/?appids=%s" % appid)
+                    item["name"] = appdata[appid]["data"]["name"]
+                    item["id"] = appdata[appid]["data"]["steam_appid"]
+                    try:
+                        item["final_price"] = appdata[appid]["data"]["price_overview"]["final"]
+                    except:
+                        item["final_price"] = 'Free to Play'
+                    item["discounted"] = True
+                    try:
+                        item["discount_percent"]  = appdata[appid]["data"]["price_overview"]["discount_percent"]
+                    except:
+                        item["discount_percent"] = '100'
+                if item["discounted"]:
+                    item["id"] = str(item["id"]) # The ID's steam returns are not a consistant type, wtf right?
+                    if data[category]["name"] in sales.keys():
+                        sales[data[category]["name"]].append(item)
+                    else:
+                        sales[data[category]["name"]] = []
+                        sales[data[category]["name"]].append(item)
         sales[data[category]["name"]] = sorted(sales[data[category]["name"]], key=lambda k: k["name"])
     
     # Return usable data
@@ -94,11 +100,15 @@ def steamsales(inp, say=''):
         for item in sales[category]:
             if message == "":
                 message = "\x02" + category + "\x0F: "
-            message += "\x02%s\x0F: $%s.%s(%s%% off)" % \
-                (item["name"],
-                str(item["final_price"])[:-2],
-                str(item["final_price"])[-2:],
-                str(item["discount_percent"]))
+            if item["final_price"] == 'Free to Play':
+                message += "\x02%s\x0F: %s" % (item["name"], 
+                    item["final_price"])
+            else:
+                message += "\x02%s\x0F: $%s.%s(%s%% off)" % \
+                    (item["name"],
+                    str(item["final_price"])[:-2],
+                    str(item["final_price"])[-2:],
+                    str(item["discount_percent"]))
             message += "; "
         message = message.strip(':; ')
         if message != "\x02" + category + "\x0F":
