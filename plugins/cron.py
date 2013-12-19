@@ -59,8 +59,7 @@ def clean_db(db, time, chan):
 
 running_cron_loops = []
 
-#@hook.event('JOIN')
-@hook.command(autohelp=False, adminonly=True)
+@hook.event('JOIN')
 def cron(paraml, nick='', conn=None, db=None):
     global running_cron_loops
     if paraml[0][0] != '#' or paraml[0] in running_cron_loops or nick != conn.nick:
@@ -70,30 +69,23 @@ def cron(paraml, nick='', conn=None, db=None):
     db_init(db)
     while True:
         try:
-            time.sleep(30)
+            time.sleep(60)
+            print ">>> u'Checking for cron jobs :%s'" % paraml[0]
             datestamp = str(datetime.datetime.now(EST()))[:16]
-            rows = get_events(db, datestamp, chan)
+            rows = get_events(db, datestamp, paraml[0])
             for row in rows:
                 conn.send("PRIVMSG {} :{}".format(paraml[0],"%s: %s" % (row[1], row[0])))
-                if row[3] == 0:
+                if row[3] == False:
                     remove_event(db, datestamp, row[2], row[0], row[1])
-            clean_db(db, datestamp, chan)
+            clean_db(db, datestamp, paraml[0])
+            
+            #Novelty
+            timestamp = localtime(timestamp_format)
+            if timestamp == '03:20': # my IRC server is in  a different time zone
+                conn.send("PRIVMSG {} :{}".format(paraml[0],"4:20 BLAZE IT!"))
+            print ">>> u'Finished checking for cron jobs :%s'" % paraml[0]
         except:
             print ">>> u'Error running cron loop :%s'" % paraml[0]
-
-
-@hook.event('JOIN')
-def blaze(paraml, nick='', conn=None):
-    global running_cron_loops
-    if paraml[0] != '#geekboy' or paraml[0] in running_cron_loops or nick != conn.nick:
-        return
-    running_cron_loops.append(paraml[0])
-    print ">>> u'Beginning blaze loop :%s'" % paraml[0]
-    while True:
-        timestamp = localtime(timestamp_format)
-        if timestamp == '03:20': # my IRC server is in  a different time zone 
-            conn.send("PRIVMSG {} :{}".format(paraml[0],"4:20 BLAZE IT!"))
-        time.sleep(60)
 
 
 @hook.command()

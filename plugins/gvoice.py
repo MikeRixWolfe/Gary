@@ -201,13 +201,6 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
         except:
             print(">>> u'Error parsing data from Google Voice :%s'" % server)
             continue
-        #return
-        #running_parseloop_threads.remove(server)
-        # state error in public channels rather than PMs so non admins know the loop is down
-        #for chan in conn.channels:
-        #    notified_admins = ", ".join(bot.config["admins"])
-        #    conn.send("PRIVMSG {} :{}".format(chn, "%s: My SMS parse loop died; please restart parseloop :%s" % (notified_admins, server)))
-        #break
         
 
 @hook.command(adminonly=False, autohelp=False)

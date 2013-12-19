@@ -131,11 +131,11 @@ def saleloop(paraml, nick='', conn=None):
         return
     running_sale_loops.append(paraml[0])
     prev_sales = {}
-
+    print(">>> u'Beginning Steam sale check loop for :%s'" % paraml[0])
     while True:
         try:
             time.sleep(1200)
-            print(">>> u'Beginning check for new Steam sales :%s'" % paraml[0])
+            print(">>> u'Checking for new Steam sales :%s'" % paraml[0])
 
             # Get data
             mask = ["specials","coming_soon","top_sellers","new_releases","genres","trailerslideshow","status"]
