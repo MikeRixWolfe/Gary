@@ -124,54 +124,57 @@ def steamsales(inp, say=''):
     
 @hook.event('JOIN')
 @hook.command()
-def saleloop(paraml, conn=None):
+def saleloop(paraml, nick='', conn=None):
     # Don't spawn threads for private messages
     global running_sale_loops
-    if paraml[0][0] != '#' or paraml[0] in running_sale_loops:
+    if paraml[0][0] != '#' or paraml[0] in running_sale_loops or nick != conn.nick:
         return
     running_sale_loops.append(paraml[0])
     prev_sales = {}
 
     while True:
-        #time.sleep(1200)
-        print(">>> u'Beginning check for new Steam sales :%s'" % paraml[0])
-
-        # Get data
-        mask = ["specials","coming_soon","top_sellers","new_releases","genres","trailerslideshow","status"]
         try:
-            sales = get_sales(mask)
-        except Exception as e:
-            print(">>> u'Error getting steam sales: %s'" % e.message)
+            time.sleep(1200)
+            print(">>> u'Beginning check for new Steam sales :%s'" % paraml[0])
 
-        # Cut down on spam on bot restarts
-        if prev_sales == {}:
-            prev_sales = sales
+            # Get data
+            mask = ["specials","coming_soon","top_sellers","new_releases","genres","trailerslideshow","status"]
+            try:
+                sales = get_sales(mask)
+            except Exception as e:
+                print(">>> u'Error getting steam sales: %s'" % e.message)
 
-        # Output appropriate data
-        for category in sales:
-            message = ""
-            for item in sales[category]:
-                if message == "":
-                    message = "\x02New " + category + "\x0F: "
-                if str(item["id"]) not in (game["id"] for category in prev_sales for game in prev_sales[category]):
-                    if item["final_price"] == 'Free to Play':
-                        message += "\x02%s\x0F: %s" % (item["name"],
-                        item["final_price"])
-                    else:
-                        message += "\x02%s\x0F: $%s.%s(%s%% off)" % \
-                            (item["name"],
-                            str(item["final_price"])[:-2],
-                            str(item["final_price"])[-2:],
-                            str(item["discount_percent"]))
-                    message += "; "
-            message = message.strip(':; ')
-            if message != "\x02New " + category + "\x0F":
-                out = "PRIVMSG {} :{}".format(paraml[0], message)
-                conn.send(out)
+            # Cut down on spam on bot restarts
+            if prev_sales == {}:
+                prev_sales = sales
 
-        # Update dict of previous sales if appropriate
-        if sales != {}:
-            prev_sales = sales
-        print(">>> u'Finished check for new Steam sales :%s'" % paraml[0])
-        time.sleep(1200)
+            # Output appropriate data
+            for category in sales:
+                message = ""
+                for item in sales[category]:
+                    if message == "":
+                        message = "\x02New " + category + "\x0F: "
+                    if str(item["id"]) not in (game["id"] for category in prev_sales for game in prev_sales[category]):
+                        if item["final_price"] == 'Free to Play':
+                            message += "\x02%s\x0F: %s" % (item["name"],
+                            item["final_price"])
+                        else:
+                            message += "\x02%s\x0F: $%s.%s(%s%% off)" % \
+                                (item["name"],
+                                str(item["final_price"])[:-2],
+                                str(item["final_price"])[-2:],
+                                str(item["discount_percent"]))
+                        message += "; "
+                message = message.strip(':; ')
+                if message != "\x02New " + category + "\x0F":
+                    out = "PRIVMSG {} :{}".format(paraml[0], message)
+                    conn.send(out)
+
+            # Update dict of previous sales if appropriate
+            if sales != {}:
+                prev_sales = sales
+            print(">>> u'Finished check for new Steam sales :%s'" % paraml[0])
+        except:
+            print(">>> u'Error checking for new Steam sales :%s'" % paraml[0])
+            continue
 

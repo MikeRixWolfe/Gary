@@ -61,27 +61,31 @@ running_cron_loops = []
 
 #@hook.event('JOIN')
 @hook.command(autohelp=False, adminonly=True)
-def cron(paraml, say='', db=None):
+def cron(paraml, nick='', conn=None, db=None):
     global running_cron_loops
-    if paraml[0][0] != '#' or paraml[0] in running_cron_loops:
+    if paraml[0][0] != '#' or paraml[0] in running_cron_loops or nick != conn.nick:
         return
     running_cron_loops.append(paraml[0])
+    print ">>> u'Beginning cron loop :%s'" % paraml[0]
     db_init(db)
     while True:
-        datestamp = str(datetime.datetime.now(EST()))[:16]
-        rows = get_events(db, datestamp, chan)
-        for row in rows:
-            conn.send("PRIVMSG {} :{}".format(paraml[0],"%s: %s" % (row[1], row[0])))
-            if row[3] == 0:
-                remove_event(db, datestamp, row[2], row[0], row[1])
-        clean_db(db, datestamp, chan)
-        time.sleep(30)
+        try:
+            time.sleep(30)
+            datestamp = str(datetime.datetime.now(EST()))[:16]
+            rows = get_events(db, datestamp, chan)
+            for row in rows:
+                conn.send("PRIVMSG {} :{}".format(paraml[0],"%s: %s" % (row[1], row[0])))
+                if row[3] == 0:
+                    remove_event(db, datestamp, row[2], row[0], row[1])
+            clean_db(db, datestamp, chan)
+        except:
+            print ">>> u'Error running cron loop :%s'" % paraml[0]
 
 
 @hook.event('JOIN')
-def blaze(paraml, conn=None):
+def blaze(paraml, nick='', conn=None):
     global running_cron_loops
-    if paraml[0] != '#geekboy' or paraml[0] in running_cron_loops:
+    if paraml[0] != '#geekboy' or paraml[0] in running_cron_loops or nick != conn.nick:
         return
     running_cron_loops.append(paraml[0])
     print ">>> u'Beginning blaze loop :%s'" % paraml[0]

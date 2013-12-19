@@ -88,6 +88,8 @@ def sms(inp, nick='', chan='', say='', input=None, db=None, bot=None):
         return "Error sending SMS; message contains unsupported characters"
 
     operands = inp.split(' ', 1)
+    if len(operands) < 2:
+        return "Please check your input and try again."
     name_or_num = operands[0].strip()
     text = "<"+ nick + "> " + operands[1].strip()
         
@@ -145,10 +147,10 @@ def call(inp, say='', nick='', input=None, db=None, bot=None):
 
 #@hook.singlethread
 @hook.event('JOIN')
-def parseloop(inp, say='', conn=None, bot=None, db=None):
+def parseloop(paraml, nick='', conn=None, bot=None, db=None):
     server = "%s:%s" % (conn.server,conn.port)
     global running_parseloop_threads
-    if server != "localhost:7666":
+    if server != "localhost:7666" or nick != conn.nick:
         return
     if len(running_parseloop_threads) > 0:
         print(">>> u'I am already parsing SMS for :%s'" % server)
@@ -164,8 +166,12 @@ def parseloop(inp, say='', conn=None, bot=None, db=None):
     except:
         print(">>> u'Error logging in to Google Voice :%s'" % server)
         return
-    try:    
-        while voice.sms():
+    #try:    
+    while True:
+        time.sleep(60)
+        try:
+            voice.sms()
+    
             print(">>> u'Checking for unread sms :%s'" % server)
             messagecounter=0
             for message in extractsms(voice.sms.html):
@@ -191,9 +197,10 @@ def parseloop(inp, say='', conn=None, bot=None, db=None):
                 print(">>> u'Outputting "+ str(messagecounter) +" message complete :%s'" % server)
             else:
                 print(">>> u'Outputting "+ str(messagecounter) +" messages complete :%s'" % server)
-            time.sleep(60)
-    except:
-        print(">>> u'Error parsing data from Google Voice :%s'" % server)
+            #time.sleep(60)
+        except:
+            print(">>> u'Error parsing data from Google Voice :%s'" % server)
+            continue
         #return
         #running_parseloop_threads.remove(server)
         # state error in public channels rather than PMs so non admins know the loop is down
