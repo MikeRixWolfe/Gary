@@ -2,9 +2,10 @@
 steam_sales.py - Written by MikeRixWolfe 2013
 """
 
-import time
+import time, re
 from util import hook, http
 from datetime import datetime
+
 
 running_sale_loops = []
 
@@ -58,6 +59,10 @@ def get_sales(mask_items):
                         item["discount_percent"] = '100'
                 if item["discounted"]:
                     item["id"] = str(item["id"]) # The ID's steam returns are not a consistant type, wtf right?
+                    try:
+                        item["name"] = item["name"].encode("ascii", "ignore")
+                    except:
+                        pass
                     if data[category]["name"] in sales.keys():
                         sales[data[category]["name"]].append(item)
                     else:
@@ -141,8 +146,9 @@ def saleloop(paraml, nick='', conn=None):
             mask = ["specials","coming_soon","top_sellers","new_releases","genres","trailerslideshow","status"]
             try:
                 sales = get_sales(mask)
-            except Exception as e:
-                print(">>> u'Error getting steam sales: %s'" % e.message)
+            except:
+                print(">>> u'Error getting steam sales :%s'" % (paraml[0]))
+                continue
 
             # Cut down on spam on bot restarts
             if prev_sales == {}:
