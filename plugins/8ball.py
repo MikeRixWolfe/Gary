@@ -29,7 +29,7 @@ nextresponsenumber = -1
 @hook.command
 @hook.command("8ball")
 def eightball(inp, nick='', say=None):
-  ".8ball <question> - ask the 8ball a question"
+  '''.8ball <question> - ask the 8ball a question'''
   global nextresponsenumber
   inp = inp.strip()
   if re.match("[a-zA-Z0-9]", inp[-1]):

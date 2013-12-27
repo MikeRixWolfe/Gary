@@ -25,7 +25,7 @@ def help(inp, bot=None, say=None):
     commandlist=sorted(commands)
     overflowlist=list()
     if not inp:
-        while len('Available commands: ' + ' '.join(commandlist)) >= 464:
+        while len('Available commands: ' + ' '.join(commandlist)) >= 460:
             overflowlist.append(commandlist.pop())
         if len(overflowlist)>0:
             say('Available commands: ' + ' '.join(commandlist))
@@ -61,7 +61,7 @@ def adminhelp(inp, bot=None, say=None):
     commandlist=sorted(commands)
     overflowlist=list()
     if not inp:
-        while len('Available commands: ' + ' '.join(commandlist)) >= 464:
+        while len('Available commands: ' + ' '.join(commandlist)) >= 460:
             overflowlist.append(commandlist.pop())
         if len(overflowlist)>0:
             say('Available commands: ' + ' '.join(commandlist))

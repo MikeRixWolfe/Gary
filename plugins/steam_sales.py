@@ -128,11 +128,10 @@ def steamsales(inp, say=''):
     
     
 @hook.event('JOIN')
-@hook.command()
 def saleloop(paraml, nick='', conn=None):
     # Don't spawn threads for private messages
     global running_sale_loops
-    if paraml[0][0] != '#' or paraml[0] in running_sale_loops or nick != conn.nick:
+    if paraml[0] != '#geekboy' or paraml[0] in running_sale_loops or nick != conn.nick:
         return
     running_sale_loops.append(paraml[0])
     prev_sales = {}
@@ -140,7 +139,7 @@ def saleloop(paraml, nick='', conn=None):
     while True:
         try:
             time.sleep(1200)
-            print(">>> u'Checking for new Steam sales :%s'" % paraml[0])
+            #print(">>> u'Checking for new Steam sales :%s'" % paraml[0])
 
             # Get data
             mask = ["specials","coming_soon","top_sellers","new_releases","genres","trailerslideshow","status"]

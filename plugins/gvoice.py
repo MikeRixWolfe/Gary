@@ -166,13 +166,12 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
     except:
         print(">>> u'Error logging in to Google Voice :%s'" % server)
         return
-    #try:    
     while True:
-        time.sleep(60)
+        time.sleep(90)
         try:
             voice.sms()
     
-            print(">>> u'Checking for unread sms :%s'" % server)
+            #print(">>> u'Checking for unread sms :%s'" % server)
             messagecounter=0
             for message in extractsms(voice.sms.html):
                 if check_smslog(db, message['id']) == None and message['from'][:-1] not in privatelist:
@@ -192,12 +191,12 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
                             conn.send(out)
                         mark_as_read(db, str(message['id']))
             if messagecounter == 0:
-               print(">>> u'No new SMS found :%s'" % server)
+                #print(">>> u'No new SMS found :%s'" % server)
+                pass
             elif messagecounter == 1:
                 print(">>> u'Outputting "+ str(messagecounter) +" message complete :%s'" % server)
             else:
                 print(">>> u'Outputting "+ str(messagecounter) +" messages complete :%s'" % server)
-            #time.sleep(60)
         except:
             print(">>> u'Error parsing data from Google Voice :%s'" % server)
             continue
