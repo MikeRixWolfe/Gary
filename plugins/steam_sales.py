@@ -8,27 +8,23 @@ from datetime import datetime
 
 running_sale_loops = []
 
-timestamp_format = '%Y%m%H%M'
-
-def localtime(format):
-    return time.strftime(format, time.localtime())
-
-
 def get_featured():
     sales_url = "http://store.steampowered.com/api/featured/"
     sales = http.get_json(sales_url)
+  
     # Log sales for debug purposes
-    path_name = 'plugins/steamsales_history/' + localtime(timestamp_format) + '-featured.json'
-    json.dump(sales, open(path_name, 'w+'), sort_keys=False, indent=2)
+    json.dump(sales, open('plugins/steamsales_history/' + time.strftime('%Y%m%H%M', time.localtime()) + '-featured.json', 'w+'), sort_keys=False, indent=2)
+    
     return sales
 
 
 def get_featuredcategories():
     sales_url = "http://store.steampowered.com/api/featuredcategories/"
     sales = http.get_json(sales_url)
+    
     # Log sales for debug purposes
-    path_name = 'plugins/steamsales_history/' + localtime(timestamp_format) + '-featuredcategories.json'
-    json.dump(sales, open(path_name, 'w+'), sort_keys=False, indent=2)
+    json.dump(sales, open('plugins/steamsales_history/' + time.strftime('%Y%m%H%M', time.localtime()) + '-featuredcategories.json', 'w+'), sort_keys=False, indent=2)
+    
     return sales
     
 
@@ -61,8 +57,7 @@ def get_sales(mask_items):
         del data[item]
     
     # Log sales for debug purposes
-    path_name = 'plugins/steamsales_history/' + localtime(timestamp_format) + '-data.json'
-    json.dump(data, open(path_name, 'w+'), sort_keys=False, indent=2)
+    json.dump(data, open('plugins/steamsales_history/' + time.strftime('%Y%m%H%M', time.localtime()) + '-data.json', 'w+'), sort_keys=False, indent=2)
  
     # Format data
     sales = {}
@@ -96,11 +91,6 @@ def get_sales(mask_items):
                         item["name"] = item["name"].encode("ascii", "ignore") # Get rid of characters the boty cant output
                     except:
                         pass
-                    # Delete this debug section
-                    #if type(item["id"]) == int:
-                    #    print item["name"] + " is an " + str(type(item["id"]))
-                    #    item["id"] = str(item["id"]) # The ID's steam returns are not a consistant type, wtf right?
-                    #    print "Now " + item["name"] + " is an " + str(type(item["id"]))
                     for k in item.keys():
                         if k not in ["discount_expiration", "discounted", "name", "currency", "final_price", "discount_percent", "id"]:
                             del item[k]
@@ -112,8 +102,7 @@ def get_sales(mask_items):
         sales[category] = sorted(sales[category], key=lambda k: k["name"])
     
     # Log sales for debug purposes
-    path_name = 'plugins/steamsales_history/' + localtime(timestamp_format) + '-sales.json'
-    json.dump(sales, open(path_name, 'w+'), sort_keys=False, indent=2)
+    json.dump(sales, open('plugins/steamsales_history/' + time.strftime('%Y%m%H%M', time.localtime()) + '-sales.json', 'w+'), sort_keys=False, indent=2)
 
     # Return usable data
     return sales
@@ -209,9 +198,7 @@ def saleloop(paraml, nick='', conn=None):
             # Output appropriate data
             for category in sales:
                 message = ""
-                output_counter = 0
                 for item in sales[category]:
-                    output_counter += 1
                     if message == "":
                         message = "\x02New " + category + "\x0F: "
                     if str(item["id"]) not in (game["id"] for category in prev_sales for game in prev_sales[category]):
@@ -226,7 +213,7 @@ def saleloop(paraml, nick='', conn=None):
                                 str(item["discount_percent"]))
                         message += "; "
                 message = message.strip(':; ')
-                if message != "\x02New " + category + "\x0F" and ((category == "Featured Sales" or category == "Flash Sales") and output_counter > 0): #1):
+                if message != "\x02New " + category + "\x0F":
                     out = "PRIVMSG {} :{}".format(paraml[0], message)
                     conn.send(out)
 
