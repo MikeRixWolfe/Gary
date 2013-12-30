@@ -2,22 +2,33 @@
 steam_sales.py - Written by MikeRixWolfe 2013
 """
 
-import time, re
+import time, re, json, os
 from util import hook, http
 from datetime import datetime
 
-
 running_sale_loops = []
+
+timestamp_format = '%Y%m%H%M'
+
+def localtime(format):
+    return time.strftime(format, time.localtime())
+
 
 def get_featured():
     sales_url = "http://store.steampowered.com/api/featured/"
     sales = http.get_json(sales_url)
+    # Log sales for debug purposes
+    path_name = 'plugins/steamsales_history/' + localtime(timestamp_format) + '-featured.json'
+    json.dump(sales, open(path_name, 'w+'), sort_keys=False, indent=2)
     return sales
 
 
 def get_featuredcategories():
     sales_url = "http://store.steampowered.com/api/featuredcategories/"
     sales = http.get_json(sales_url)
+    # Log sales for debug purposes
+    path_name = 'plugins/steamsales_history/' + localtime(timestamp_format) + '-featuredcategories.json'
+    json.dump(sales, open(path_name, 'w+'), sort_keys=False, indent=2)
     return sales
     
 
@@ -38,9 +49,7 @@ def get_sales(mask_items):
     data["featured"]["name"] = "Featured Sales"
     data["featured"]["items"] = []
     for item in flash_data["large_capsules"]:
-        try:
-            check_for_key = item["discount_expiration"]
-        except KeyError:
+        if "discount_expiration" not in item.keys():
             item["discount_expiration"] = 9999999999
         if item["discount_expiration"] - fetchtime <= 28800:
             data["flash"]["items"].append(item)
@@ -50,12 +59,17 @@ def get_sales(mask_items):
     # Mask Data
     for item in mask_items:
         del data[item]
-        
+    
+    # Log sales for debug purposes
+    path_name = 'plugins/steamsales_history/' + localtime(timestamp_format) + '-data.json'
+    json.dump(data, open(path_name, 'w+'), sort_keys=False, indent=2)
+ 
     # Format data
     sales = {}
     for category in data:
         for item in data[category]["items"]:
-                if "url" in item.keys() and item["url"] != "":
+                # Prepare item data
+                if "url" in item.keys() and item["url"] != "": # Midweek Madness/etc
                     data[category]["name"] = item["name"]
                     appid = str(item["url"])[34:-1] #str(re.match(r'[0-9]{5-6}', item["url"]))
                     appdata = http.get_json("http://store.steampowered.com/api/appdetails/?appids=%s" % appid)
@@ -70,19 +84,37 @@ def get_sales(mask_items):
                         item["discount_percent"]  = appdata[appid]["data"]["price_overview"]["discount_percent"]
                     except KeyError:
                         item["discount_percent"] = '100'
+                    if "discounted" not in item.keys() and item["discount_percent"] > 100:
+                        item["discounted"] = True
+                    else:
+                        item["discounted"] = False
+                # Begin work for discounted item
                 if item["discounted"]:
+                    # Clean Item
                     item["id"] = str(item["id"]) # The ID's steam returns are not a consistant type, wtf right?
                     try:
-                        item["name"] = item["name"].encode("ascii", "ignore")
+                        item["name"] = item["name"].encode("ascii", "ignore") # Get rid of characters the boty cant output
                     except:
                         pass
-                    if data[category]["name"] in sales.keys():
-                        sales[data[category]["name"]].append(item)
-                    else:
+                    # Delete this debug section
+                    #if type(item["id"]) == int:
+                    #    print item["name"] + " is an " + str(type(item["id"]))
+                    #    item["id"] = str(item["id"]) # The ID's steam returns are not a consistant type, wtf right?
+                    #    print "Now " + item["name"] + " is an " + str(type(item["id"]))
+                    for k in item.keys():
+                        if k not in ["discount_expiration", "discounted", "name", "currency", "final_price", "discount_percent", "id"]:
+                            del item[k]
+                    # Add item to sales
+                    if data[category]["name"] not in sales.keys():
                         sales[data[category]["name"]] = []
-                        sales[data[category]["name"]].append(item) 
-        sales[data[category]["name"]] = sorted(sales[data[category]["name"]], key=lambda k: k["name"])
+                    sales[data[category]["name"]].append(item)
+    for category in sales:
+        sales[category] = sorted(sales[category], key=lambda k: k["name"])
     
+    # Log sales for debug purposes
+    path_name = 'plugins/steamsales_history/' + localtime(timestamp_format) + '-sales.json'
+    json.dump(sales, open(path_name, 'w+'), sort_keys=False, indent=2)
+
     # Return usable data
     return sales
 
@@ -91,6 +123,9 @@ def get_sales(mask_items):
 def steamsales(inp, say=''):
     ".steamsales <flash|featured|specials|top_sellers|daily|all> - Check Steam for specified sales; Displays special event deals on top of chosen deals."
     options={"flash": "Flash Sales", "featured": "Featured Sales", "specials" : "Specials", "top_sellers" : "Top Sellers", "daily" : "Daily Deal", "all" : "All"}
+    # Establish environment
+    if not os.path.exists('plugins/steamsales_history'):
+        os.makedirs('plugins/steamsales_history')
 
     # Verify and stage input data
     inp = inp.lower().split()
@@ -147,7 +182,12 @@ def saleloop(paraml, nick='', conn=None):
     if paraml[0] != '#geekboy' or paraml[0] in running_sale_loops or nick != conn.nick:
         return
     running_sale_loops.append(paraml[0])
+
+    # Establish environment
+    if not os.path.exists('plugins/steamsales_history'):
+        os.makedirs('plugins/steamsales_history')
     prev_sales = {}
+
     print(">>> u'Beginning Steam sale check loop for :%s'" % paraml[0])
     while True:
         try:
@@ -162,14 +202,16 @@ def saleloop(paraml, nick='', conn=None):
                 print(">>> u'Error getting steam sales :%s'" % (paraml[0]))
                 continue
 
-            # Cut down on spam on bot restarts
+            # Cut down on spam on bot restarts, correct for bad/empty json returns
             if prev_sales == {}:
                 prev_sales = sales
 
             # Output appropriate data
             for category in sales:
                 message = ""
+                output_counter = 0
                 for item in sales[category]:
+                    output_counter += 1
                     if message == "":
                         message = "\x02New " + category + "\x0F: "
                     if str(item["id"]) not in (game["id"] for category in prev_sales for game in prev_sales[category]):
@@ -184,7 +226,7 @@ def saleloop(paraml, nick='', conn=None):
                                 str(item["discount_percent"]))
                         message += "; "
                 message = message.strip(':; ')
-                if message != "\x02New " + category + "\x0F":
+                if message != "\x02New " + category + "\x0F" and ((category == "Featured Sales" or category == "Flash Sales") and output_counter > 0): #1):
                     out = "PRIVMSG {} :{}".format(paraml[0], message)
                     conn.send(out)
 
