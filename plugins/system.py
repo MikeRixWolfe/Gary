@@ -72,8 +72,8 @@ def uptime(inp, bot=None):
 
 
 @hook.command(autohelp=False)
-def suptime(inp, bot=None):
-    """.suptime - Shows the system's uptime."""
+def sysuptime(inp, bot=None):
+    """.sysuptime - Shows the system's uptime."""
     uptime_string=""
     with open('/proc/uptime', 'r') as f:
         uptime_seconds = float(f.readline().split()[0])

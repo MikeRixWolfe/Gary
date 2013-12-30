@@ -30,9 +30,22 @@ def get_sales(mask_items):
         return {}
         
     # Aggregate data
+    fetchtime = int(time.time())
     data["flash"] = {}
-    data["flash"]["name"] = "Flash/Featured Sales"
-    data["flash"]["items"] = flash_data["large_capsules"]
+    data["flash"]["name"] = "Flash Sales"
+    data["flash"]["items"] = []
+    data["featured"] = {}
+    data["featured"]["name"] = "Featured Sales"
+    data["featured"]["items"] = []
+    for item in flash_data["large_capsules"]:
+        try:
+            check_for_key = item["discount_expiration"]
+        except KeyError:
+            item["discount_expiration"] = 9999999999
+        if item["discount_expiration"] - fetchtime <= 28800:
+            data["flash"]["items"].append(item)
+        else:
+            data["featured"]["items"].append(item)
 
     # Mask Data
     for item in mask_items:
@@ -44,7 +57,7 @@ def get_sales(mask_items):
         for item in data[category]["items"]:
                 if "url" in item.keys() and item["url"] != "":
                     data[category]["name"] = item["name"]
-                    appid = str(item["url"])[34:-1]
+                    appid = str(item["url"])[34:-1] #str(re.match(r'[0-9]{5-6}', item["url"]))
                     appdata = http.get_json("http://store.steampowered.com/api/appdetails/?appids=%s" % appid)
                     item["name"] = appdata[appid]["data"]["name"]
                     item["id"] = appdata[appid]["data"]["steam_appid"]
@@ -76,8 +89,8 @@ def get_sales(mask_items):
     
 @hook.command()
 def steamsales(inp, say=''):
-    ".steamsales <flash|specials|top_sellers|daily|all> - Check Steam for specified sales; Displays special event deals on top of chosen deals."
-    options={"flash": "Flash/Featured Sales", "specials" : "Specials", "top_sellers" : "Top Sellers", "daily" : "Daily Deal", "all" : "All"}
+    ".steamsales <flash|featured|specials|top_sellers|daily|all> - Check Steam for specified sales; Displays special event deals on top of chosen deals."
+    options={"flash": "Flash Sales", "featured": "Featured Sales", "specials" : "Specials", "top_sellers" : "Top Sellers", "daily" : "Daily Deal", "all" : "All"}
 
     # Verify and stage input data
     inp = inp.lower().split()
@@ -95,7 +108,7 @@ def steamsales(inp, say=''):
     try:
         sales = get_sales(mask)
     except Exception as e:
-        print e.message
+        print(str(e))
         return " Steam Store API error, please try again in a few minutes"
     
     # Mask data for users request
