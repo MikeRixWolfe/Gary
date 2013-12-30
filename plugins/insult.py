@@ -5,8 +5,8 @@ from util import hook
 
 noun = ["ass", "back", "cock", "dick", "shit", "team"]
 adjective=["eating", "fucking", "killing", "stabbing", "sucking"]
-prefix=["blowjob","cock", "dick", "dip", "douche", "fuck", "rimjob","rookie", "shisno"]
-suffix=["bag", "berry", "biscuit", "bite", "fucker", "shit", "tard", "whore"]
+prefix=["blowjob","cock", "dick", "dip", "douche", "fuck"]
+suffix=["bag", "berry", "biscuit", "bite", "shit", "tard", "whore"]
 
 
 @hook.command
