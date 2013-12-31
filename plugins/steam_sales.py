@@ -201,7 +201,7 @@ def saleloop(paraml, nick='', conn=None):
                 for item in sales[category]:
                     if message == "":
                         message = "\x02New " + category + "\x0F: "
-                    if str(item["id"]) not in (game["id"] for category in prev_sales for game in prev_sales[category]):
+                    if item not in (game for category in prev_sales for game in prev_sales[category]):
                         if item["final_price"] == 'Free to Play':
                             message += "\x02%s\x0F: %s" % (item["name"],
                             item["final_price"])
