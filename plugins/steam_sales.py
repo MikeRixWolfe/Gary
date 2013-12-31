@@ -13,8 +13,9 @@ def get_featured():
     sales = http.get_json(sales_url)
   
     # Log sales for debug purposes
-    json.dump(sales, open('plugins/steamsales_history/' + time.strftime('%Y%m%H%M', time.localtime()) + '-featured.json', 'w+'), sort_keys=False, indent=2)
-    
+    #with open('plugins/steamsales_history/' + time.strftime('%Y%m%d%H%M', time.localtime()) + '-featuredcategories.json', 'w+') as f:
+    #    json.dump(sales, f, sort_keys=False, indent=2)
+ 
     return sales
 
 
@@ -23,7 +24,8 @@ def get_featuredcategories():
     sales = http.get_json(sales_url)
     
     # Log sales for debug purposes
-    json.dump(sales, open('plugins/steamsales_history/' + time.strftime('%Y%m%H%M', time.localtime()) + '-featuredcategories.json', 'w+'), sort_keys=False, indent=2)
+    #with open('plugins/steamsales_history/' + time.strftime('%Y%m%d%H%M', time.localtime()) + '-featuredcategories.json', 'w+') as f:
+    #    json.dump(sales, f, sort_keys=False, indent=2)
     
     return sales
     
@@ -57,7 +59,8 @@ def get_sales(mask_items):
         del data[item]
     
     # Log sales for debug purposes
-    json.dump(data, open('plugins/steamsales_history/' + time.strftime('%Y%m%H%M', time.localtime()) + '-data.json', 'w+'), sort_keys=False, indent=2)
+    #with open('plugins/steamsales_history/' + time.strftime('%Y%m%d%H%M', time.localtime()) + '-featuredcategories.json', 'w+') as f:
+    #    json.dump(data, f, sort_keys=False, indent=2)
  
     # Format data
     sales = {}
@@ -102,7 +105,8 @@ def get_sales(mask_items):
         sales[category] = sorted(sales[category], key=lambda k: k["name"])
     
     # Log sales for debug purposes
-    json.dump(sales, open('plugins/steamsales_history/' + time.strftime('%Y%m%H%M', time.localtime()) + '-sales.json', 'w+'), sort_keys=False, indent=2)
+    #with open('plugins/steamsales_history/' + time.strftime('%Y%m%d%H%M', time.localtime()) + '-featuredcategories.json', 'w+') as f:
+    #    json.dump(sales, f, sort_keys=False, indent=2)
 
     # Return usable data
     return sales
@@ -112,9 +116,9 @@ def get_sales(mask_items):
 def steamsales(inp, say=''):
     ".steamsales <flash|featured|specials|top_sellers|daily|all> - Check Steam for specified sales; Displays special event deals on top of chosen deals."
     options={"flash": "Flash Sales", "featured": "Featured Sales", "specials" : "Specials", "top_sellers" : "Top Sellers", "daily" : "Daily Deal", "all" : "All"}
-    # Establish environment
-    if not os.path.exists('plugins/steamsales_history'):
-        os.makedirs('plugins/steamsales_history')
+    # Create dr to log sales for debug purposes
+    #if not os.path.exists('plugins/steamsales_history'):
+    #    os.makedirs('plugins/steamsales_history')
 
     # Verify and stage input data
     inp = inp.lower().split()
@@ -172,11 +176,11 @@ def saleloop(paraml, nick='', conn=None):
         return
     running_sale_loops.append(paraml[0])
 
-    # Establish environment
-    if not os.path.exists('plugins/steamsales_history'):
-        os.makedirs('plugins/steamsales_history')
-    prev_sales = {}
+    # Create dr to log sales for debug purposes
+    #if not os.path.exists('plugins/steamsales_history'):
+    #    os.makedirs('plugins/steamsales_history')
 
+    prev_sales = {}
     print(">>> u'Beginning Steam sale check loop for :%s'" % paraml[0])
     while True:
         try:
@@ -204,7 +208,7 @@ def saleloop(paraml, nick='', conn=None):
                     if item not in (game for category in prev_sales for game in prev_sales[category]):
                         if item["final_price"] == 'Free to Play':
                             message += "\x02%s\x0F: %s" % (item["name"],
-                            item["final_price"])
+                                item["final_price"])
                         else:
                             message += "\x02%s\x0F: $%s.%s(%s%% off)" % \
                                 (item["name"],
@@ -220,6 +224,7 @@ def saleloop(paraml, nick='', conn=None):
             # Update dict of previous sales if appropriate
             if sales != {}:
                 prev_sales = sales
+
             print(">>> u'Finished check for new Steam sales :%s'" % paraml[0])
         except:
             print(">>> u'Error checking for new Steam sales :%s'" % paraml[0])

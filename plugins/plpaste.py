@@ -6,12 +6,14 @@ def plpaste(inp, say='', bot=None):
     if inp in bot.commands:
         with open(bot.commands[inp][0].func_code.co_filename.strip()) as f:
             say(web.haste(f.read(), ext='py'))
+            return
     else:
         try:
             if inp[-3:] == '.py':
-                inp = inp[-3:]
+                inp = inp[:-3]
             plugin = open('plugins/%s.py' % inp)
             say(web.haste(plugin.read(), ext='py'))
+            return
         except:
             pass
                  
