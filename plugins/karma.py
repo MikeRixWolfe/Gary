@@ -53,6 +53,7 @@ def karma(inp, chan='', say=None, db=None, input=None):
         say("%s has neutral karma" % inp.strip('()? '))
 
 
+@hook.singlethread
 @hook.regex(r'^(.+)(?: has an all-time net karma of )(-)?(\d+)(?:\ .+)?')
 def setkarma(inp, nick='', chan='', db=None):
     db_init(db)

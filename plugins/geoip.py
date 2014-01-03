@@ -2,7 +2,7 @@
 geoip.py: written by MikeFightsBears 2013
 """
 
-import os, subprocess
+import os
 from util import hook, http
 
 @hook.command

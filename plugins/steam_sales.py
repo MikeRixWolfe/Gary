@@ -3,7 +3,7 @@ steam_sales.py - Written by MikeRixWolfe 2013
 """
 
 import time, re, json, os
-from util import hook, http
+from util import hook, http, text
 from datetime import datetime
 
 running_sale_loops = []
@@ -13,8 +13,8 @@ def get_featured():
     sales = http.get_json(sales_url)
   
     # Log sales for debug purposes
-    #with open('plugins/steamsales_history/' + time.strftime('%Y%m%d%H%M', time.localtime()) + '-featuredcategories.json', 'w+') as f:
-    #    json.dump(sales, f, sort_keys=False, indent=2)
+    with open('persist/steamsales_history/' + time.strftime('%Y%m%d%H%M', time.localtime()) + '-featured.json', 'w+') as f:
+        json.dump(sales, f, sort_keys=False, indent=2)
  
     return sales
 
@@ -24,8 +24,8 @@ def get_featuredcategories():
     sales = http.get_json(sales_url)
     
     # Log sales for debug purposes
-    #with open('plugins/steamsales_history/' + time.strftime('%Y%m%d%H%M', time.localtime()) + '-featuredcategories.json', 'w+') as f:
-    #    json.dump(sales, f, sort_keys=False, indent=2)
+    with open('persist/steamsales_history/' + time.strftime('%Y%m%d%H%M', time.localtime()) + '-featuredcategories.json', 'w+') as f:
+        json.dump(sales, f, sort_keys=False, indent=2)
     
     return sales
     
@@ -59,8 +59,8 @@ def get_sales(mask_items):
         del data[item]
     
     # Log sales for debug purposes
-    #with open('plugins/steamsales_history/' + time.strftime('%Y%m%d%H%M', time.localtime()) + '-featuredcategories.json', 'w+') as f:
-    #    json.dump(data, f, sort_keys=False, indent=2)
+    with open('persist/steamsales_history/' + time.strftime('%Y%m%d%H%M', time.localtime()) + '-data.json', 'w+') as f:
+        json.dump(data, f, sort_keys=False, indent=2)
  
     # Format data
     sales = {}
@@ -105,20 +105,21 @@ def get_sales(mask_items):
         sales[category] = sorted(sales[category], key=lambda k: k["name"])
     
     # Log sales for debug purposes
-    #with open('plugins/steamsales_history/' + time.strftime('%Y%m%d%H%M', time.localtime()) + '-featuredcategories.json', 'w+') as f:
-    #    json.dump(sales, f, sort_keys=False, indent=2)
+    with open('persist/steamsales_history/' + time.strftime('%Y%m%d%H%M', time.localtime()) + '-sales.json', 'w+') as f:
+        json.dump(sales, f, sort_keys=False, indent=2)
 
     # Return usable data
     return sales
 
-    
+
+@hook.singlethread
 @hook.command()
-def steamsales(inp, say=''):
+def steamsales(inp, say='', chan=''):
     ".steamsales <flash|featured|specials|top_sellers|daily|all> - Check Steam for specified sales; Displays special event deals on top of chosen deals."
     options={"flash": "Flash Sales", "featured": "Featured Sales", "specials" : "Specials", "top_sellers" : "Top Sellers", "daily" : "Daily Deal", "all" : "All"}
     # Create dr to log sales for debug purposes
-    #if not os.path.exists('plugins/steamsales_history'):
-    #    os.makedirs('plugins/steamsales_history')
+    #if not os.path.exists('persist/steamsales_history'):
+    #    os.makedirs('persist/steamsales_history')
 
     # Verify and stage input data
     inp = inp.lower().split()
@@ -136,8 +137,8 @@ def steamsales(inp, say=''):
     try:
         sales = get_sales(mask)
     except Exception as e:
-        print(str(e))
-        return " Steam Store API error, please try again in a few minutes"
+        print(">>> u'Error getting steam sales for {}: {}'".format(chan, e))
+        return "Steam Store API error, please try again in a few minutes."
     
     # Mask data for users request
     if "all" not in inp:
@@ -152,11 +153,10 @@ def steamsales(inp, say=''):
             if message == "":
                 message = "\x02" + category + "\x0F: "
             if item["final_price"] == 'Free to Play':
-                message += "\x02%s\x0F: %s" % (item["name"], 
+                message += "\x02{}\x0F: {}".format(item["name"], 
                     item["final_price"])
             else:
-                message += "\x02%s\x0F: $%s.%s(%s%% off)" % \
-                    (item["name"],
+                message += "\x02{}\x0F: ${}.{}({}% off)".format(item["name"],
                     str(item["final_price"])[:-2],
                     str(item["final_price"])[-2:],
                     str(item["discount_percent"]))
@@ -165,7 +165,7 @@ def steamsales(inp, say=''):
         if message != "\x02" + category + "\x0F":
             say(message)
         else:
-            say("%s: None found" % message)
+            say("{}: None found".format(message))
     
     
 @hook.event('JOIN')
@@ -177,11 +177,11 @@ def saleloop(paraml, nick='', conn=None):
     running_sale_loops.append(paraml[0])
 
     # Create dr to log sales for debug purposes
-    #if not os.path.exists('plugins/steamsales_history'):
-    #    os.makedirs('plugins/steamsales_history')
+    #if not os.path.exists('persist/steamsales_history'):
+    #    os.makedirs('persist/steamsales_history')
 
     prev_sales = {}
-    print(">>> u'Beginning Steam sale check loop for :%s'" % paraml[0])
+    print(">>> u'Beginning Steam sale check loop for :{}'".format(paraml[0]))
     while True:
         try:
             time.sleep(1200)
@@ -191,8 +191,8 @@ def saleloop(paraml, nick='', conn=None):
             mask = ["specials","coming_soon","top_sellers","new_releases","genres","trailerslideshow","status"]
             try:
                 sales = get_sales(mask)
-            except:
-                print(">>> u'Error getting steam sales :%s'" % (paraml[0]))
+            except Exception as e:
+                print(">>> u'Error getting Steam sales for {}: {}'".format(paraml[0]), e)
                 continue
 
             # Cut down on spam on bot restarts, correct for bad/empty json returns
@@ -207,17 +207,16 @@ def saleloop(paraml, nick='', conn=None):
                         message = "\x02New " + category + "\x0F: "
                     if item not in (game for category in prev_sales for game in prev_sales[category]):
                         if item["final_price"] == 'Free to Play':
-                            message += "\x02%s\x0F: %s" % (item["name"],
+                            message += "\x02{}\x0F: {}".format(item["name"],
                                 item["final_price"])
                         else:
-                            message += "\x02%s\x0F: $%s.%s(%s%% off)" % \
-                                (item["name"],
+                            message += "\x02{}\x0F: ${}.{}({}% off)".format(item["name"],
                                 str(item["final_price"])[:-2],
                                 str(item["final_price"])[-2:],
                                 str(item["discount_percent"]))
                         message += "; "
                 message = message.strip(':; ')
-                if message != "\x02New " + category + "\x0F":
+                if message != "\x02New " + category + "\x0F" or ((category == "Featured Sales" or category == "Flash Sales") and message.count(';') > 0):
                     out = "PRIVMSG {} :{}".format(paraml[0], message)
                     conn.send(out)
 
@@ -225,8 +224,8 @@ def saleloop(paraml, nick='', conn=None):
             if sales != {}:
                 prev_sales = sales
 
-            print(">>> u'Finished check for new Steam sales :%s'" % paraml[0])
-        except:
-            print(">>> u'Error checking for new Steam sales :%s'" % paraml[0])
+            print(">>> u'Finished check for new Steam sales :{}'".format(paraml[0]))
+        except Exception as e:
+            print(">>> u'Steam saleloop error for {}: {}'".format(paraml[0]), e)
             continue
 
