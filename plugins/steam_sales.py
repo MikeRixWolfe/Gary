@@ -2,42 +2,51 @@
 steam_sales.py - Written by MikeRixWolfe 2013
 """
 
-import time, re, json, os
-from util import hook, http, text
+import time
+import re
+import json
+import os
+from util import hook, http
 from datetime import datetime
 
+
 running_sale_loops = []
+
 
 def get_featured():
     sales_url = "http://store.steampowered.com/api/featured/"
     sales = http.get_json(sales_url)
-  
+
     # Log sales for debug purposes
-    with open('persist/steamsales_history/' + time.strftime('%Y%m%d%H%M', time.localtime()) + '-featured.json', 'w+') as f:
+    with open('persist/steamsales_history/' +
+              time.strftime('%Y%m%d%H%M', time.localtime()) +
+              '-featured.json', 'w+') as f:
         json.dump(sales, f, sort_keys=False, indent=2)
- 
+
     return sales
 
 
 def get_featuredcategories():
     sales_url = "http://store.steampowered.com/api/featuredcategories/"
     sales = http.get_json(sales_url)
-    
-    # Log sales for debug purposes
-    with open('persist/steamsales_history/' + time.strftime('%Y%m%d%H%M', time.localtime()) + '-featuredcategories.json', 'w+') as f:
-        json.dump(sales, f, sort_keys=False, indent=2)
-    
-    return sales
-    
 
-def get_sales(mask_items):
+    # Log sales for debug purposes
+    with open('persist/steamsales_history/' +
+              time.strftime('%Y%m%d%H%M', time.localtime()) +
+              '-featuredcategories.json', 'w+') as f:
+        json.dump(sales, f, sort_keys=False, indent=2)
+
+    return sales
+
+
+def get_sales(mask, flag=False):
     # Fetch data
     try:
         data = get_featuredcategories()
         flash_data = get_featured()
     except:
-        return {}
-        
+        raise
+
     # Aggregate data
     fetchtime = int(time.time())
     data["flash"] = {}
@@ -53,170 +62,191 @@ def get_sales(mask_items):
             data["flash"]["items"].append(item)
         else:
             data["featured"]["items"].append(item)
+    data = {v["name"].split(' ', 1)[0].lower() if k.isdigit() else k: v
+            for k, v in data.items() if isinstance(v, dict)}
 
     # Mask Data
-    for item in mask_items:
-        del data[item]
-    
+    if flag:
+        data = {k: v for k, v in data.items() if v["name"] in mask}
+    else:
+        data = {k: v for k, v in data.items() if k not in mask}
+
     # Log sales for debug purposes
-    with open('persist/steamsales_history/' + time.strftime('%Y%m%d%H%M', time.localtime()) + '-data.json', 'w+') as f:
+    with open('persist/steamsales_history/' +
+              time.strftime('%Y%m%d%H%M', time.localtime()) +
+              '-data.json', 'w+') as f:
         json.dump(data, f, sort_keys=False, indent=2)
- 
+
     # Format data
     sales = {}
     for category in data:
+        sales[data[category]["name"]] = []
         for item in data[category]["items"]:
                 # Prepare item data
-                if "url" in item.keys() and item["url"] != "": # Midweek Madness/etc
+                if "url" in item.keys() and item["url"]:  # Midweek Madness/etc
                     data[category]["name"] = item["name"]
-                    appid = str(item["url"])[34:-1] #str(re.match(r'[0-9]{5-6}', item["url"]))
-                    appdata = http.get_json("http://store.steampowered.com/api/appdetails/?appids=%s" % appid)
+                    appid = str(item["url"])[34:-1]
+                    appdata = http.get_json("http://store.steampowered.com\
+                        /api/appdetails/?appids={}".format(appid))
                     item["name"] = appdata[appid]["data"]["name"]
                     item["id"] = appdata[appid]["data"]["steam_appid"]
                     try:
-                        item["final_price"] = appdata[appid]["data"]["price_overview"]["final"]
+                        item["final_price"] = \
+                            appdata[appid]["data"]["price_overview"]["final"]
                     except KeyError:
                         item["final_price"] = 'Free to Play'
                     item["discounted"] = True
                     try:
-                        item["discount_percent"]  = appdata[appid]["data"]["price_overview"]["discount_percent"]
+                        item["discount_percent"] = 
+                            appdata[appid]["data"]["price_overview"]["discount_percent"]
                     except KeyError:
                         item["discount_percent"] = '100'
-                    if "discounted" not in item.keys() and item["discount_percent"] > 100:
+                    if "discounted" not in item.keys() \
+                            and item["discount_percent"] > 0:
                         item["discounted"] = True
                     else:
                         item["discounted"] = False
                 # Begin work for discounted item
                 if item["discounted"]:
                     # Clean Item
-                    item["id"] = str(item["id"]) # The ID's steam returns are not a consistant type, wtf right?
+                    item["id"] = str(item["id"])
                     try:
-                        item["name"] = item["name"].encode("ascii", "ignore") # Get rid of characters the boty cant output
+                        item["name"] = item["name"].encode("ascii", "ignore")
                     except:
                         pass
-                    for k in item.keys():
-                        if k not in ["discount_expiration", "discounted", "name", "currency", "final_price", "discount_percent", "id"]:
-                            del item[k]
+                    item = {k: v for k, v in item.items() if k in
+                            ["discount_expiration", "discounted",
+                            "name", "currency", "final_price",
+                            "discount_percent", "id"]}
                     # Add item to sales
-                    if data[category]["name"] not in sales.keys():
-                        sales[data[category]["name"]] = []
                     sales[data[category]["name"]].append(item)
-    for category in sales:
-        sales[category] = sorted(sales[category], key=lambda k: k["name"])
-    
+    sales = {k: sorted(v, key=lambda v: v["name"]) for k, v in sales.items()}
+
     # Log sales for debug purposes
-    with open('persist/steamsales_history/' + time.strftime('%Y%m%d%H%M', time.localtime()) + '-sales.json', 'w+') as f:
+    with open('persist/steamsales_history/' +
+              time.strftime('%Y%m%d%H%M', time.localtime()) +
+              '-sales.json', 'w+') as f:
         json.dump(sales, f, sort_keys=False, indent=2)
 
     # Return usable data
     return sales
 
 
+def format_sale_item(item):
+    if item["final_price"] == 'Free to Play':
+        out = "\x02{}\x0F: {}; ".format(item["name"],
+              item["final_price"])
+    else:
+        out = "\x02{}\x0F: ${}.{}({}% off); ".format(item["name"],
+              str(item["final_price"])[:-2],
+              str(item["final_price"])[-2:],
+              str(item["discount_percent"]))
+    return out
+
+
 @hook.singlethread
 @hook.command()
 def steamsales(inp, say='', chan=''):
-    ".steamsales <flash|featured|specials|top_sellers|daily|all> - Check Steam for specified sales; Displays special event deals on top of chosen deals."
-    options={"flash": "Flash Sales", "featured": "Featured Sales", "specials" : "Specials", "top_sellers" : "Top Sellers", "daily" : "Daily Deal", "all" : "All"}
+    ".steamsales <flash|featured|specials|top_sellers|daily|all> - \
+        Check Steam for specified sales; \
+        Displays special event deals on top of chosen deals."
+    options = {"flash": "Flash Sales",
+               "featured": "Featured Sales",
+               "specials": "Specials",
+               "top_sellers": "Top Sellers",
+               "daily": "Daily Deal",
+               "all": "All"}
     # Create dr to log sales for debug purposes
-    #if not os.path.exists('persist/steamsales_history'):
-    #    os.makedirs('persist/steamsales_history')
+    if not os.path.exists('persist/steamsales_history'):
+        os.makedirs('persist/steamsales_history')
+
+    # Bool flag denoting strict or non-strict masking
+    flag = re.match(r'^.*(-strict).*', inp)
 
     # Verify and stage input data
-    inp = inp.lower().split()
-    inp = [line.strip(', ') for line in inp]
-    for i in inp:
-        if i not in options.keys():
-            inp.remove(i)
-    
+    if flag:
+        inp = [options[line.strip(', ')]
+               for line in inp.lower().split()
+               if line in options.keys()]
+    else:
+        inp = [line.strip(', ')
+               for line in inp.lower().split()
+               if line in options.keys()]
+
     # Check for bad input
-    if inp == []: 
+    if not inp:
         return steamsales.__doc__
 
+    # Construct Mask
+    mask = ["coming_soon", "new_releases", "genres",
+            "trailerslideshow", "status"]
+    if any(x in ["all", "All"] for x in inp):
+            flag = False
+    elif flag:
+        mask = inp
+    else:
+        mask += [option for option in options.keys() if option not in inp]
+
     # Get data
-    mask = ["coming_soon","new_releases","genres","trailerslideshow","status"]
     try:
-        sales = get_sales(mask)
+        sales = get_sales(mask, flag)
     except Exception as e:
         print(">>> u'Error getting steam sales for {}: {}'".format(chan, e))
         return "Steam Store API error, please try again in a few minutes."
-    
-    # Mask data for users request
-    if "all" not in inp:
-        for key in options:
-            if key not in inp and options[key] in sales.keys():
-                del sales[options[key]]
 
     # Output appropriate data
     for category in sales:
-        message = ""
+        message = "\x02" + category + "\x0F: "
         for item in sales[category]:
-            if message == "":
-                message = "\x02" + category + "\x0F: "
-            if item["final_price"] == 'Free to Play':
-                message += "\x02{}\x0F: {}".format(item["name"], 
-                    item["final_price"])
-            else:
-                message += "\x02{}\x0F: ${}.{}({}% off)".format(item["name"],
-                    str(item["final_price"])[:-2],
-                    str(item["final_price"])[-2:],
-                    str(item["discount_percent"]))
-            message += "; "
+            message += format_sale_item(item)
         message = message.strip(':; ')
         if message != "\x02" + category + "\x0F":
             say(message)
         else:
             say("{}: None found".format(message))
-    
-    
+
+
 @hook.event('JOIN')
 def saleloop(paraml, nick='', conn=None):
     # Don't spawn threads for private messages
     global running_sale_loops
-    if paraml[0] != '#geekboy' or paraml[0] in running_sale_loops or nick != conn.nick:
+    if paraml[0] != '#geekboy' or paraml[0] in running_sale_loops:
         return
     running_sale_loops.append(paraml[0])
 
     # Create dr to log sales for debug purposes
-    #if not os.path.exists('persist/steamsales_history'):
-    #    os.makedirs('persist/steamsales_history')
+    if not os.path.exists('persist/steamsales_history'):
+        os.makedirs('persist/steamsales_history')
 
     prev_sales = {}
     print(">>> u'Beginning Steam sale check loop for :{}'".format(paraml[0]))
     while True:
         try:
             time.sleep(1200)
-            #print(">>> u'Checking for new Steam sales :%s'" % paraml[0])
 
             # Get data
-            mask = ["specials","coming_soon","top_sellers","new_releases","genres","trailerslideshow","status"]
+            mask = ["specials", "coming_soon", "top_sellers", "new_releases",
+                    "genres", "trailerslideshow", "status"]
             try:
                 sales = get_sales(mask)
             except Exception as e:
-                print(">>> u'Error getting Steam sales for {}: {}'".format(paraml[0]), e)
+                print(">>> u'Error getting Steam sales for \
+                    {}: {}'".format(paraml[0]), e)
                 continue
 
-            # Cut down on spam on bot restarts, correct for bad/empty json returns
+            # Handle restarts and empty requests
             if prev_sales == {}:
                 prev_sales = sales
 
             # Output appropriate data
+            #if item not in (x for v in prev_sales for x in prev_sales[v]):
             for category in sales:
-                message = ""
+                message = "\x02New " + category + "\x0F: "
                 for item in sales[category]:
-                    if message == "":
-                        message = "\x02New " + category + "\x0F: "
-                    if item not in (game for category in prev_sales for game in prev_sales[category]):
-                        if item["final_price"] == 'Free to Play':
-                            message += "\x02{}\x0F: {}".format(item["name"],
-                                item["final_price"])
-                        else:
-                            message += "\x02{}\x0F: ${}.{}({}% off)".format(item["name"],
-                                str(item["final_price"])[:-2],
-                                str(item["final_price"])[-2:],
-                                str(item["discount_percent"]))
-                        message += "; "
+                    if item not in [x for v in prev_sales.values() for x in v]:
+                        message += format_sale_item(item)
                 message = message.strip(':; ')
-                if message != "\x02New " + category + "\x0F" or ((category == "Featured Sales" or category == "Flash Sales") and message.count(';') > 0):
+                if message != "\x02New " + category + "\x0F":
                     out = "PRIVMSG {} :{}".format(paraml[0], message)
                     conn.send(out)
 
@@ -224,8 +254,10 @@ def saleloop(paraml, nick='', conn=None):
             if sales != {}:
                 prev_sales = sales
 
-            print(">>> u'Finished check for new Steam sales :{}'".format(paraml[0]))
+            print(">>> u'Finished check for new Steam sales :\
+                {}'".format(paraml[0]))
         except Exception as e:
-            print(">>> u'Steam saleloop error for {}: {}'".format(paraml[0]), e)
+            print(">>> u'Steam saleloop error for \
+                {}: {}'".format(paraml[0]), e)
             continue
 

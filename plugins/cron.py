@@ -70,7 +70,6 @@ def cron(paraml, nick='', conn=None, db=None):
     while True:
         try:
             time.sleep(30)
-            #print ">>> u'Checking for cron jobs :%s'" % paraml[0]
             datestamp = str(datetime.datetime.now(EST()))[:16]
             rows = get_events(db, datestamp, paraml[0])
             for row in rows:
@@ -78,7 +77,6 @@ def cron(paraml, nick='', conn=None, db=None):
                 if row[3] == False:
                     remove_event(db, datestamp, row[2], row[0], row[1])
             clean_db(db, datestamp, paraml[0])
-            #print ">>> u'Finished checking for cron jobs :%s'" % paraml[0]
         except:
             print ">>> u'Error running cron loop :%s'" % paraml[0]
 

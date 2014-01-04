@@ -41,6 +41,7 @@ def karma_edit(inp, chan='', nick='', say=None, db=None):
         db.commit()
 
 
+@hook.singlethread
 @hook.command
 def karma(inp, chan='', say=None, db=None, input=None):
     ".karma <word> - returns karma of <word>; <word>(+ +|- -) - increments or decrements karma of <word> (no space)"
