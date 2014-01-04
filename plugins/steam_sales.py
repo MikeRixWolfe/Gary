@@ -239,7 +239,6 @@ def saleloop(paraml, nick='', conn=None):
                 prev_sales = sales
 
             # Output appropriate data
-            #if item not in (x for v in prev_sales for x in prev_sales[v]):
             for category in sales:
                 message = "\x02New " + category + "\x0F: "
                 for item in sales[category]:
