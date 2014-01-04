@@ -97,7 +97,7 @@ def get_sales(mask, flag=False):
                         item["final_price"] = 'Free to Play'
                     item["discounted"] = True
                     try:
-                        item["discount_percent"] = 
+                        item["discount_percent"] = \
                             appdata[appid]["data"]["price_overview"]["discount_percent"]
                     except KeyError:
                         item["discount_percent"] = '100'
