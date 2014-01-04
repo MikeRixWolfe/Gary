@@ -67,7 +67,7 @@ def first(inp, input=None, db=None, say=None):
     else:
         say("Never!")
 
-#@hook.singlethread
+
 @hook.command(autohelp=False)
 def king(inp, input=None, db=None, say=None, bot=None):
     ".king - gets the user with the most used commands"

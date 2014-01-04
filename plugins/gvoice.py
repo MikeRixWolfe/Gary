@@ -11,8 +11,6 @@ from util import hook, text
 from googlevoice import Voice
 from googlevoice.util import input
 
-running_parseloop_threads = []
-
 
 def db_init(db):
     db.execute("create table if not exists phonebook(name, phonenumber,"
@@ -82,8 +80,7 @@ def extractsms(htmlsms):
 
 @hook.command()
 def sms(inp, nick='', chan='', say='', input=None, db=None, bot=None):
-    ".sms <10 digit number|name in phonebook> <message> - sends a text message\
-         to a specified number or recipient via Google Voice"
+    ".sms <10 digit number|name in phonebook> <message> - sends a text message to a specified number or recipient via Google Voice"
     if input.chan[0] != '#':
         return "Can only SMS from public channels to control abuse."
     db_init(db)
@@ -123,8 +120,7 @@ def sms(inp, nick='', chan='', say='', input=None, db=None, bot=None):
 
 @hook.command(adminonly=True)
 def call(inp, say='', nick='', input=None, db=None, bot=None):
-    ".call <10 digit number|user in phonebook> - calls specified <number|user>\
-         and connects the call to your number from .phonebook via Google Voice"
+    ".call <10 digit number|user in phonebook> - calls specified <number|user> and connects the call to your number from .phonebook via Google Voice"
     db_init(db)
     privatelist = bot.config["gvoice"]["private"]
     forwardingNumber = get_phonenumber(db, nick)
@@ -146,27 +142,21 @@ def call(inp, say='', nick='', input=None, db=None, bot=None):
         try:
             voice.login()
         except:
-            return "Google Voice login error, \
-                please try again in a few minutes."
+            return "Google Voice login error, please try again in a few minutes."
         voice.call(outgoingNumber, forwardingNumber)
         say("Calling %s from %s..." % (outgoingNumber, forwardingNumber))
     else:
         return "Your number needs to be in my phonebook to use this function"
 
 
-#@hook.singlethread
+@hook.singlethread
 @hook.event('JOIN')
 def parseloop(paraml, nick='', conn=None, bot=None, db=None):
     server = "%s:%s" % (conn.server, conn.port)
-    global running_parseloop_threads
-    if server != "localhost:7666" or nick != conn.nick:
+    # Ensure it runs on the right channel, on the right server
+    if server != "localhost:7666" or paraml[0] != "#geekboy":
         return
-    if len(running_parseloop_threads) > 0:
-        print(">>> u'I am already parsing SMS for :%s'" % server)
-        return
-    else:
-        running_parseloop_threads.append(server)
-        print(">>> u'Beginning SMS parse loop for %s'" % server)
+    print(">>> u'Beginning SMS parse loop for %s'" % server)
     db_init(db)
     privatelist = bot.config["gvoice"]["private"]
     voice = Voice()
@@ -222,8 +212,7 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
         try:
             voice.login()
         except:
-            say(">>> u'Error logging in to Google Voice, \
-                please try again in a few minutes.'")
+            say(">>> u'Error logging in to Google Voice, please try again in a few minutes.'")
             return
         try:
             voice.sms()
@@ -264,8 +253,7 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
 
 @hook.command
 def phonebook(inp, nick='', input=None, db=None, bot=None):
-    ".phonebook <name|10 digit number|delete> - \
-        gets a users phone number, or sets/deletes your phone number"
+    ".phonebook <name|10 digit number|delete> - gets a users phone number, or sets/deletes your phone number"
     db_init(db)
     privatelist = bot.config["gvoice"]["private"]
     name_or_num = inp.strip()
@@ -304,8 +292,7 @@ def privatecontacts(inp, notice=None, bot=None, say=None):
 
 @hook.command(adminonly=True)
 def add_privatecontact(inp, say=None, notice=None, bot=None, config=None):
-    """.add_privateContact <number|contact> - \
-        adds <number|contact> to private contact list."""
+    """.add_privateContact <number|contact> - adds <number|contact> to private contact list."""
     target = inp.strip()
     privatelist = bot.config["gvoice"]["private"]
     if target in privatelist:
@@ -321,8 +308,7 @@ def add_privatecontact(inp, say=None, notice=None, bot=None, config=None):
 
 @hook.command(adminonly=True)
 def remove_privatecontact(inp, say=None, notice=None, bot=None, config=None):
-    """.remove_privateContact <number|contact> - \
-        removes <number|contact> from private contact list."""
+    """.remove_privateContact <number|contact> - removes <number|contact> from private contact list."""
     target = inp.strip()
     privatelist = bot.config["gvoice"]["private"]
     if target in privatelist:

@@ -115,7 +115,7 @@ def log(paraml, input=None, bot=None, db=None):
     print timestamp, input.chan, beau.encode('utf8', 'ignore')
 
 
-#@hook.singlethread
+@hook.singlethread
 def log_chat(db, chan, nick, msg, timestamp):
     db.execute("insert into log(time, chan, nick, msg, uts)"
 	"values(?, lower(?), lower(?), ?, ?)", (datetime.datetime.now(), chan, nick, msg, time.time()))

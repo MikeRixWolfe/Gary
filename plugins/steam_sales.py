@@ -45,7 +45,7 @@ def get_sales(mask, flag=False):
         data = get_featuredcategories()
         flash_data = get_featured()
     except:
-        raise
+        return {}
 
     # Aggregate data
     fetchtime = int(time.time())
@@ -147,9 +147,7 @@ def format_sale_item(item):
 @hook.singlethread
 @hook.command()
 def steamsales(inp, say='', chan=''):
-    ".steamsales <flash|featured|specials|top_sellers|daily|all> - \
-        Check Steam for specified sales; \
-        Displays special event deals on top of chosen deals."
+    ".steamsales <flash|featured|specials|top_sellers|daily|all> - Check Steam for specified sales; Displays special event deals on top of chosen deals."
     options = {"flash": "Flash Sales",
                "featured": "Featured Sales",
                "specials": "Specials",
@@ -210,6 +208,7 @@ def steamsales(inp, say='', chan=''):
 def saleloop(paraml, nick='', conn=None):
     # Don't spawn threads for private messages
     global running_sale_loops
+    # Can remove first condition for multi-channel
     if paraml[0] != '#geekboy' or paraml[0] in running_sale_loops:
         return
     running_sale_loops.append(paraml[0])
@@ -230,8 +229,7 @@ def saleloop(paraml, nick='', conn=None):
             try:
                 sales = get_sales(mask)
             except Exception as e:
-                print(">>> u'Error getting Steam sales for \
-                    {}: {}'".format(paraml[0]), e)
+                print(">>> u'Error getting Steam sales for {}: {}'".format(paraml[0]), e)
                 continue
 
             # Handle restarts and empty requests
@@ -242,7 +240,8 @@ def saleloop(paraml, nick='', conn=None):
             for category in sales:
                 message = "\x02New " + category + "\x0F: "
                 for item in sales[category]:
-                    if item not in [x for v in prev_sales.values() for x in v]:
+                    #if item not in [x for v in prev_sales.values() for x in v]:
+                    if item not in (x for v in prev_sales for x in prev_sales[v]):
                         message += format_sale_item(item)
                 message = message.strip(':; ')
                 if message != "\x02New " + category + "\x0F":
@@ -253,10 +252,8 @@ def saleloop(paraml, nick='', conn=None):
             if sales != {}:
                 prev_sales = sales
 
-            print(">>> u'Finished check for new Steam sales :\
-                {}'".format(paraml[0]))
+            print(">>> u'Finished checking for Steam sales: {}'".format(paraml[0]))
         except Exception as e:
-            print(">>> u'Steam saleloop error for \
-                {}: {}'".format(paraml[0]), e)
+            print(">>> u'Steam saleloop error for {}: {}'".format(paraml[0]), e)
             continue
 
