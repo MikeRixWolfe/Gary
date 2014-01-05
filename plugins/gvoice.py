@@ -200,6 +200,7 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
                       " messages complete :%s'" % server)
         except:
             print(">>> u'Error parsing data from Google Voice :%s'" % server)
+            time.sleep(360)
             continue
 
 

@@ -68,6 +68,7 @@ def setkarma(inp, nick='', chan='', db=None):
     else:
         db.execute("insert or replace into karma(chan, word, karma)"
             "values(?,?,?)", (chan, word.lower(), karma))
+        db.commit()
         print ">>> u'Karma of %s set to %s :%s'" % (word, karma, chan)
 
 

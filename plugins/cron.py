@@ -7,6 +7,7 @@ import time
 import datetime
 from util import hook
 
+running_cron_loops = []
 timestamp_format = '%I:%M'
 datetimemask = '%Y-%m-%d %H:%M'
 
@@ -57,12 +58,11 @@ def clean_db(db, time, chan):
     db.commit()
     return
 
-running_cron_loops = []
 
 @hook.event('JOIN')
 def cron(paraml, nick='', conn=None, db=None):
     global running_cron_loops
-    if paraml[0] != '#geekboy' or paraml[0] in running_cron_loops or nick != conn.nick:
+    if paraml[0] != '#geekboy' or paraml[0] in running_cron_loops:
         return
     running_cron_loops.append(paraml[0])
     print ">>> u'Beginning cron loop :%s'" % paraml[0]
