@@ -8,7 +8,7 @@ def sieve_suite(bot, input, func, kind, args):
         return input
 
     if kind == "command":
-        if input.trigger in bot.config.get('disabled', []):
+        if input.trigger in bot.config.get('disabled', []) and input.nick not in bot.config.get('admins', []):
             return None
 
     fn = re.match(r'^plugins/(.+\.py$)', func._filename)
