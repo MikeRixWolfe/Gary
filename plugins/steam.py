@@ -28,4 +28,8 @@ def steam(inp):
     page = http.get("http://store.steampowered.com/search/?term=" + inp)
     soup = BeautifulSoup(page, 'lxml', from_encoding="utf-8")
     result = soup.find('a', {'class': 'search_result_row'})
-    return get_steam_info(result['href']) + " - " + web.isgd(result['href'])
+    try:
+        return get_steam_info(result['href']) + " - " + web.isgd(result['href'])
+    except Exception as e:
+        print "Steam search error: {}".format(e)
+        return "Steam API error, please try again later."

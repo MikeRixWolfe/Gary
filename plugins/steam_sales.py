@@ -83,29 +83,28 @@ def get_sales(mask, flag=False):
         sales[data[category]["name"]] = []
         for item in data[category]["items"]:
                 # Prepare item data
-                if "url" in item.keys() and item["url"]:  # Midweek Madness/etc
-                    data[category]["name"] = item["name"]
-                    appid = str(item["url"])[34:-1]
-                    appdata = http.get_json("http://store.steampowered.com\
-                        /api/appdetails/?appids={}".format(appid))
-                    item["name"] = appdata[appid]["data"]["name"]
-                    item["id"] = appdata[appid]["data"]["steam_appid"]
-                    try:
-                        item["final_price"] = \
-                            appdata[appid]["data"]["price_overview"]["final"]
-                    except KeyError:
-                        item["final_price"] = 'Free to Play'
-                    item["discounted"] = True
-                    try:
-                        item["discount_percent"] = \
-                            appdata[appid]["data"]["price_overview"]["discount_percent"]
-                    except KeyError:
-                        item["discount_percent"] = '100'
-                    if "discounted" not in item.keys() \
-                            and item["discount_percent"] > 0:
+                try:
+                    if "url" in item.keys() and item["url"]:  # Midweek Madness/etc
+                        data[category]["name"] = item["name"]
+                        appid = str(item["url"])[34:-1]
+                        appdata = http.get_json("http://store.steampowered.com/api/appdetails/?appids={}".format(appid))
+                        item["name"] = appdata[appid]["data"]["name"]
+                        item["id"] = appdata[appid]["data"]["steam_appid"]
+                        try:
+                            item["final_price"] = appdata[appid]["data"]["price_overview"]["final"]
+                        except KeyError:
+                            item["final_price"] = 'Free to Play'
                         item["discounted"] = True
-                    else:
-                        item["discounted"] = False
+                        try:
+                            item["discount_percent"] = appdata[appid]["data"]["price_overview"]["discount_percent"]
+                        except KeyError:
+                            item["discount_percent"] = '100'
+                        if "discounted" not in item.keys() and item["discount_percent"] > 0:
+                            item["discounted"] = True
+                        else:
+                            item["discounted"] = False
+                except:
+                    continue
                 # Begin work for discounted item
                 if item["discounted"]:
                     # Clean Item
@@ -200,8 +199,8 @@ def steamsales(inp, say='', chan=''):
         message = message.strip(':; ')
         if message != "\x02" + category + "\x0F":
             say(message)
-        else:
-            say("{}: None found".format(message))
+        #else:
+        #    say("{}: None found".format(message))
 
 
 @hook.event('JOIN')
@@ -209,7 +208,7 @@ def saleloop(paraml, nick='', conn=None):
     # Don't spawn threads for private messages
     global running_sale_loops
     # Can remove first condition for multi-channel
-    if paraml[0] != '#geekboy' or paraml[0] in running_sale_loops:
+    if paraml[0][0] != '#' or paraml[0] in running_sale_loops:
         return
     running_sale_loops.append(paraml[0])
 
