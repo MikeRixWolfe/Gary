@@ -2,6 +2,7 @@
 sms.py written by MikeFightsBears September 2013
 requires pygooglevoice
 """
+
 import time
 import re
 import sys
@@ -51,6 +52,14 @@ def mark_as_read(db, msgId):
     db.execute("insert into smslog(msgId) values(?)", (msgId,))
     db.commit()
     return
+
+
+def voice_login(voice = Voice()):
+    try:
+        voice.login()
+    except:
+        print(">>> u'Error logging in to Google Voice :%s'" % server)
+    return voice
 
 
 def extractsms(htmlsms):
@@ -171,8 +180,7 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
             voice.sms()
             messagecounter = 0
             for message in extractsms(voice.sms.html):
-                if check_smslog(db, message['id']) is None \
-                        and message['from'][:-1] not in privatelist:
+                if check_smslog(db, message['id']) is None and message['from'][:-1] not in privatelist:
                     messagecounter = messagecounter + 1
                     number = message['from'][2:-1]  # slice off "+1" and ":"
                     recip_nick = get_name(db, number)
@@ -200,8 +208,12 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
                       " messages complete :%s'" % server)
         except:
             print(">>> u'Error parsing data from Google Voice :%s'" % server)
-            time.sleep(360)
-            voice.login()
+            del voice
+            voice = Voice()
+            try:
+                voice.login()
+            except:
+                print(">>> u'Error relogging in to Google Voice :%s'" % server)
             continue
 
 
