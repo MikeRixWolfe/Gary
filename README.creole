@@ -16,7 +16,7 @@
 ==Requirements==
 *Gary runs on Python 2.6. 
 *Many of the plugins require [[http://codespeak.net/lxml/|lxml]]. It is developed on Ubuntu 9.10 with Python 2.6.4.
-*Many plugins require BeautifulSoup4
+*Many plugins require BeautifulSoup4.
 *GVoice plugin requires pygooglevoice, I reccomend [[https://github.com/MikeRixWolfe/pygooglevoice|my fork]].
 
 ==Special Thanks==

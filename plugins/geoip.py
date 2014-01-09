@@ -43,3 +43,4 @@ def whereis(inp):
         out = "Sorry, I couldn't find that user."
     return out
 
+#https://www.google.com/maps/?q=chicago+to+kalamazoo
