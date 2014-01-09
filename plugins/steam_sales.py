@@ -162,12 +162,10 @@ def steamsales(inp, say='', chan=''):
 
     # Verify and stage input data
     if flag:
-        inp = [options[line.strip(', ')]
-               for line in inp.lower().split()
+        inp = [options[line.strip(', ')] for line in inp.lower().split()
                if line in options.keys()]
     else:
-        inp = [line.strip(', ')
-               for line in inp.lower().split()
+        inp = [line.strip(', ') for line in inp.lower().split()
                if line in options.keys()]
 
     # Check for bad input
@@ -188,7 +186,7 @@ def steamsales(inp, say='', chan=''):
     try:
         sales = get_sales(mask, flag)
     except Exception as e:
-        print(">>> u'Error getting steam sales for {}: {}'".format(chan, e))
+        print(">>> u'Error getting steam sales: {} :{}'".format(e, chan))
         return "Steam Store API error, please try again in a few minutes."
 
     # Output appropriate data
@@ -199,8 +197,8 @@ def steamsales(inp, say='', chan=''):
         message = message.strip(':; ')
         if message != "\x02" + category + "\x0F":
             say(message)
-        #else:
-        #    say("{}: None found".format(message))
+        elif category in options.values():
+            say("{}: None found".format(message))
 
 
 @hook.event('JOIN')
@@ -217,7 +215,7 @@ def saleloop(paraml, nick='', conn=None):
         os.makedirs('persist/steamsales_history')
 
     prev_sales = {}
-    print(">>> u'Beginning Steam sale check loop for :{}'".format(paraml[0]))
+    print(">>> u'Beginning Steam sale check loop :{}'".format(paraml[0]))
     while True:
         try:
             time.sleep(1200)
@@ -228,7 +226,7 @@ def saleloop(paraml, nick='', conn=None):
             try:
                 sales = get_sales(mask)
             except Exception as e:
-                print(">>> u'Error getting Steam sales for {}: {}'".format(paraml[0]), e)
+                print(">>> u'Error getting Steam sales: {} :{}'".format(e, paraml[0]))
                 continue
 
             # Handle restarts and empty requests
@@ -251,8 +249,8 @@ def saleloop(paraml, nick='', conn=None):
             if sales != {}:
                 prev_sales = sales
 
-            print(">>> u'Finished checking for Steam sales: {}'".format(paraml[0]))
+            #print(">>> u'Finished checking for Steam sales :{}'".format(paraml[0]))
         except Exception as e:
-            print(">>> u'Steam saleloop error for {}: {}'".format(paraml[0]), e)
+            print(">>> u'Steam saleloop error: {} :{}'".format(e,paraml[0]))
             continue
 
