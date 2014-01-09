@@ -208,7 +208,7 @@ def saleloop(paraml, nick='', conn=None):
     # Don't spawn threads for private messages
     global running_sale_loops
     # Can remove first condition for multi-channel
-    if paraml[0][0] != '#' or paraml[0] in running_sale_loops:
+    if paraml[0] != '#geekboy' or paraml[0] in running_sale_loops:
         return
     running_sale_loops.append(paraml[0])
 
