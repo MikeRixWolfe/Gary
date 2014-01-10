@@ -197,7 +197,7 @@ def steamsales(inp, say='', chan=''):
         message = message.strip(':; ')
         if message != "\x02" + category + "\x0F":
             say(message)
-        elif any(x in [k for k, v in options.items() if v == category] for x in inp):
+        elif (k for k, v in options.items() if v == category).next() in inp:
             say("{}: None found".format(message))
 
 
