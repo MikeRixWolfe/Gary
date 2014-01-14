@@ -201,7 +201,7 @@ def steamsales(inp, say='', chan=''):
             say("{}: None found".format(message))
 
 
-@hook.event('JOIN')
+#@hook.event('JOIN')
 def saleloop(paraml, nick='', conn=None):
     # Don't spawn threads for private messages
     global running_sale_loops

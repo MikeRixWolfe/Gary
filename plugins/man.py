@@ -42,11 +42,9 @@ def man(inp, say=''):
         else:
             system_manpage = get_system_manpage(command)
             if system_manpage:
-                man_re = "r'^[a-zA-Z]+\(([1-9])\)'"
                 haste_url = web.haste(system_manpage, ext='txt')
                 isgd_url = web.try_isgd(haste_url)
-                page =  re.match(man_re, system_manpage)
-                say("{} - {}({})".format(isgd_url, command, page))
+                say("{} - {}".format(isgd_url, command, page))
             else:
                 return "There is no man page for {}.".format(command)
     except Exception as e:#(http.HTTPError, http.URLError) as e:
