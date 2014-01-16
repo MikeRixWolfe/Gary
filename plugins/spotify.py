@@ -26,7 +26,7 @@ def region_filter(data):
 
 
 @hook.command
-def spotify(inp, say = None):
+def spotify(inp, say=None):
   ".spotify <query> - Searches the Spotify database for URL's to any matching songs. Replies with the first result."
 
   # Put together the request from bot input and the API URL

@@ -36,7 +36,4 @@ def ruby(inp, say=None):
     document, url = response
     output = parse_html(document)
 
-    message = ""
-    for line in output:
-        message += line[-1].decode('utf-8') + " "
-    return message
+    return output[-1].encode("ascii", "ignore")

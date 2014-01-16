@@ -15,6 +15,7 @@ import re, time, locale, random
 from bs4 import BeautifulSoup
 from util import hook, http, web, text
 from random import choice
+from steam import get_steam_info
 
 html_re = (r'https?\://(www\.)?\w+\.[a-zA-Z]{2,5}(\S)+', re.I)
 
@@ -92,7 +93,7 @@ def youtube_url(match, bot=None, say=None):
 @hook.regex(r'(?i)http://(?:www\.)?tinyurl.com/([A-Za-z0-9\-]+)')
 def tinyurl(inp, say=''):
     try:
-        say (http.open(inp.group()).url.strip())
+        say(http.open(inp.group()).url.strip())
     except http.URLError, e:
         pass
 
@@ -174,23 +175,4 @@ steam_re = (r'(.*:)//(store.steampowered.com)(:[0-9]+)?(.*)', re.I)
 @hook.regex(*steam_re)
 def steam_url(match):
     return get_steam_info("http://store.steampowered.com" + match.group(4))
-
-def get_steam_info(url):
-    # we get the soup manually because the steam pages have some odd encoding troubles
-    page = http.get(url)
-    soup = BeautifulSoup(page, 'lxml', from_encoding="utf-8")
-
-    name = soup.find('div', {'class': 'apphub_AppName'}).text
-    desc = ": " + text.truncate_str(soup.find('div', {'class': 'game_description_snippet'}).text.strip())
-
-    # the page has a ton of returns and tabs
-    details = soup.find('div', {'class': 'glance_details'}).text.strip().split(u"\n\n\r\n\t\t\t\t\t\t\t\t\t")
-    genre = " - Genre: " + details[0].replace(u"Genre: ", u"")
-    date = " - Release date: " + details[1].replace(u"Release Date: ", u"")
-    price = ""
-    if not "Free to Play" in genre:
-        price = " - Price: " + soup.find('div', {'class': 'game_purchase_price price'}).text.strip()
-
-    return name + desc + genre + date + price
-
 

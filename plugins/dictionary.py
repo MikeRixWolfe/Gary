@@ -22,10 +22,10 @@ def urban(inp):
     return out
 
 # define plugin by GhettoWizard & Scaevolus
-@hook.command('dictionary')
+@hook.command('dict')
 @hook.command
 def define(inp):
-    ".define/.dictionary <word> - fetches definition of <word>"
+    ".define/.dict <word> - fetches definition of <word>"
 
     url = 'http://ninjawords.com/'
 

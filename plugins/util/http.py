@@ -53,7 +53,7 @@ def open(url, query_params=None, user_agent=None, referer=None, post_data=None,
         query_params = {}
 
     if user_agent is None:
-        user_agent = ua_gary
+        user_agent = ua_firefox
 
     query_params.update(kwargs)
 

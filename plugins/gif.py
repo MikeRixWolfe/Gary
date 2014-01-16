@@ -3,9 +3,8 @@ from util import hook, http
 
 
 @hook.api_key('giphy')
-@hook.command('gif')
 @hook.command
-def giphy(inp, api_key=None):
+def gif(inp, api_key=None):
     '''.gif/.giphy <query> - returns first giphy search result'''
     url = 'http://api.giphy.com/v1/gifs/search'
     try:

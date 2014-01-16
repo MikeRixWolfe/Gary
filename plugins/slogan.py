@@ -18,7 +18,6 @@ def slogan(inp,say=''):
 
 @hook.command
 def sloganspam(inp,say=''):
-    ".sloganspam <word> - Makes 5 slogans for <word>."
     c = 0
     while c < 5:
         c += 1 

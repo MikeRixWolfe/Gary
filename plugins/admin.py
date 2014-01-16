@@ -260,7 +260,7 @@ def say(inp, conn=None, chan=None):
 
 
 @hook.command(adminonly=True)
-def acion(inp, conn=None, chan=None):
+def action(inp, conn=None, chan=None):
     """.action [channel] <action> - Makes the bot do <action> in [channel]. If [channel] is blank the bot will say the <action> in the channel the command was used in."""
     inp = inp.split(" ")
     if inp[0][0] == "#":

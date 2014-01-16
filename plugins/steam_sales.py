@@ -62,14 +62,12 @@ def get_sales(mask, flag=False):
             data["flash"]["items"].append(item)
         else:
             data["featured"]["items"].append(item)
-    data = {v["name"].split(' ', 1)[0].lower() if k.isdigit() else k: v
-            for k, v in data.items() if isinstance(v, dict)}
 
     # Mask Data
     if flag:
-        data = {k: v for k, v in data.items() if v["name"] in mask}
+        data = {k: v for k, v in data.items() if isinstance(v, dict) and v["name"] in mask}
     else:
-        data = {k: v for k, v in data.items() if k not in mask}
+        data = {k: v for k, v in data.items() if isinstance(v, dict) and k not in mask}
 
     # Log sales for debug purposes
     with open('persist/steamsales_history/' +
@@ -80,45 +78,55 @@ def get_sales(mask, flag=False):
     # Format data
     sales = {}
     for category in data:
-        sales[data[category]["name"]] = []
         for item in data[category]["items"]:
-                # Prepare item data
-                try:
-                    if "url" in item.keys() and item["url"]:  # Midweek Madness/etc
-                        data[category]["name"] = item["name"]
-                        appid = str(item["url"])[34:-1]
-                        appdata = http.get_json("http://store.steampowered.com/api/appdetails/?appids={}".format(appid))
-                        item["name"] = appdata[appid]["data"]["name"]
-                        item["id"] = appdata[appid]["data"]["steam_appid"]
-                        try:
-                            item["final_price"] = appdata[appid]["data"]["price_overview"]["final"]
-                        except KeyError:
-                            item["final_price"] = 'Free to Play'
+            # Prepare item data
+            try:
+                if "url" in item.keys() and item["url"]:  # Midweek Madness/etc
+                    data[category]["name"] = item["name"]
+                    appid = str(item["url"])[34:-1]
+                    appdata = http.get_json("http://store.steampowered.com/api/appdetails/?appids={}".format(appid))
+                    item["name"] = appdata[appid]["data"]["name"]
+                    item["id"] = appdata[appid]["data"]["steam_appid"]
+                    
+                    if "Free to Play" in appdata[appid]["data"]["genres"]:
+                        item["final_price"] = 'Free to Play'
+                        item["discount_percent"] = '100'
+                    else:
+                        item["final_price"] = appdata[appid]["data"]["price_overview"]["final"]
+                        item["discount_percent"] = appdata[appid]["data"]["price_overview"]["discount_percent"]
+                    #try:
+                    #    item["final_price"] = appdata[appid]["data"]["price_overview"]["final"]
+                    #except KeyError:
+                    #    item["final_price"] = 'Free to Play'
+                    #item["discounted"] = True
+                    #try:
+                    #    item["discount_percent"] = appdata[appid]["data"]["price_overview"]["discount_percent"]
+                    #except KeyError:
+                    #    item["discount_percent"] = '100'
+
+                    if "discounted" not in item.keys() and item["discount_percent"] > 0:
                         item["discounted"] = True
-                        try:
-                            item["discount_percent"] = appdata[appid]["data"]["price_overview"]["discount_percent"]
-                        except KeyError:
-                            item["discount_percent"] = '100'
-                        if "discounted" not in item.keys() and item["discount_percent"] > 0:
-                            item["discounted"] = True
-                        else:
-                            item["discounted"] = False
+                    else:
+                        item["discounted"] = False
+            except:
+                continue
+            # Begin work for discounted item
+            if item["discounted"]:
+                # Clean Item
+                item["id"] = str(item["id"])
+                try:
+                    item["name"] = item["name"].encode("ascii", "ignore")
                 except:
-                    continue
-                # Begin work for discounted item
-                if item["discounted"]:
-                    # Clean Item
-                    item["id"] = str(item["id"])
-                    try:
-                        item["name"] = item["name"].encode("ascii", "ignore")
-                    except:
-                        pass
-                    item = {k: v for k, v in item.items() if k in
-                            ["discount_expiration", "discounted",
-                            "name", "currency", "final_price",
-                            "discount_percent", "id"]}
-                    # Add item to sales
-                    sales[data[category]["name"]].append(item)
+                    pass
+                item = {k: v for k, v in item.items() if k in
+                        ["discount_expiration", "discounted",
+                        "name", "currency", "final_price",
+                        "discount_percent", "id"]}
+                # Add item to sales
+                if data[category]["name"] not in sales.keys():
+                    sales[data[category]["name"]] = []
+                sales[data[category]["name"]].append(item)
+                    
     sales = {k: sorted(v, key=lambda v: v["name"]) for k, v in sales.items()}
 
     # Log sales for debug purposes

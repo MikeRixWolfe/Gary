@@ -1,7 +1,6 @@
 import urlparse
 from util import hook, http, urlnorm
 
-@hook.command('isdown')
 @hook.command
 def isup(inp):
     ".isup <site> - uses isup.me to see if a site is up or not"

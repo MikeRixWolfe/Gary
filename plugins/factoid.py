@@ -81,7 +81,7 @@ def forget(inp, chan='', say=None, db=None):
 
 
 @hook.command
-@hook.regex(r'^(.+)\?')
+@hook.regex(r'^(.+)\?$')
 def factoid(inp, chan='', say=None, db=None):
     "Gary: <word|(multi word)> is <data> - sets <word|(multi word)> to <data>; \
     no Gary, <word|(multi word)> is <new data> - resets <word|(multi word)> to <new data>; \

@@ -1,25 +1,29 @@
 import re
+import json
 from util import hook, http, web, text
 from bs4 import BeautifulSoup
 
 
 def get_steam_info(url):
-    # we get the soup manually because the steam pages have some odd encoding troubles
-    page = http.get(url)
-    soup = BeautifulSoup(page, 'lxml', from_encoding="utf-8")
+    appid = re.match(r'.*?/app/(.+)/', url).group(1)
+    appdata = http.get_json("http://store.steampowered.com/api/appdetails/?appids={}".format(appid))
+    print appid
+    name = appdata[appid]["data"]["name"].encode("ascii", "ignore")
+    #desc = text.truncate_str(re.sub('<[^<]+?>', '', appdata[appid]["data"]["about_the_game"]))
+    genres = []
+    for genre in appdata[appid]["data"]["genres"]:
+        genres.append(genre["description"])
+    date = appdata[appid]["data"]["release_date"]["date"]
+    if not "Free to Play" in genres:
+        raw_price = str(appdata[appid]["data"]["price_overview"]["final"])
+        price = "$" + raw_price[:-2] + "." + raw_price[-2:]
+    else:
+        price = "Free to Play"
+        genres.remove("Free to Play")
+    genre = "/".join(genres)
 
-    name = soup.find('div', {'class': 'apphub_AppName'}).text
-    desc = ": " + text.truncate_str(soup.find('div', {'class': 'game_description_snippet'}).text.strip())
-
-    # the page has a ton of returns and tabs
-    details = soup.find('div', {'class': 'glance_details'}).text.strip().split(u"\n\n\r\n\t\t\t\t\t\t\t\t\t")
-    genre = " - Genre: " + details[0].replace(u"Genre: ", u"")
-    date = " - Release date: " + details[1].replace(u"Release Date: ", u"")
-    price = ""
-    if not "Free to Play" in genre:
-        price = " - Price: " + soup.find('div', {'class': 'game_purchase_price price'}).text.strip()
-
-    return name + desc + genre + date + price
+    #return "\x02{}\x0F: {} - {} - {} - {}".format(name, desc, genre, date, price)
+    return "\x02{}\x0F: {} - {} - {}".format(name, genre, date, price)
 
 
 @hook.command

@@ -11,7 +11,8 @@ from util import hook, http
 def stock(inp):
     '''.stock <symbol> - gets stock information from Yahoo.'''
 
-    url = ('http://query.yahooapis.com/v1/public/yql?format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys')
+    url = ('http://query.yahooapis.com/v1/public/yql?format=json&'
+           'env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys')
 
     try:
         parsed = http.get_json(url, q='select * from yahoo.finance.quote where symbol in ("%s")' % inp)  # heh, SQLI
@@ -49,10 +50,12 @@ def stockhistory(inp):
     url = ('http://query.yahooapis.com/v1/public/yql?format=json&'
            'env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys')
 
-    parsed = http.get_json(url, q='select * from yahoo.finance.quote '
-                           'where symbol in ("%s")' % inp)  # heh, SQLI
-
-    quote = parsed['query']['results']['quote']
+    try:
+        parsed = http.get_json(url, q='select * from yahoo.finance.quote '
+                               'where symbol in ("%s")' % inp)  # heh, SQLI
+        quote = parsed['query']['results']['quote']
+    except:
+        return "Yahoo Fianance API error, please try again in a few minutes"
 
     # if we dont get a company name back, the symbol doesn't match a company
     if quote['Change'] is None:
