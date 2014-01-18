@@ -196,7 +196,8 @@ class IRC(object):
 
     def send(self, str):
         self.conn.oqueue.put(str)
-    
+
+"""    
 class FakeIRC(IRC):
     def __init__(self, server, nick, port=6667, channels=[], conf={}, fn=""):
         self.channels = channels
@@ -237,7 +238,7 @@ class FakeIRC(IRC):
 
     def cmd(self, command, params=None):
         pass
-
+"""
 
 class SSLIRC(IRC):
     def __init__(self, server, nick, port=6667, channels=[], conf={},
