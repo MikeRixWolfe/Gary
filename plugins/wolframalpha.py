@@ -43,9 +43,6 @@ def wa(inp, api_key=None):
 
     ret = re.sub(r'\\:([0-9a-z]{4})', unicode_sub, ret)
 
-    #if len(ret) > 430:
-    #    ret = ret[:ret.rfind(' ', 0, 430)]
-    #    ret = re.sub(r'\W+$', '', ret) + '...'
     ret = ret.split('|')[0]
 
     if not ret:
