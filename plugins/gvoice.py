@@ -226,14 +226,14 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
         try:
             voice.login()
         except:
-            say(">>> u'Error logging in to Google Voice, please try again in a few minutes.'")
+            say("Error logging in to Google Voice, please try again in a few minutes.")
             return
         try:
             voice.sms()
         except:
-            say(">>> u'Error parsing data from Google Voice'")
+            say("Error parsing data from Google Voice.")
             return
-        say(">>> u'Checking for unread sms'")
+        say("Checking for unread SMS...")
         messagecounter = 0
         for message in extractsms(voice.sms.html):
             if check_smslog(db, message['id']) is None \
@@ -254,15 +254,15 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
                         conn.send(out)
                     mark_as_read(db, str(message['id']))
         if messagecounter == 0:
-            say(">>> u'No new SMS found'")
+            say("'No new SMS found.")
         elif messagecounter == 1:
-            say(">>> u'Outputting " +
+            say("Outputting " +
                 str(messagecounter) +
-                " message complete'")
+                " message complete.")
         else:
-            say(">>> u'Outputting " +
+            say("Outputting " +
                 str(messagecounter) +
-                " messages complete'")
+                " messages complete.")
 
 
 @hook.command
