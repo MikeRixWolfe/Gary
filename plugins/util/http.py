@@ -20,7 +20,7 @@ from bs4 import BeautifulSoup
 ua_gary = 'Gary/1.0 http://github.com/michaelrixwolfe/gary'
 
 ua_firefox = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.6) ' \
-    'Gecko/20070725 Firefox/2.0.0.6'
+             'Gecko/20070725 Firefox/2.0.0.6'
 ua_internetexplorer = 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'
 
 jar = cookielib.CookieJar()
@@ -46,14 +46,11 @@ def get_soup(*args, **kwargs):
     return BeautifulSoup(get(*args, **kwargs), 'lxml')
 
 
-def open(url, query_params=None, user_agent=None, referer=None, post_data=None,
+def open(url, query_params=None, headers=None, post_data=None,
          get_method=None, cookies=False, oauth=False, oauth_keys=None, **kwargs):
 
     if query_params is None:
         query_params = {}
-
-    if user_agent is None:
-        user_agent = ua_firefox
 
     query_params.update(kwargs)
 
@@ -64,10 +61,12 @@ def open(url, query_params=None, user_agent=None, referer=None, post_data=None,
     if get_method is not None:
         request.get_method = lambda: get_method
 
-    request.add_header('User-Agent', user_agent)
+    if headers is not None:
+        for header_key, header_value in headers.iteritems():
+            request.add_header(header_key, header_value)
 
-    if referer is not None:
-        request.add_header('Referer', referer)
+    if 'User-Agent' not in request.headers:
+        request.add_header('User-Agent', ua_firefox)
 
     if oauth:
         nonce = oauth_nonce()
