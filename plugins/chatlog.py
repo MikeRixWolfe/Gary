@@ -9,10 +9,10 @@ from util import hook
 @hook.command
 def last(inp, nick='', input=None, db=None, say=None):
     ".last <phrase> - finds the last occurence of a phrase"
-    regex_msg = '%'+input.msg[6:]+'%'
+    regex_msg = '%' + inp.strip() + '%'
 
     #Long query to overcome the fact that this command has already been logged and would be the last logged instance of the word
-    row = db.execute("select * from log where msg like ? and uts = (select max(uts) from log where msg like ? and uts !=  (select max(uts) from log where msg like ?)) and chan = ?",
+    row = db.execute("select time, nick, msg from log where msg like ? and uts = (select max(uts) from log where msg like ? and uts !=  (select max(uts) from log where msg like ?)) and chan = ?",
                 (regex_msg, regex_msg, regex_msg, input.chan)).fetchone()
     if row:
         #.strftime("%Y-%m-%d %H:%M:%S"),
@@ -23,18 +23,18 @@ def last(inp, nick='', input=None, db=None, say=None):
         minutes=delta.seconds/60%60
         seconds=delta.seconds%60
         if years > 0:
-            say("%s last said \"%s\" on %s (%s years, %s days, %s hours, %s minutes, and %s seconds ago)" % (row[2], row[3], row[0][:-7], years, days, hours, minutes, seconds))
+            say("%s last said \"%s\" on %s (%s years, %s days, %s hours, %s minutes, and %s seconds ago)" % (row[1], row[2], row[0][:-7], years, days, hours, minutes, seconds))
         elif days > 0 and years == 0:
-            say("%s last said \"%s\" on %s (%s days, %s hours, %s minutes, and %s seconds ago)" % (row[2], row[3], row[0][:-7], days, hours, minutes, seconds))
+            say("%s last said \"%s\" on %s (%s days, %s hours, %s minutes, and %s seconds ago)" % (row[1], row[2], row[0][:-7], days, hours, minutes, seconds))
         elif hours > 0 and days == 0:
-            say("%s last said \"%s\" on %s (%s hours, %s minutes, and %s seconds ago)" % (row[2], row[3], row[0][:-7], hours, minutes, seconds))
+            say("%s last said \"%s\" on %s (%s hours, %s minutes, and %s seconds ago)" % (row[1], row[2], row[0][:-7], hours, minutes, seconds))
         elif minutes > 0 and hours == 0:
-            say("%s last said \"%s\" on %s (%s minutes, and %s seconds ago)" % (row[2], row[3], row[0][:-7], minutes, seconds))
+            say("%s last said \"%s\" on %s (%s minutes, and %s seconds ago)" % (row[1], row[2], row[0][:-7], minutes, seconds))
         else:
-            if row[2] == nick:
+            if row[1] == nick:
     	        say("Seriously? You said it like, just now...") 
             else:
-    	        say("Seriously? %s said it like, just now..." % row[2])
+    	        say("Seriously? %s said it like, just now..." % row[1])
     else:
         say("Never!")
 
@@ -42,8 +42,7 @@ def last(inp, nick='', input=None, db=None, say=None):
 @hook.command
 def first(inp, input=None, db=None, say=None):
     ".first <phrase> - finds the first occurence of a phrase"
-    regex_msg = '%'+input.msg[7:]+'%'
-    print (regex_msg)
+    regex_msg = '%' + inp.strip() + '%'
     row = db.execute("select * from log where msg like ? and uts = (select min(uts) from log where msg like ? ) and chan = ?",
                 (regex_msg, regex_msg, input.chan)).fetchone()
     if row:
@@ -55,15 +54,15 @@ def first(inp, input=None, db=None, say=None):
         minutes=delta.seconds/60%60
         seconds=delta.seconds%60
         if years > 0:
-            say("%s first said \"%s\" on %s (%s years, %s days, %s hours, %s minutes, and %s seconds ago)" % (row[2], row[3], row[0][:-7], years, days, hours, minutes, seconds))
+            say("%s first said \"%s\" on %s (%s years, %s days, %s hours, %s minutes, and %s seconds ago)" % (row[1], row[2], row[0][:-7], years, days, hours, minutes, seconds))
         elif days > 0 and years == 0:
-            say("%s first said \"%s\" on %s (%s days, %s hours, %s minutes, and %s seconds ago)" % (row[2], row[3], row[0][:-7], days, hours, minutes, seconds))
+            say("%s first said \"%s\" on %s (%s days, %s hours, %s minutes, and %s seconds ago)" % (row[1], row[2], row[0][:-7], days, hours, minutes, seconds))
         elif hours > 0 and days == 0:
-            say("%s first said \"%s\" on %s (%s hours, %s minutes, and %s seconds ago)" % (row[2], row[3], row[0][:-7], hours, minutes, seconds))
+            say("%s first said \"%s\" on %s (%s hours, %s minutes, and %s seconds ago)" % (row[1], row[2], row[0][:-7], hours, minutes, seconds))
         elif minutes > 0 and hours == 0:
-            say("%s first said \"%s\" on %s (%s minutes, and %s seconds ago)" % (row[2], row[3], row[0][:-7], minutes, seconds))
+            say("%s first said \"%s\" on %s (%s minutes, and %s seconds ago)" % (row[1], row[2], row[0][:-7], minutes, seconds))
         else:
-            say("%s first said \"%s\" on %s (%s seconds ago)" % (row[2], row[3], row[0][:-7], seconds))
+            say("%s first said \"%s\" on %s (%s seconds ago)" % (row[1], row[2], row[0][:-7], seconds))
     else:
         say("Never!")
 
@@ -89,7 +88,7 @@ def king(inp, input=None, db=None, say=None, bot=None):
 @hook.command
 def said(inp, input=None, db=None, say=None):
     ".said <phrase> - finds anywho who has said a phrase"  
-    regex_msg = '%'+input.msg[6:]+'%'
+    regex_msg = '%' + inp.strip() + '%'
     rows = db.execute("select distinct nick from log where msg like ? and chan = ? order by nick",
                 (regex_msg,input.chan)).fetchall()
     if rows:
@@ -104,9 +103,9 @@ def said(inp, input=None, db=None, say=None):
         if overflow_counter == 0 and len(rows) == 1:
             return_string = "%s has said \"%s\"" % (raw_list[:-2], input.msg[6:])
         elif overflow_counter == 0 and len(rows) > 1:
-	        return_string = "%s have said \"%s\"" % (raw_list[:-2], input.msg[6:]) 
+            return_string = "%s have said \"%s\"" % (raw_list[:-2], input.msg[6:]) 
         else:
-	        return_string = "%s%s others have all said \"%s\"" % (raw_list, overflow_counter, input.msg[6:])
+            return_string = "%s%s others have all said \"%s\"" % (raw_list, overflow_counter, input.msg[6:])
         formatted_string = rreplace(return_string, ', ', ', and ', 1)
         say(formatted_string)
     else:
