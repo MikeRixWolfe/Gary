@@ -1,18 +1,13 @@
 """
 log.py: written by Scaevolus 2009
-	2013.09.24 - modified by MikeFightsBears
+        rewritten by MikeFightsBears 2014
 """
 
-import os
-import codecs
 import time
 import re
-import datetime
+from datetime import datetime
 
 from util import hook
-
-
-log_fds = {}  # '%(net)s %(chan)s' : (filename, fd)
 
 timestamp_format = '%H:%M:%S'
 
@@ -23,6 +18,7 @@ formats = {'PRIVMSG': '<%(nick)s> %(msg)s',
     'KICK': '-!- %(param1)s was kicked from %(chan)s by %(nick)s [%(msg)s]',
     'TOPIC': '-!- %(nick)s changed the topic of %(chan)s to: %(msg)s',
     'QUIT': '-!- %(nick)s has quit [%(msg)s]',
+    'NICK': '',
     'PING': '',
     'NOTICE': ''
 }
@@ -32,20 +28,15 @@ ctcp_formats = {'ACTION': '* %(nick)s %(ctcpmsg)s'}
 irc_color_re = re.compile(r'(\x03(\d+,\d+|\d)|[\x0f\x02\x16\x1f])')
 
 def db_init(db):
-    db.execute("create table if not exists log(time, chan, nick, msg, uts,"
-                " primary key(time, chan, nick))")
+    db.execute("create table if not exists log(time, server, chan, nick, user,"
+               " action, msg, uts, primary key(time, server, chan, nick))")
     db.commit()
-
-
-def get_log_filename(dir, server, chan):
-    return os.path.join(dir, 'log',  localtime('%Y'), server,
-            (localtime('%%s.%m-%d.log') % chan).lower())
 
 
 def localtime(format):
     return time.strftime(format, time.localtime())
 
-
+    
 def beautify(input):
     format = formats.get(input.command, '%(raw)s')
     args = dict(input)
@@ -70,53 +61,26 @@ def beautify(input):
     return format % args
 
 
-def get_log_fd(dir, server, chan):
-    fn = get_log_filename(dir, server, chan)
-    cache_key = '%s %s' % (server, chan)
-    filename, fd = log_fds.get(cache_key, ('', 0))
-
-    if fn != filename:  # we need to open a file for writing
-        if fd != 0:     # is a valid fd
-            fd.flush()
-            fd.close()
-        dir = os.path.split(fn)[0]
-        if not os.path.exists(dir):
-            os.makedirs(dir)
-        fd = codecs.open(fn, 'a', 'utf-8')
-        log_fds[cache_key] = (fn, fd)
-
-    return fd
-
-
 @hook.singlethread
 @hook.event('*')
-def log(paraml, input=None, bot=None, db=None):
+def logtest(paraml, input=None, bot=None, db=None):
     timestamp = localtime(timestamp_format)
-
-    fd = get_log_fd(bot.persist_dir, input.server, 'raw')
-    fd.write(timestamp + ' ' + input.raw + '\n')
-
-    if input.command == 'QUIT':  # these are temporary fixes until proper
-        input.chan = 'quit'      # presence tracking is implemented
-    if input.command == 'NICK':
-        input.chan = 'nick'
-
     beau = beautify(input)
 
     if beau == '':  # don't log this
         return
 
-    if input.chan:
-        fd = get_log_fd(bot.persist_dir, input.server, input.chan)
-        fd.write(timestamp + ' ' + beau + '\n')
-	#db_init(db)
-	if input.chan[0] == '#' and beau[:3] != '-!-':
-	    log_chat(db, input.chan, input.nick, input.msg, timestamp)
-    print timestamp, input.chan, beau.encode('utf8', 'ignore')
+    if input.chan and input.nick != input.conn.nick and input.command in formats.keys() and (input.chan[0] == '#' or input.chan == input.nick):
+        db_init(db)
+        log_chat(db, input.server, input.chan, input.nick, input.user, input.host,
+                 input.command, re.sub(r'^<' + input.nick + '>\ ','', beau.encode('ascii', 'ignore'), 1))
+
+    print timestamp, input.chan, beau.encode('ascii', 'ignore')
 
 
-@hook.singlethread
-def log_chat(db, chan, nick, msg, timestamp):
-    db.execute("insert into log(time, chan, nick, msg, uts)"
-	"values(?, lower(?), lower(?), ?, ?)", (datetime.datetime.now(), chan, nick, msg, time.time()))
+def log_chat(db, server, chan, nick, user, host, action, msg):
+    db.execute("insert into log(time, server, chan, nick, user, action, msg, uts)"
+               " values(?, lower(?), lower(?), lower(?), lower(?), upper(?), ?, ?)", 
+               (datetime.now(), server, chan, nick, user + "@" + host, action, msg, time.time()))
     db.commit()
+
