@@ -18,10 +18,10 @@ def get_featured():
     sales = http.get_json(sales_url)
 
     # Log sales for debug purposes
-    with open('persist/steamsales_history/' +
-              time.strftime('%Y%m%d%H%M', time.localtime()) +
-              '-featured.json', 'w+') as f:
-        json.dump(sales, f, sort_keys=False, indent=2)
+    #with open('persist/steamsales_history/' +
+    #          time.strftime('%Y%m%d%H%M', time.localtime()) +
+    #          '-featured.json', 'w+') as f:
+    #    json.dump(sales, f, sort_keys=False, indent=2)
 
     return sales
 
@@ -31,10 +31,10 @@ def get_featuredcategories():
     sales = http.get_json(sales_url)
 
     # Log sales for debug purposes
-    with open('persist/steamsales_history/' +
-              time.strftime('%Y%m%d%H%M', time.localtime()) +
-              '-featuredcategories.json', 'w+') as f:
-        json.dump(sales, f, sort_keys=False, indent=2)
+    #with open('persist/steamsales_history/' +
+    #          time.strftime('%Y%m%d%H%M', time.localtime()) +
+    #          '-featuredcategories.json', 'w+') as f:
+    #    json.dump(sales, f, sort_keys=False, indent=2)
 
     return sales
 
@@ -70,10 +70,10 @@ def get_sales(mask, flag=False):
         data = {k: v for k, v in data.items() if isinstance(v, dict) and k not in mask}
 
     # Log sales for debug purposes
-    with open('persist/steamsales_history/' +
-              time.strftime('%Y%m%d%H%M', time.localtime()) +
-              '-data.json', 'w+') as f:
-        json.dump(data, f, sort_keys=False, indent=2)
+    #with open('persist/steamsales_history/' +
+    #          time.strftime('%Y%m%d%H%M', time.localtime()) +
+    #          '-data.json', 'w+') as f:
+    #    json.dump(data, f, sort_keys=False, indent=2)
 
     # Format data
     sales = {}
@@ -130,10 +130,10 @@ def get_sales(mask, flag=False):
     sales = {k: sorted(v, key=lambda v: v["name"]) for k, v in sales.items()}
 
     # Log sales for debug purposes
-    with open('persist/steamsales_history/' +
-              time.strftime('%Y%m%d%H%M', time.localtime()) +
-              '-sales.json', 'w+') as f:
-        json.dump(sales, f, sort_keys=False, indent=2)
+    #with open('persist/steamsales_history/' +
+    #          time.strftime('%Y%m%d%H%M', time.localtime()) +
+    #          '-sales.json', 'w+') as f:
+    #    json.dump(sales, f, sort_keys=False, indent=2)
 
     # Return usable data
     return sales
@@ -209,12 +209,13 @@ def steamsales(inp, say='', chan=''):
             say("{}: None found".format(message))
 
 
+@hook.singlethread
 #@hook.event('JOIN')
 def saleloop(paraml, nick='', conn=None):
     # Don't spawn threads for private messages
     global running_sale_loops
     # Can remove first condition for multi-channel
-    if paraml[0] != '#geekboy' or paraml[0] in running_sale_loops:
+    if paraml[0] != '#test' or paraml[0] in running_sale_loops:
         return
     running_sale_loops.append(paraml[0])
 
