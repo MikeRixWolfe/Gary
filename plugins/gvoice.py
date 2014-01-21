@@ -96,7 +96,7 @@ def sms(inp, nick='', chan='', say='', input=None, db=None, bot=None):
     voice = Voice()
     privatelist = bot.config["gvoice"]["private"]
     try:
-        inp = inp.strip().decode('ascii', 'ignore')
+        inp = inp.strip().encode('ascii', 'ignore')
     except:
         return "Error sending SMS; message contains unsupported characters"
 
