@@ -1,6 +1,6 @@
 import re
 
-from util import hook, http
+from util import hook, http, text
 
 
 @hook.api_key('wolframalpha')
@@ -43,9 +43,7 @@ def wa(inp, api_key=None):
 
     ret = re.sub(r'\\:([0-9a-z]{4})', unicode_sub, ret)
 
-    ret = ret.split('|')[0]
-
     if not ret:
         return 'No results'
 
-    return ret
+    return text.truncate_str(ret, 430)
