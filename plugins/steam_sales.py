@@ -32,7 +32,7 @@ def get_featured():
     sales = http.get_json(sales_url)
 
     # Log sales for debug purposes
-    if debug == True:
+    if debug:
         log_sales_data("featured")
 
     return sales
@@ -43,7 +43,7 @@ def get_featuredcategories():
     sales = http.get_json(sales_url)
 
     # Log sales for debug purposes
-    if debug == True:
+    if debug:
         log_sales_data("featuredcategories")
 
     return sales
@@ -82,7 +82,7 @@ def get_sales(mask, flag=False):
                 v in data.items() if isinstance(v, dict) and k not in mask}
 
     # Log sales for debug purposes
-    if debug == True:
+    if debug:
         log_sales_data("data")
 
     # Format data
@@ -132,7 +132,7 @@ def get_sales(mask, flag=False):
     sales = {k: sorted(v, key=lambda v: v["name"]) for k, v in sales.items()}
 
     # Log sales for debug purposes
-    if debug == True:
+    if debug:
         log_sales_data("sales")
 
     # Return usable data
