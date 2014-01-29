@@ -22,12 +22,12 @@ def help(inp, bot=None, say=None):
                             funcs[func] = command
 
     commands = dict((value, key) for key, value in funcs.iteritems())
-    commandlist=sorted(commands)
-    overflowlist=list()
+    commandlist = sorted(commands)
+    overflowlist = list()
     if not inp:
         while len('Available commands: ' + ' '.join(commandlist)) >= 460:
             overflowlist.append(commandlist.pop())
-        if len(overflowlist)>0:
+        if len(overflowlist) > 0:
             say('Available commands: ' + ' '.join(commandlist))
             say(' '.join(sorted(overflowlist)))
         else:
@@ -36,7 +36,6 @@ def help(inp, bot=None, say=None):
     else:
         if inp in commands:
             say(commands[inp].__doc__)
-
 
 
 @hook.command(autohelp=False, adminonly=True)
@@ -58,12 +57,12 @@ def adminhelp(inp, bot=None, say=None):
                             funcs[func] = command
 
     commands = dict((value, key) for key, value in funcs.iteritems())
-    commandlist=sorted(commands)
-    overflowlist=list()
+    commandlist = sorted(commands)
+    overflowlist = list()
     if not inp:
         while len('Available commands: ' + ' '.join(commandlist)) >= 460:
             overflowlist.append(commandlist.pop())
-        if len(overflowlist)>0:
+        if len(overflowlist) > 0:
             say('Available commands: ' + ' '.join(commandlist))
             say(' '.join(sorted(overflowlist)))
         else:

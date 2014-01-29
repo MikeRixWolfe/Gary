@@ -11,9 +11,11 @@ running_cron_loops = []
 timestamp_format = '%I:%M'
 datetimemask = '%Y-%m-%d %H:%M'
 
+
 class EST(datetime.tzinfo):
+
     def utcoffset(self, dt):
-      return datetime.timedelta(hours=-5)
+        return datetime.timedelta(hours=-5)
 
     def dst(self, dt):
         return datetime.timedelta(0)
@@ -25,12 +27,13 @@ def localtime(format):
 
 def db_init(db):
     db.execute("create table if not exists cron(time, chan, msg, set_by, recurring,"
-            " primary key(time, chan, set_by))")
+               " primary key(time, chan, set_by))")
     db.commit()
 
 
 def get_events(db, time, chan):
-    rows = db.execute("select msg, set_by, chan, recurring from cron where time<=? and chan=lower(?)",
+    rows = db.execute(
+        "select msg, set_by, chan, recurring from cron where time<=? and chan=lower(?)",
         (time, chan.lower())).fetchall()
     if rows:
         return rows
@@ -39,21 +42,24 @@ def get_events(db, time, chan):
 
 
 def set_event(db, time, chan, msg, set_by, recurring):
-    db.execute("insert or replace into cron(time, chan, msg, set_by, recurring) values(?,?,?,?,?)", 
+    db.execute(
+        "insert or replace into cron(time, chan, msg, set_by, recurring) values(?,?,?,?,?)",
         (time, chan.lower(), msg, set_by, recurring))
     db.commit()
     return
 
 
 def remove_event(db, time, chan, msg, set_by):
-    db.execute("delete from cron where time=? and chan=lower(?) and msg=? and set_by=?",
+    db.execute(
+        "delete from cron where time=? and chan=lower(?) and msg=? and set_by=?",
         (time, chan.lower(), msg, set_by))
     db.commit()
     return
 
 
 def clean_db(db, time, chan):
-    db.execute("delete from cron where time<? and chan=lower(?) and recurring!='1'",
+    db.execute(
+        "delete from cron where time<? and chan=lower(?) and recurring!='1'",
         (time, chan.lower()))
     db.commit()
     return
@@ -73,7 +79,8 @@ def cron(paraml, nick='', conn=None, db=None):
             datestamp = str(datetime.datetime.now(EST()))[:16]
             rows = get_events(db, datestamp, paraml[0])
             for row in rows:
-                conn.send("PRIVMSG {} :{}".format(paraml[0],"%s: %s" % (row[1], row[0])))
+                conn.send(
+                    "PRIVMSG {} :{}".format(paraml[0], "%s: %s" % (row[1], row[0])))
                 if row[3] == False:
                     remove_event(db, datestamp, row[2], row[0], row[1])
             clean_db(db, datestamp, paraml[0])
@@ -89,7 +96,7 @@ def remindme(inp, nick='', chan='', db=None):
     if new_event and new_event.group(1) > str(datetime.datetime.now(EST()))[:16]:
         timestamp = new_event.group(1)
         message = new_event.group(2)
-        
+
         try:
             set_event(db, timestamp, chan, message, nick, False)
         except:

@@ -54,7 +54,7 @@ def mark_as_read(db, msgId):
     return
 
 
-def voice_login(voice = Voice()):
+def voice_login(voice=Voice()):
     try:
         voice.login()
     except:
@@ -333,4 +333,3 @@ def remove_privatecontact(inp, say=None, notice=None, bot=None, config=None):
     else:
         say("%s is not a private contact." % format(target))
     return
-

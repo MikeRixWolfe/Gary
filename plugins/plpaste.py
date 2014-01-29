@@ -1,5 +1,6 @@
 from util import hook, web
 
+
 @hook.command(adminonly=True)
 def plpaste(inp, say='', bot=None):
     ".plpaste <plugin> - Hastebin's a plugin's code and returns the link"
@@ -16,5 +17,5 @@ def plpaste(inp, say='', bot=None):
             return
         except:
             pass
-                 
+
         return "Could not find specified plugin."

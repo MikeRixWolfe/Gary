@@ -8,43 +8,48 @@ import time
 
 from util import hook
 
+
 def db_init(db):
     db.execute("create table if not exists quote"
-        "(key INTEGER PRIMARY KEY, chan, nick, add_nick, msg, time real)")
-    db.commit() 
+               "(key INTEGER PRIMARY KEY, chan, nick, add_nick, msg, time real)")
+    db.commit()
 
 
 def add_quote(db, chan, nick, add_nick, msg):
-    db.execute('''insert into quote (chan, nick, add_nick, msg, time) values(?,?,?,?,?)''',
+    db.execute(
+        '''insert into quote (chan, nick, add_nick, msg, time) values(?,?,?,?,?)''',
         (chan, nick, add_nick, msg, time.time()))
     db.commit()
 
 
 def del_quote(key):
     db.execute('''delete from quote where key=?''',
-        (key,))
+               (key,))
     db.commit()
 
 
 def get_quotes_by_nick(db, chan, nick):
-    return db.execute("select key, time, nick, msg from quote where chan=? and lower(nick)=lower(?) order by time",
+    return db.execute(
+        "select key, time, nick, msg from quote where chan=? and lower(nick)=lower(?) order by time",
         (chan, nick)).fetchall()
 
 
 def get_quotes_by_chan(db, chan):
-    return db.execute("select key, time, nick, msg from quote where chan=? order by time", 
+    return db.execute(
+        "select key, time, nick, msg from quote where chan=? order by time",
         (chan,)).fetchall()
 
 
 def get_quote_by_key(db, key):
     return db.execute("select key, time, nick, msg from quote where key=?",
-        (key,)).fetchall()
+                      (key,)).fetchall()
 
 
 def format_quote(q):
     key, ctime, nick, msg = q
     return "Quote #%d: <%s> \"%s\" on %s" % (key, nick, msg,
-        time.strftime("%Y-%m-%d", time.gmtime(ctime)))
+                                             time.strftime("%Y-%m-%d", time.gmtime(ctime)))
+
 
 @hook.command(autohelp=False)
 def randomquote(inp, nick='', chan='', db=None, input=None):
@@ -63,6 +68,7 @@ def randomquote(inp, nick='', chan='', db=None, input=None):
     num = random.randint(1, n_quotes)
     selected_quote = quotes[num - 1]
     return format_quote(selected_quote)
+
 
 @hook.command
 def getquote(inp, nick='', chan='', db=None):
@@ -83,8 +89,8 @@ def getquote(inp, nick='', chan='', db=None):
 def quote(inp, nick='', chan='', db=None):
     ".quote <nick> <msg> - gets adds quote"
     db_init(db)
-    quoted_nick = inp.split(' ',1)[0].strip('<> ')
-    msg = inp.split(' ',1)[1].strip(' ') 
+    quoted_nick = inp.split(' ', 1)[0].strip('<> ')
+    msg = inp.split(' ', 1)[1].strip(' ')
 
     try:
         add_quote(db, chan, quoted_nick, nick, msg)
@@ -92,4 +98,3 @@ def quote(inp, nick='', chan='', db=None):
     except db.IntegrityError:
         return "Error in adding quote."
     return "Quote added."
-

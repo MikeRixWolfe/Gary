@@ -4,31 +4,34 @@ import re
 from util import hook
 from lxml import etree, html
 
+
 def get_response(code):
-  url = "http://codepad.org/"
- 
-  parameters = { 
-    "lang": "Ruby", 
-    "code": code, 
-    "run": "True", 
-    "submit": "Submit"
-  }
+    url = "http://codepad.org/"
 
-  request = urllib2.Request(url, urllib.urlencode(parameters))
-  response = urllib2.urlopen(request).read()
-  response_url = urllib2.urlopen(request).geturl()
+    parameters = {
+        "lang": "Ruby",
+        "code": code,
+        "run": "True",
+        "submit": "Submit"
+    }
 
-  return [response, response_url]
+    request = urllib2.Request(url, urllib.urlencode(parameters))
+    response = urllib2.urlopen(request).read()
+    response_url = urllib2.urlopen(request).geturl()
+
+    return [response, response_url]
+
 
 def parse_html(document):
-  html = etree.HTML(document)
-  output = html.xpath('//div[@class="code"][2]//pre//text()')
-  return output
+    html = etree.HTML(document)
+    output = html.xpath('//div[@class="code"][2]//pre//text()')
+    return output
+
 
 @hook.command
 def ruby(inp, say=None):
     '''.rb / .ruby <code> - Executes Ruby code.'''
-    
+
     code = inp.split(" ")[0:]
     code = " ".join(code)
 

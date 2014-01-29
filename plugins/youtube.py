@@ -12,6 +12,7 @@ url = base_url + 'videos/%s?v=2&alt=jsonc'
 search_api_url = base_url + 'videos?v=2&alt=jsonc&max-results=1'
 video_url = "http://youtube.com/watch?v=%s"
 
+
 def get_video_description(vid_id):
     j = http.get_json(url % vid_id)
 

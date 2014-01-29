@@ -24,11 +24,13 @@ def rt(inp, api_key=None):
     if critics_score == -1:
         return
 
-    reviews = http.get_json(movie_reviews_url % id, apikey=api_key, review_type='all')
+    reviews = http.get_json(movie_reviews_url %
+                            id, apikey=api_key, review_type='all')
     review_count = reviews['total']
 
     fresh = critics_score * review_count / 100
     rotten = review_count - fresh
 
     return u"%s - critics: \x02%s%%\x02 (%s\u2191%s\u2193)" \
-            " audience: \x02%s%%\x02 - %s" % (title.strip(), str(critics_score).strip(), str(fresh).strip(), str(rotten).strip(), str(audience_score).strip(' '), url.strip(' '))
+        " audience: \x02%s%%\x02 - %s" % (title.strip(), str(critics_score).strip(), str(fresh)
+                                          .strip(), str(rotten).strip(), str(audience_score).strip(' '), url.strip(' '))

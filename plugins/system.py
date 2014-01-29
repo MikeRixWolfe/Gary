@@ -26,7 +26,8 @@ def system(inp):
     cpu = platform.machine()
     return "Hostname: \x02{}\x02, Operating System: \x02{}\x02, Python " \
            "Version: \x02{} {}\x02, Architecture: \x02{}\x02, CPU: \x02{}" \
-           "\x02".format(hostname, os, python_imp, python_ver, architecture, cpu)
+           "\x02".format(hostname, os, python_imp,
+                         python_ver, architecture, cpu)
 
 
 @hook.command(autohelp=False)
@@ -45,7 +46,7 @@ def memory(inp):
         out = "Threads: \x02{}\x02, Real Memory: \x02{}\x02, Allocated Memory: \x02{}\x02, Peak " \
               "Allocated Memory: \x02{}\x02, Stack Size: \x02{}\x02, Heap " \
               "Size: \x02{}\x02".format(s['Threads'], strings[0], strings[1], strings[2],
-              strings[3], strings[4])
+                                        strings[3], strings[4])
         # return output
         sfile.close()
         return out
@@ -74,10 +75,10 @@ def uptime(inp, bot=None):
 @hook.command(autohelp=False)
 def sysuptime(inp, bot=None):
     """.sysuptime - Shows the system's uptime."""
-    uptime_string=""
+    uptime_string = ""
     with open('/proc/uptime', 'r') as f:
         uptime_seconds = float(f.readline().split()[0])
-        uptime_string = str(timedelta(seconds = uptime_seconds))
+        uptime_string = str(timedelta(seconds=uptime_seconds))
     return "Uptime: \x02{}\x02".format(uptime_string[:-7])
 
 

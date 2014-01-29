@@ -1,5 +1,6 @@
 from util import http, hook
 
+
 @hook.command('btc', autohelp=False)
 @hook.command(autohelp=False)
 def bitcoin(inp, say=None):
@@ -22,4 +23,5 @@ def litecoin(inp, say=None):
     """litecoin - gets current exchange rate for litecoins from BTC-E"""
     data = http.get_json("https://btc-e.com/api/2/ltc_usd/ticker")
     ticker = data['ticker']
-    say("Current: \x0307${!s}\x0f - High: \x0307${!s}\x0f - Low: \x0307${!s}\x0f - Volume: {!s} LTC".format(ticker['buy'],ticker['high'],ticker['low'],ticker['vol_cur']))
+    say("Current: \x0307${!s}\x0f - High: \x0307${!s}\x0f - Low: \x0307${!s}\x0f - Volume: {!s} LTC".format(
+        ticker['buy'], ticker['high'], ticker['low'], ticker['vol_cur']))

@@ -6,9 +6,9 @@ from util import hook
 def ping(inp):
     '''.ping - pings an IP address or domain'''
 
-    command = "ping -c 1 " + inp;
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE);
+    command = "ping -c 1 " + inp
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
     process.wait()
-    result = process.stdout.read();
+    result = process.stdout.read()
     result = result.split('\n')
     return result[1]

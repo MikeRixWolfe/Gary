@@ -7,6 +7,7 @@ from util import hook, http
 
 api_url = "http://ws.audioscrobbler.com/2.0/?format=json"
 
+
 @hook.api_key('lastfm')
 @hook.command('np')
 @hook.command(autohelp=False)
@@ -56,8 +57,9 @@ def nowplaying(inp, nick='', say=None, api_key=None):
 
     say(ret)
 
+
 @hook.api_key('lastfm')
-@hook.command#(autohelp=False)
+@hook.command  # (autohelp=False)
 def toptrack(inp, nick='', say=None, api_key=None):
     ".toptrack [overall|7day|1month|3month|6month|12month] <user> - gets a LastFM user's most played track, specify time period or default to overall"
     inp = inp.strip("").split(" ")
@@ -66,10 +68,10 @@ def toptrack(inp, nick='', say=None, api_key=None):
         period = inp[0]
         user = inp[1]
     elif len(inp) == 1:
-        period="overall"
+        period = "overall"
         user = inp[0]
     else:
-        period="overall"
+        period = "overall"
         user = nick.strip()
 
     response = http.get_json(api_url, method="user.gettoptracks",
@@ -104,7 +106,8 @@ def toptrack(inp, nick='', say=None, api_key=None):
     artist = track["artist"]["name"]
     playcount = track["playcount"]
 
-    ret = "\x02%s\x0F's \x02%s\x0F top track - \x02%s\x0f" % (user, period, title)
+    ret = "\x02%s\x0F's \x02%s\x0F top track - \x02%s\x0f" % (user,
+                                                              period, title)
     if artist:
         ret += " by \x02%s\x0f" % artist
     if playcount:
@@ -118,8 +121,9 @@ def toptrack(inp, nick='', say=None, api_key=None):
 def similar(inp, nick='', say=None, api_key=None):
     ".similar <artist> - gets similar artists via lastfm"
 
-    response = http.get_json(api_url, method="artist.getsimilar", api_key=api_key, artist=inp.strip(), limit=5, autocorrect=1)
-    
+    response = http.get_json(api_url, method="artist.getsimilar",
+                             api_key=api_key, artist=inp.strip(), limit=5, autocorrect=1)
+
     if 'error' in response:
         if inp:  # specified a user name
             return "error: %s" % response["message"]

@@ -17,7 +17,7 @@ def isfloat(string):
 def gex(inp):
     '''.gex <amount> <from currency> <to currency> - Returns Google Exchange result; <amount> and <to currency> default to 1 and USD respectively'''
 
-    #Veryfiy and format input
+    # Veryfiy and format input
     query = inp.decode('utf-8').upper().split(' ', 2)
     if len(query) == 1:
         query.append('USD')
@@ -25,16 +25,17 @@ def gex(inp):
         if query[0].isdigit():
             query.append('USD')
         else:
-            query.insert(0,'1')
+            query.insert(0, '1')
     if len(query) == 3:
         if not (query[0].isdigit() or isfloat(query[0])):
             query[0] = 1
 
-    #Get data
-    query_url = 'https://rate-exchange.appspot.com/currency?from='+query[1]+'&to='+query[2]
+    # Get data
+    query_url = 'https://rate-exchange.appspot.com/currency?from=' + \
+        query[1] + '&to=' + query[2]
 
-    #Return
-    try: 
+    # Return
+    try:
         data = http.get_json(query_url, q=query[0])
     except:
         return "Google Exchange API error, please try again in a few minutes."

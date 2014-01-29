@@ -8,7 +8,7 @@ with open("plugins/data/slogans.txt") as f:
 
 
 @hook.command
-def slogan(inp,say=''):
+def slogan(inp, say=''):
     "slogan <word> - Makes a slogan for <word>."
     out = random.choice(slogans)
     if inp.lower() and out.startswith("<text>"):
@@ -17,12 +17,11 @@ def slogan(inp,say=''):
 
 
 @hook.command
-def sloganspam(inp,say=''):
+def sloganspam(inp, say=''):
     c = 0
     while c < 5:
-        c += 1 
+        c += 1
         out = random.choice(slogans)
         if inp.lower() and out.startswith("<text>"):
             inp = text.capitalize_first(inp)
         say(out.replace('<text>', inp))
-

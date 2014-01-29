@@ -44,7 +44,7 @@ def get_episodes_for_series(seriesname):
 
     try:
         series = get_zipped_xml(base_url + '%s/series/%s/all/en.zip' %
-                                    (api_key, series_id), path="en.xml")
+                                (api_key, series_id), path="en.xml")
     except URLError:
         res["error"] = "error contacting thetvdb.com"
         return res
@@ -114,8 +114,8 @@ def tv_next(inp):
         elif airdate == today:
             next_eps = ['Today (%s)' % episode_desc] + next_eps
         else:
-            #we're iterating in reverse order with newest episodes last
-            #so, as soon as we're past today, break out of loop
+            # we're iterating in reverse order with newest episodes last
+            # so, as soon as we're past today, break out of loop
             break
 
     if not next_eps:
@@ -153,8 +153,8 @@ def tv_last(inp):
         (first_aired, airdate, episode_desc) = ep_info
 
         if airdate < today:
-            #iterating in reverse order, so the first episode encountered
-            #before today was the most recently aired
+            # iterating in reverse order, so the first episode encountered
+            # before today was the most recently aired
             prev_ep = '%s (%s)' % (first_aired, episode_desc)
             break
 

@@ -7,20 +7,20 @@ from util import hook
 
 def db_init(db):
     db.execute("create table if not exists karma(chan, word, karma,"
-	" primary key(chan, word))")
+               " primary key(chan, word))")
     db.commit()
 
-	
+
 def get_karma(db, chan, word):
     row = db.execute("select karma from karma where chan=? and word=lower(?)",
-        (chan, word)).fetchone()
+                     (chan, word)).fetchone()
     if row:
         return row[0]
     else:
         return 0
 
 
-@hook.singlethread	
+@hook.singlethread
 @hook.regex(r'([^ ^\(^(\)\+\+)^(\)--)]+((\+\+)|(--))|\([^\(^(\)\+\+$)^(\)--)]+\)((\+\+)|(--)))')
 def karma_edit(inp, chan='', nick='', say=None, db=None):
     db_init(db)
@@ -37,7 +37,7 @@ def karma_edit(inp, chan='', nick='', say=None, db=None):
         else:
             karma = karma
         db.execute("insert or replace into karma(chan, word, karma)"
-            "values(?,?,?)", (chan, word.lower(), karma))
+                   "values(?,?,?)", (chan, word.lower(), karma))
         db.commit()
 
 
@@ -64,10 +64,10 @@ def setkarma(inp, nick='', chan='', db=None):
         karma = -karma
     karma_from_db = int(get_karma(db, chan, word))
     if nick != "extrastout":
-        return #"Please don't impersonate others." 
+        return  # "Please don't impersonate others."
     else:
         db.execute("insert or replace into karma(chan, word, karma)"
-            "values(?,?,?)", (chan, word.lower(), karma))
+                   "values(?,?,?)", (chan, word.lower(), karma))
         db.commit()
         print ">>> u'Karma of %s set to %s :%s'" % (word, karma, chan)
 
@@ -76,7 +76,8 @@ def setkarma(inp, nick='', chan='', db=None):
 def topkarma(inp, chan='', say=None, db=None):
     ".topkarma - returns 3 top karma'd items"
     db_init(db)
-    items = db.execute("select word, karma from karma where chan=? order by karma desc limit 3",
+    items = db.execute(
+        "select word, karma from karma where chan=? order by karma desc limit 3",
         (chan,)).fetchall()
     message = "Top karma'd items: "
     for item in items:
@@ -88,10 +89,10 @@ def topkarma(inp, chan='', say=None, db=None):
 def botkarma(inp, chan='', say=None, db=None):
     ".botkarma - returns 3 lowest karma'd items"
     db_init(db)
-    items = db.execute("select word, karma from karma where chan=? order by karma limit 3",
+    items = db.execute(
+        "select word, karma from karma where chan=? order by karma limit 3",
         (chan,)).fetchall()
     message = "Lowest karma'd items: "
     for item in items:
         message = message + item[0] + " with " + str(item[1]) + ", "
     say(message[:-2])
-

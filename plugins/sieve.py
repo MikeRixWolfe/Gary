@@ -29,13 +29,14 @@ def sieve_suite(bot, input, func, kind, args):
 
     if args.get('adminonly') == True:
         admins = bot.config.get('admins', [])
-        if input.nick.strip(' ~@%+') not in admins:# or input.chan[0] != "#":
+        if input.nick.strip(' ~@%+') not in admins:  # or input.chan[0] != "#":
             return None
 
     if args.get('operonly') == True:
         admins = bot.config.get('admins', [])
         opers = bot.config.get('opers', [])
-        if input.nick.strip(' ~@%+') not in admins and input.nick.strip(' ~@%+') not in opers:# or input.chan[0] != "#":
+        # or input.chan[0] != "#":
+        if input.nick.strip(' ~@%+') not in admins and input.nick.strip(' ~@%+') not in opers:
             return None
 
     ignored = bot.config.get('ignored', [])

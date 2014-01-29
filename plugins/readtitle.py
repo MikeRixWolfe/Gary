@@ -11,7 +11,10 @@ v0.6    changed regex again!
 v0.7    inserted isgd link to beginning of each title
 v0.8    added url hooks from all other plugins
 '''
-import re, time, locale, random
+import re
+import time
+import locale
+import random
 from bs4 import BeautifulSoup
 from util import hook, http, web, text
 from random import choice
@@ -19,11 +22,13 @@ from steam import get_steam_info
 
 html_re = (r'https?\://(www\.)?\w+\.[a-zA-Z]{2,5}(\S)+', re.I)
 
-skipurls = ["youtube","youtu.be","tinyurl", "rd.io", "rdio", "reddit", "spotify", "open.spotify.com", "steam"]
+skipurls = ["youtube", "youtu.be", "tinyurl", "rd.io",
+            "rdio", "reddit", "spotify", "open.spotify.com", "steam"]
+
 
 @hook.regex(*html_re)
 def readtitle(match, say=None, nick=None):
-    #if "bochmed" in nick.lower():
+    # if "bochmed" in nick.lower():
     #    return
     parsed_url = match.group().split(' ')[0]
     # say('matched {}'.format(parsed_url))
@@ -33,13 +38,13 @@ def readtitle(match, say=None, nick=None):
         request_url = http.get_html(parsed_url)
     except http.HTTPError as e:
         errors = {400: 'bad request (ratelimited?) 400',
-        401: 'unauthorized 401 ',
-        403: 'forbidden 403',
-        404: 'invalid user/id 404',
-        500: 'something is broken 500',
-        502: 'something is down ("getting upgraded?") 502',
-        503: 'something is overloaded 503',
-        410: 'something something 410' }
+                  401: 'unauthorized 401 ',
+                  403: 'forbidden 403',
+                  404: 'invalid user/id 404',
+                  500: 'something is broken 500',
+                  502: 'something is down ("getting upgraded?") 502',
+                  503: 'something is overloaded 503',
+                  410: 'something something 410'}
         if e.code == 404:
             return 'bad url?'
         if e.code in errors:
@@ -65,6 +70,7 @@ url = base_url + 'videos/%s?v=2&alt=jsonc'
 search_api_url = base_url + 'videos?v=2&alt=jsonc&max-results=1'
 video_url = "http://youtube.com/watch?v=%s"
 
+
 def get_video_description(vid_id):
     j = http.get_json(url % vid_id)
 
@@ -74,7 +80,7 @@ def get_video_description(vid_id):
     j = j['data']
 
     #out = '\x02%s\x02' % j['title']
-    out =  j['title']
+    out = j['title']
 
     if 'contentRating' in j:
         out += ' - \x034NSFW\x02'
@@ -84,10 +90,10 @@ def get_video_description(vid_id):
 
 @hook.regex(*youtube_re)
 def youtube_url(match, bot=None, say=None):
-    #if "autoreply" in bot.config and not bot.config["autoreply"]:
+    # if "autoreply" in bot.config and not bot.config["autoreply"]:
     #    return
-    url = web.try_isgd(video_url % match) 
-    say(url + " - " +get_video_description(match.group(1)))
+    url = web.try_isgd(video_url % match)
+    say(url + " - " + get_video_description(match.group(1)))
 
 
 @hook.regex(r'(?i)http://(?:www\.)?tinyurl.com/([A-Za-z0-9\-]+)')
@@ -115,32 +121,38 @@ def rdio_url(match, bot=None):
     data = json.loads(response[1])
     info = data['result']
     if 'name' in info:
-        if 'artist' in info and 'album' in info:  #Track
+        if 'artist' in info and 'album' in info:  # Track
             name = info['name']
             artist = info['artist']
             album = info['album']
             return u"Rdio track: \x02{}\x02 by \x02{}\x02 - {}".format(name, artist, album)
-        elif 'artist' in info and not 'album' in info:  #Album
+        elif 'artist' in info and not 'album' in info:  # Album
             name = info['name']
             artist = info['artist']
             return u"Rdio album: \x02{}\x02 by \x02{}\x02".format(name, artist)
-        else:  #Artist
+        else:  # Artist
             name = info['name']
             return u"Rdio artist: \x02{}\x02".format(name)
 
 
 reddit_re = (r'.*((www\.)?reddit\.com/r[^ ]+)', re.I)
 
+
 @hook.regex(*reddit_re)
 def reddit_url(match):
     thread = http.get_html(match.group(0))
 
     title = thread.xpath('//title/text()')[0]
-    upvotes = thread.xpath("//span[@class='upvotes']/span[@class='number']/text()")[0]
-    downvotes = thread.xpath("//span[@class='downvotes']/span[@class='number']/text()")[0]
-    author = thread.xpath("//div[@id='siteTable']//a[contains(@class,'author')]/text()")[0]
-    timeago = thread.xpath("//div[@id='siteTable']//p[@class='tagline']/time/text()")[0]
-    comments = thread.xpath("//div[@id='siteTable']//a[@class='comments']/text()")[0]
+    upvotes = thread.xpath(
+        "//span[@class='upvotes']/span[@class='number']/text()")[0]
+    downvotes = thread.xpath(
+        "//span[@class='downvotes']/span[@class='number']/text()")[0]
+    author = thread.xpath(
+        "//div[@id='siteTable']//a[contains(@class,'author')]/text()")[0]
+    timeago = thread.xpath(
+        "//div[@id='siteTable']//p[@class='tagline']/time/text()")[0]
+    comments = thread.xpath(
+        "//div[@id='siteTable']//a[@class='comments']/text()")[0]
 
     return '\x02{}\x02 - posted by \x02{}\x02 {} ago - {} upvotes, {} downvotes - {}'.format(
         title, author, timeago, upvotes, downvotes, comments)
@@ -148,31 +160,32 @@ def reddit_url(match):
 
 @hook.regex(r"(http://open\.spotify\.com/track/\S*)", re.I)
 def spotify_parse(inp, say=None):
-  url = inp.group(0)
-  response = http.get_html(url)
+    url = inp.group(0)
+    response = http.get_html(url)
 
-  title_parse = response.xpath("//h1[@itemprop='name']")
-  artist_parse = response.xpath("//h2/a")
-  title = title_parse[0].text_content()
-  artist = artist_parse[0].text_content()
+    title_parse = response.xpath("//h1[@itemprop='name']")
+    artist_parse = response.xpath("//h2/a")
+    title = title_parse[0].text_content()
+    artist = artist_parse[0].text_content()
 
-  say("Spotify: %s - %s" % (artist, title))
+    say("Spotify: %s - %s" % (artist, title))
+
 
 @hook.regex(r"spotify:track:(\S*)", re.I)
 def spotify_parse_uri(inp, say=None):
-  url = "http://open.spotify.com/track/%s" % inp.group(1)
-  response = http.get_html(url)
+    url = "http://open.spotify.com/track/%s" % inp.group(1)
+    response = http.get_html(url)
 
-  title_parse = response.xpath("//h1[@itemprop='name']")
-  artist_parse = response.xpath("//h2/a")
-  title = title_parse[0].text_content()
-  artist = artist_parse[0].text_content()
+    title_parse = response.xpath("//h1[@itemprop='name']")
+    artist_parse = response.xpath("//h2/a")
+    title = title_parse[0].text_content()
+    artist = artist_parse[0].text_content()
 
-  say("Spotify: %s - %s" % (artist, title))
+    say("Spotify: %s - %s" % (artist, title))
 
 steam_re = (r'(.*:)//(store.steampowered.com)(:[0-9]+)?(.*)', re.I)
+
 
 @hook.regex(*steam_re)
 def steam_url(match):
     return get_steam_info("http://store.steampowered.com" + match.group(4))
-

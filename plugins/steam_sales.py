@@ -12,18 +12,20 @@ from datetime import datetime
 debug = False
 running_sale_loops = []
 
+
 def log_sales_data(filename):
     # Create dr to log sales for debug purposes
     if not os.path.exists('persist/steamsales_history'):
         os.makedirs('persist/steamsales_history')
 
-    #Log specified data
+    # Log specified data
     with open('persist/steamsales_history/' +
               time.strftime('%Y%m%d%H%M', time.localtime()) +
               '-' + filename + '.json', 'w+') as f:
         json.dump(sales, f, sort_keys=False, indent=2)
 
     return
+
 
 def get_featured():
     sales_url = "http://store.steampowered.com/api/featured/"
@@ -73,9 +75,11 @@ def get_sales(mask, flag=False):
 
     # Mask Data
     if flag:
-        data = {k: v for k, v in data.items() if isinstance(v, dict) and v["name"] in mask}
+        data = {k: v for k,
+                v in data.items() if isinstance(v, dict) and v["name"] in mask}
     else:
-        data = {k: v for k, v in data.items() if isinstance(v, dict) and k not in mask}
+        data = {k: v for k,
+                v in data.items() if isinstance(v, dict) and k not in mask}
 
     # Log sales for debug purposes
     if debug == True:
@@ -90,15 +94,18 @@ def get_sales(mask, flag=False):
                 if "url" in item.keys() and item["url"]:  # Midweek Madness/etc
                     data[category]["name"] = item["name"]
                     appid = str(item["url"])[34:-1]
-                    appdata = http.get_json("http://store.steampowered.com/api/appdetails/?appids={}".format(appid))
+                    appdata = http.get_json(
+                        "http://store.steampowered.com/api/appdetails/?appids={}".format(appid))
                     item["name"] = appdata[appid]["data"]["name"]
                     item["id"] = appdata[appid]["data"]["steam_appid"]
                     if "Free to Play" in appdata[appid]["data"]["genres"]:
                         item["final_price"] = 'Free to Play'
                         item["discount_percent"] = '100'
                     else:
-                        item["final_price"] = appdata[appid]["data"]["price_overview"]["final"]
-                        item["discount_percent"] = appdata[appid]["data"]["price_overview"]["discount_percent"]
+                        item["final_price"] = appdata[appid][
+                            "data"]["price_overview"]["final"]
+                        item["discount_percent"] = appdata[appid][
+                            "data"]["price_overview"]["discount_percent"]
                     if "discounted" not in item.keys() and item["discount_percent"] > 0:
                         item["discounted"] = True
                     else:
@@ -115,13 +122,13 @@ def get_sales(mask, flag=False):
                     pass
                 item = {k: v for k, v in item.items() if k in
                         ["discount_expiration", "discounted",
-                        "name", "currency", "final_price",
-                        "discount_percent", "id"]}
+                         "name", "currency", "final_price",
+                         "discount_percent", "id"]}
                 # Add item to sales
                 if data[category]["name"] not in sales.keys():
                     sales[data[category]["name"]] = []
                 sales[data[category]["name"]].append(item)
-                    
+
     sales = {k: sorted(v, key=lambda v: v["name"]) for k, v in sales.items()}
 
     # Log sales for debug purposes
@@ -135,12 +142,14 @@ def get_sales(mask, flag=False):
 def format_sale_item(item):
     if item["final_price"] == 'Free to Play':
         out = "\x02{}\x0F: {}; ".format(item["name"],
-              item["final_price"])
+                                        item["final_price"])
     else:
         out = "\x02{}\x0F: ${}.{}({}% off); ".format(item["name"],
-              str(item["final_price"])[:-2],
-              str(item["final_price"])[-2:],
-              str(item["discount_percent"]))
+                                                     str(item["final_price"])[
+                                                         :-2],
+                                                     str(item["final_price"])[
+                                                         -2:],
+                                                     str(item["discount_percent"]))
     return out
 
 
@@ -203,7 +212,8 @@ def steamsales(inp, say='', chan=''):
 @hook.event('JOIN')
 def saleloop(paraml, nick='', conn=None):
     global running_sale_loops
-    # If specified chan or not running; can remove first condition for multi-channel
+    # If specified chan or not running; can remove first condition for
+    # multi-channel
     if paraml[0] != '#test' or paraml[0] in running_sale_loops:
         return
     running_sale_loops.append(paraml[0])
@@ -219,7 +229,8 @@ def saleloop(paraml, nick='', conn=None):
             try:
                 sales = get_sales(mask)
             except Exception as e:
-                print(">>> u'Error getting Steam sales: {} :{}'".format(e, paraml[0]))
+                print(
+                    ">>> u'Error getting Steam sales: {} :{}'".format(e, paraml[0]))
                 continue
 
             # Handle restarts and empty requests
@@ -241,6 +252,5 @@ def saleloop(paraml, nick='', conn=None):
             if sales != {}:
                 prev_sales = sales
         except Exception as e:
-            print(">>> u'Steam saleloop error: {} :{}'".format(e,paraml[0]))
+            print(">>> u'Steam saleloop error: {} :{}'".format(e, paraml[0]))
             continue
-

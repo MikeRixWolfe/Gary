@@ -114,12 +114,12 @@ def voicers(inp, bot=None, say=None):
 def voicer(inp, say=None, bot=None):
     """.voicer user - Adds user to voicers."""
     targets = inp.lower().split()
-    voicers =  bot.config["voice"]
+    voicers = bot.config["voice"]
     opers = bot.config["opers"]
     admins = bot.config["admins"]
-    mergelist = voicers+opers+admins
-    skips=[]
-    newvoicers=[]
+    mergelist = voicers + opers + admins
+    skips = []
+    newvoicers = []
     for target in targets:
         if target not in mergelist:
             newvoicers.append(target)
@@ -140,8 +140,8 @@ def devoicer(inp, say=None, bot=None):
     voicers = bot.config["voice"]
     opers = bot.config["opers"]
     admins = bot.config["admins"]
-    skips=[]
-    oldvoicers=[]
+    skips = []
+    oldvoicers = []
     for target in targets:
         if target not in admins and target not in opers:
             if target in voicers:
@@ -151,7 +151,7 @@ def devoicer(inp, say=None, bot=None):
                 skips.append(target)
     voicers.sort()
     json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
-    
+
     if len(oldvoicers) == 0:
         if len(skips) == 0:
             return "You can not remove bot admins or opers as bot voicers."

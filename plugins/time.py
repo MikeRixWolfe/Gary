@@ -19,7 +19,7 @@ def time_command(inp, bot=None):
 
     if inp.lower() == "butts":
         return "It's always time for butts."
-    
+
     query = "current time in {}".format(inp)
 
     api_key = bot.config.get("api_keys", {}).get("wolframalpha", None)
@@ -27,7 +27,8 @@ def time_command(inp, bot=None):
         return "error: no wolfram alpha api key set"
 
     request = http.get_xml(api_url, input=query, appid=api_key)
-    time = " ".join(request.xpath("//pod[@title='Result']/subpod/plaintext/text()"))
+    time = " ".join(
+        request.xpath("//pod[@title='Result']/subpod/plaintext/text()"))
     time = time.replace("  |  ", ", ")
 
     if time:
@@ -35,7 +36,8 @@ def time_command(inp, bot=None):
         if inp.lower() == "unix":
             place = "Unix Epoch"
         else:
-            place = cap_first(" ".join(request.xpath("//pod[@" "title='Input interpretation']/subpod/plaintext/text()"))[16:])
+            place = cap_first(
+                " ".join(request.xpath("//pod[@" "title='Input interpretation']/subpod/plaintext/text()"))[16:])
         return "\x02{}\x02 - {}".format(place, time)
     else:
         return "Could not get the time for '{}'.".format(inp)

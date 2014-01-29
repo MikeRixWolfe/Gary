@@ -1,5 +1,6 @@
 from util import hook, http
 
+
 @hook.command
 def lmgtfy(inp):
     """.lmgtfy [phrase] - Posts a google link for the specified phrase"""

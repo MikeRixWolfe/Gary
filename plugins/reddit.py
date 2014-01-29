@@ -18,10 +18,10 @@ def reddit(inp):
     # find the requested post number (if any)
     if len(parts) > 1:
         inp = parts[0]
-        try: 
+        try:
             id_num = int(parts[1]) - 1
         except ValueError:
-            return "Invalid post number."   
+            return "Invalid post number."
 
     try:
         data = http.get_json(base_url.format(inp.strip()))
@@ -51,6 +51,5 @@ def reddit(inp):
         item["warning"] = ""
 
     return u'\x02{title}\x02 - posted by \x02{author}\x02' \
-    ' {timesince} ago - {ups} upvotes, {downs} downvotes -' \
-    ' {link}{warning}'.format(**item)
-
+        ' {timesince} ago - {ups} upvotes, {downs} downvotes -' \
+        ' {link}{warning}'.format(**item)

@@ -15,7 +15,9 @@ def stock(inp):
            'env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys')
 
     try:
-        parsed = http.get_json(url, q='select * from yahoo.finance.quote where symbol in ("%s")' % inp)  # heh, SQLI
+        # heh, SQLI
+        parsed = http.get_json(
+            url, q='select * from yahoo.finance.quote where symbol in ("%s")' % inp)
         quote = parsed['query']['results']['quote']
     except:
         return "Yahoo Fianance API error, please try again in a few minutes"
@@ -67,35 +69,35 @@ def stockhistory(inp):
     try:
         quotehistory = parsed2['query']['results']['quote'][-1]
     except TypeError:
-         return "Historical data not available for %s" % inp
+        return "Historical data not available for %s" % inp
 
     yearopen = float(quotehistory['Open'])
     price = float(quote['LastTradePriceOnly'])
 
-    change = price-yearopen
+    change = price - yearopen
 
     if change < 0:
         quote['color'] = "5"
         strchange = '-' + str(change).strip("0")
     else:
         quote['color'] = "3"
-        strchange='+' + str(change).strip("0")
+        strchange = '+' + str(change).strip("0")
 
     quote['YearChange'] = strchange
 
-    quote['PercentChange'] = 100 * change / ( price - change)
+    quote['PercentChange'] = 100 * change / (price - change)
 
     yearopenvol = int(quotehistory['Volume'])
     vol = int(quote['Volume'])
-    
-    volchange = vol-yearopenvol
+
+    volchange = vol - yearopenvol
     quote['YearVolChange'] = volchange
 
     if volchange < 0:
         quote['volcolor'] = "5"
     else:
         quote['volcolor'] = "3"
- 
+
     quote['PercentVolChange'] = 100 * volchange / (vol - volchange)
     print quote['volcolor']
 
@@ -105,5 +107,5 @@ def stockhistory(inp):
           "Volume @ %(Volume)s " \
           "\x03%(volcolor)s%(YearVolChange)s (%(PercentVolChange).2d%%)\x03 " \
           "Avg Daily Volume: %(AverageDailyVolume)s" % quote
-    
+
     return ret

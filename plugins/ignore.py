@@ -28,10 +28,11 @@ def ignore(inp, say=None, notice=None, bot=None, config=None):
         admins = bot.config.get('admins', [])
         if target in admins:
             return "I can not ignore a bot admin"
-        else: 
+        else:
             ignorelist.append(target)
             ignorelist.sort()
-            json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
+            json.dump(bot.config, open('config', 'w'),
+                      sort_keys=True, indent=2)
             return "%s has been ignored." % format(target)
     return
 

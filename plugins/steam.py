@@ -6,7 +6,8 @@ from bs4 import BeautifulSoup
 
 def get_steam_info(url):
     appid = re.match(r'.*?/app/(.+)/', url).group(1)
-    appdata = http.get_json("http://store.steampowered.com/api/appdetails/?appids={}".format(appid))
+    appdata = http.get_json(
+        "http://store.steampowered.com/api/appdetails/?appids={}".format(appid))
     print appid
     name = appdata[appid]["data"]["name"].encode("ascii", "ignore")
     #desc = text.truncate_str(re.sub('<[^<]+?>', '', appdata[appid]["data"]["about_the_game"]))
@@ -22,7 +23,8 @@ def get_steam_info(url):
         genres.remove("Free to Play")
     genre = "/".join(genres)
 
-    #return "\x02{}\x0F: {} - {} - {} - {}".format(name, desc, genre, date, price)
+    # return "\x02{}\x0F: {} - {} - {} - {}".format(name, desc, genre, date,
+    # price)
     return "\x02{}\x0F: {} - {} - {}".format(name, genre, date, price)
 
 

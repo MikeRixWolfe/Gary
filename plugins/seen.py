@@ -15,7 +15,7 @@ def rreplace(s, old, new, occurrence):
 def db_init(db):
     "check to see that our db has the the seen table and return a connection."
     db.execute("create table if not exists seen(name, time, quote, chan, "
-                 "primary key(name, chan))")
+               "primary key(name, chan))")
     db.commit()
 
 
@@ -24,8 +24,8 @@ def db_init(db):
 def seeninput(paraml, input=None, db=None, bot=None):
     db_init(db)
     db.execute("insert or replace into seen(name, time, quote, chan)"
-        "values(?,?,?,?)", (input.nick.lower(), time.time(), input.msg,
-            input.chan))
+               "values(?,?,?,?)", (input.nick.lower(), time.time(), input.msg,
+                                   input.chan))
     db.commit()
 
 
@@ -33,26 +33,29 @@ def seeninput(paraml, input=None, db=None, bot=None):
 def around(inp, nick='', chan='', say='',  db=None, input=None):
     ".around [minutes] - Lists what nicks have been active in the last [minutes] minutes, defaults to 15"
     db_init(db)
-    minutes=15
+    minutes = 15
     if inp.strip().isdigit():
         minutes = int(inp.strip())
-    period = time.time()-(minutes*60)
+    period = time.time() - (minutes * 60)
     rows = db.execute("select name  from seen where time >= "
-                           " ? and chan = ? order by name", (period,chan)).fetchall()
+                      " ? and chan = ? order by name", (period, chan)).fetchall()
 
     if rows:
-        raw_list=""
+        raw_list = ""
         overflow_counter = 0
         for row in rows:
-            return_string = "Users around in the last %s minutes: %s" % (minutes, raw_list[:-2])
-            if len("Users around in the last  minutes: ") + len(str(minutes))+ len(return_string) + len(str(overflow_counter)) < 460:
+            return_string = "Users around in the last %s minutes: %s" % (
+                minutes, raw_list[:-2])
+            if len("Users around in the last  minutes: ") + len(str(minutes)) + len(return_string) + len(str(overflow_counter)) < 460:
                 raw_list += row[0] + ", "
             else:
                 overflow_counter += 1
         if overflow_counter == 0:
-            return_string = "Users around in the last %s minutes: %s" % (minutes, raw_list[:-2])
+            return_string = "Users around in the last %s minutes: %s" % (
+                minutes, raw_list[:-2])
         else:
-            return_string = "Users around in the last %s minutes: %s%s others." % (minutes, raw_list, overflow_counter)
+            return_string = "Users around in the last %s minutes: %s%s others." % (
+                minutes, raw_list, overflow_counter)
         formatted_string = rreplace(return_string, ', ', ', and ', 1)
         say(formatted_string)
     else:
@@ -76,11 +79,11 @@ def seen(inp, nick='', chan='', db=None, input=None):
         reltime = timesince.timesince(last_seen[1])
         if last_seen[0] != inp.lower():  # for glob matching
             inp = last_seen[0]
-        if last_seen[2][0:1]=="\x01":
+        if last_seen[2][0:1] == "\x01":
             return '%s was last seen %s ago: *"%s %s*"' % \
-                    (inp, reltime, inp, last_seen[2][8:-1])
+                (inp, reltime, inp, last_seen[2][8:-1])
         else:
             return '%s was last seen %s ago saying: "%s"' % \
-                    (inp, reltime, last_seen[2])
+                (inp, reltime, last_seen[2])
     else:
         return "I've never seen %s" % inp

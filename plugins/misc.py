@@ -16,16 +16,15 @@ def get_version():
 
     revnumber = len(stdout.splitlines())
 
-    
     shorthash = stdout.split(None, 1)[0]
 
     http.ua_gary = 'Gary/r%d %s (http://github.com/MikeRixWolfe/gary)' \
-                        % (revnumber, shorthash)
+        % (revnumber, shorthash)
 
     return shorthash, revnumber
 
 
-#autorejoin channels
+# autorejoin channels
 @hook.event('KICK')
 def rejoin(paraml, conn=None):
     if paraml[1] == conn.nick:
@@ -33,7 +32,7 @@ def rejoin(paraml, conn=None):
             conn.join(paraml[0])
 
 
-#join channels when invited
+# join channels when invited
 @hook.event('INVITE')
 def invite(paraml, conn=None):
     conn.join(paraml[-1])

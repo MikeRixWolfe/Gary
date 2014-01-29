@@ -3,7 +3,8 @@ admin.py - Written by MikeFightsBears 2013
 """
 
 from util import hook
-import os, sys
+import os
+import sys
 import re
 import json
 import time
@@ -29,7 +30,8 @@ def restart(inp, nick=None, conn=None, bot=None):
     """.restart [reason] - Restarts the bot with [reason] as its quit message."""
     for botcon in bot.conns:
         if inp:
-            bot.conns[botcon].cmd("QUIT", ["Restarted by {} ({})".format(nick, inp)])
+            bot.conns[botcon].cmd(
+                "QUIT", ["Restarted by {} ({})".format(nick, inp)])
         else:
             bot.conns[botcon].cmd("QUIT", ["Restarted by {}.".format(nick)])
     time.sleep(5)
@@ -60,7 +62,7 @@ def part(inp, conn=None, chan=None, notice=None):
     else:
         target = chan
     notice("Attempting to leave {}...".format(target))
-    conn.send("PART "+ target)
+    conn.send("PART " + target)
 
 
 @hook.command(autohelp=False, adminonly=True)
@@ -90,6 +92,7 @@ def raw(inp, conn=None, notice=None):
     """.raw <command> - Sends a RAW IRC command."""
     notice("Raw command sent.")
     conn.send(inp)
+
 
 def mode_cmd(mode, text, inp, chan, conn, notice):
     """ generic mode setting function """
@@ -169,7 +172,7 @@ def deop(inp, conn=None, chan=None, notice=None):
 
 @hook.command(adminonly=True)
 def topic(inp, conn=None, chan=None):
-    """.topic [channel] <topic> - Change the topic of a channel.""" 
+    """.topic [channel] <topic> - Change the topic of a channel."""
     split = inp.split(" ")
     if split[0].startswith("#"):
         message = " ".join(split[1:])
@@ -302,6 +305,3 @@ def pm(inp, conn=None, chan=None):
         message = " ".join(inp[0:])
         out = "PRIVMSG {} :{}".format(chan, message)
     conn.send(out)
-
-
-
