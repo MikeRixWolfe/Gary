@@ -9,19 +9,29 @@ import os
 from util import hook, http
 from datetime import datetime
 
-
+debug = False
 running_sale_loops = []
 
+def log_sales_data(filename):
+    # Create dr to log sales for debug purposes
+    if not os.path.exists('persist/steamsales_history'):
+        os.makedirs('persist/steamsales_history')
+
+    #Log specified data
+    with open('persist/steamsales_history/' +
+              time.strftime('%Y%m%d%H%M', time.localtime()) +
+              '-' + filename + '.json', 'w+') as f:
+        json.dump(sales, f, sort_keys=False, indent=2)
+
+    return
 
 def get_featured():
     sales_url = "http://store.steampowered.com/api/featured/"
     sales = http.get_json(sales_url)
 
     # Log sales for debug purposes
-    #with open('persist/steamsales_history/' +
-    #          time.strftime('%Y%m%d%H%M', time.localtime()) +
-    #          '-featured.json', 'w+') as f:
-    #    json.dump(sales, f, sort_keys=False, indent=2)
+    if debug == True:
+        log_sales_data("featured")
 
     return sales
 
@@ -31,10 +41,8 @@ def get_featuredcategories():
     sales = http.get_json(sales_url)
 
     # Log sales for debug purposes
-    #with open('persist/steamsales_history/' +
-    #          time.strftime('%Y%m%d%H%M', time.localtime()) +
-    #          '-featuredcategories.json', 'w+') as f:
-    #    json.dump(sales, f, sort_keys=False, indent=2)
+    if debug == True:
+        log_sales_data("featuredcategories")
 
     return sales
 
@@ -70,10 +78,8 @@ def get_sales(mask, flag=False):
         data = {k: v for k, v in data.items() if isinstance(v, dict) and k not in mask}
 
     # Log sales for debug purposes
-    #with open('persist/steamsales_history/' +
-    #          time.strftime('%Y%m%d%H%M', time.localtime()) +
-    #          '-data.json', 'w+') as f:
-    #    json.dump(data, f, sort_keys=False, indent=2)
+    if debug == True:
+        log_sales_data("data")
 
     # Format data
     sales = {}
@@ -87,23 +93,12 @@ def get_sales(mask, flag=False):
                     appdata = http.get_json("http://store.steampowered.com/api/appdetails/?appids={}".format(appid))
                     item["name"] = appdata[appid]["data"]["name"]
                     item["id"] = appdata[appid]["data"]["steam_appid"]
-                    
                     if "Free to Play" in appdata[appid]["data"]["genres"]:
                         item["final_price"] = 'Free to Play'
                         item["discount_percent"] = '100'
                     else:
                         item["final_price"] = appdata[appid]["data"]["price_overview"]["final"]
                         item["discount_percent"] = appdata[appid]["data"]["price_overview"]["discount_percent"]
-                    #try:
-                    #    item["final_price"] = appdata[appid]["data"]["price_overview"]["final"]
-                    #except KeyError:
-                    #    item["final_price"] = 'Free to Play'
-                    #item["discounted"] = True
-                    #try:
-                    #    item["discount_percent"] = appdata[appid]["data"]["price_overview"]["discount_percent"]
-                    #except KeyError:
-                    #    item["discount_percent"] = '100'
-
                     if "discounted" not in item.keys() and item["discount_percent"] > 0:
                         item["discounted"] = True
                     else:
@@ -130,10 +125,8 @@ def get_sales(mask, flag=False):
     sales = {k: sorted(v, key=lambda v: v["name"]) for k, v in sales.items()}
 
     # Log sales for debug purposes
-    #with open('persist/steamsales_history/' +
-    #          time.strftime('%Y%m%d%H%M', time.localtime()) +
-    #          '-sales.json', 'w+') as f:
-    #    json.dump(sales, f, sort_keys=False, indent=2)
+    if debug == True:
+        log_sales_data("sales")
 
     # Return usable data
     return sales
@@ -161,9 +154,6 @@ def steamsales(inp, say='', chan=''):
                "top_sellers": "Top Sellers",
                "daily": "Daily Deal",
                "all": "All"}
-    # Create dr to log sales for debug purposes
-    if not os.path.exists('persist/steamsales_history'):
-        os.makedirs('persist/steamsales_history')
 
     # Bool flag denoting strict or non-strict masking
     flag = re.match(r'^.*(-strict).*', inp)
@@ -212,17 +202,11 @@ def steamsales(inp, say='', chan=''):
 @hook.singlethread
 @hook.event('JOIN')
 def saleloop(paraml, nick='', conn=None):
-    # Don't spawn threads for private messages
     global running_sale_loops
-    # Can remove first condition for multi-channel
+    # If specified chan or not running; can remove first condition for multi-channel
     if paraml[0] != '#test' or paraml[0] in running_sale_loops:
         return
     running_sale_loops.append(paraml[0])
-
-    # Create dr to log sales for debug purposes
-    if not os.path.exists('persist/steamsales_history'):
-        os.makedirs('persist/steamsales_history')
-
     prev_sales = {}
     print(">>> u'Beginning Steam sale check loop :{}'".format(paraml[0]))
     while True:
@@ -246,7 +230,6 @@ def saleloop(paraml, nick='', conn=None):
             for category in sales:
                 message = "\x02New " + category + "\x0F: "
                 for item in sales[category]:
-                    #if item not in [x for v in prev_sales.values() for x in v]:
                     if item not in (x for v in prev_sales for x in prev_sales[v]):
                         message += format_sale_item(item)
                 message = message.strip(':; ')
@@ -257,8 +240,6 @@ def saleloop(paraml, nick='', conn=None):
             # Update dict of previous sales if appropriate
             if sales != {}:
                 prev_sales = sales
-
-            #print(">>> u'Finished checking for Steam sales :{}'".format(paraml[0]))
         except Exception as e:
             print(">>> u'Steam saleloop error: {} :{}'".format(e,paraml[0]))
             continue
