@@ -49,9 +49,8 @@ def gex(inp):
                 data["rate"])
         )
     except:
-        return (
-            "I could not convert %s %s to %s; please check your input." % (
+        return "I could not convert %s %s to %s; please check your input." % (
                 query[0],
                 query[1],
                 query[2])
-        )
+        

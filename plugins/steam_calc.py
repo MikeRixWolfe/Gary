@@ -104,9 +104,7 @@ def steamcalc(inp, reply=None):
               " and a total size of {size}GB! The average metascore for these"
               " games is {average_metascore}.".format(**data))
     except:
-        return (
-            "The return string contains characters I can't output, get mulched."
-        )
+        return "The return string contains characters I can't output, get mulched."
 
     if do_refresh:
         refresh_data(name)

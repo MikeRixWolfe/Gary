@@ -58,9 +58,7 @@ def beats(inp):
                "ght representing 248/1000 of a day, just over 5 hours and 57 minute" \
                "s. There are no timezones."
     elif inp.lower() == "guide":
-        return (
-            "1 day = 1000 .beats, 1 hour = 41.666 .beats, 1 min = 0.6944 .beats, 1 second = 0.01157 .beats"
-        )
+        return "1 day = 1000 .beats, 1 hour = 41.666 .beats, 1 min = 0.6944 .beats, 1 second = 0.01157 .beats"
 
     t = time.gmtime()
     h, m, s = t.tm_hour, t.tm_min, t.tm_sec
