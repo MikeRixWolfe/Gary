@@ -69,8 +69,6 @@ def forget(inp, chan='', say=None, db=None):
     db_init(db)
     word=inp.strip()
     data = get_factoid(db, chan, word)
-    #if not chan.startswith('#'):
-    #    return "I won't forget anything in private."
     if data:
         db.execute("delete from factoids where chan=? and word=lower(?)",
                    (chan, word))

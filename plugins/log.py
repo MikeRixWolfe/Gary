@@ -1,6 +1,5 @@
 """
-log.py: written by Scaevolus 2009
-        rewritten by MikeFightsBears 2014
+log.py: written by MikeFightsBears 2014
 """
 
 import time

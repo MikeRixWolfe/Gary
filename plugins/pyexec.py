@@ -12,7 +12,7 @@ def python(inp):
     ".python <prog> - executes python code <prog>"
 
     res = http.get("http://eval.appspot.com/eval", statement=inp).splitlines()
-    print(res)
+    #print(res)
     if len(res) == 0:
         return
     res[0] = re_lineends.split(res[0])[0]
