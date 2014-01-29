@@ -14,13 +14,17 @@ def isup(inp):
 
     try:
         soup = http.get_soup('http://isup.me/' + domain)
-    except http.HTTPError, http.URLError:
+    except http.HTTPError as xxx_todo_changeme:
+        http.URLError = xxx_todo_changeme
         return "Could not get status."
 
     content = soup.find('div').text.strip()
 
     if "not just you" in content:
-        return "It's not just you. {} looks \x02\x034down\x02\x0f from here!".format(url)
+        return (
+            "It's not just you. {} looks \x02\x034down\x02\x0f from here!".format(
+                url)
+        )
     elif "is up" in content:
         return "It's just you. {} is \x02\x033up\x02\x0f.".format(url)
     else:

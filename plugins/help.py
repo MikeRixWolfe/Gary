@@ -14,7 +14,7 @@ def help(inp, bot=None, say=None):
         if fn.group(1).lower() not in disabled:
             if command not in disabled:
                 if func.__doc__ is not None:
-                    if args.get('adminonly') != True:
+                    if not args.get('adminonly'):
                         if func in funcs:
                             if len(funcs[func]) < len(command):
                                 funcs[func] = command
@@ -49,7 +49,7 @@ def adminhelp(inp, bot=None, say=None):
         if fn.group(1).lower() not in disabled:
             if command not in disabled:
                 if func.__doc__ is not None:
-                    if args.get('adminonly') == True:
+                    if args.get('adminonly'):
                         if func in funcs:
                             if len(funcs[func]) < len(command):
                                 funcs[func] = command

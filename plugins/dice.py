@@ -1,7 +1,7 @@
 """
 dice.py: written by Scaevolus 2008, updated 2009
 simulates dicerolls
-	2013.09.24  - modified by MikeFightsBears
+    2013.09.24  - modified by MikeFightsBears
 """
 import re
 import random
@@ -84,6 +84,6 @@ def roll(inp):
                 return "Thanks for overflowing a float, jerk >:["
 
     if desc:
-        return "%s: %d (%s=%s)" % (desc.strip(),  total, inp, ", ".join(rolls))
+        return "%s: %d (%s=%s)" % (desc.strip(), total, inp, ", ".join(rolls))
     else:
         return "%d (%s=%s)" % (total, inp, ", ".join(rolls))

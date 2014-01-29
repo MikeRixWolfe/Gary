@@ -43,7 +43,7 @@ def twitter(inp, api_key=None):
 
     try:
         tweet = http.get_json(request_url, oauth=True, oauth_keys=api_key)
-    except http.HTTPError, e:
+    except http.HTTPError as e:
         errors = {400: 'bad request (ratelimited?)',
                   401: 'unauthorized (private)',
                   403: 'forbidden',

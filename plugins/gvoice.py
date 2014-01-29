@@ -151,7 +151,9 @@ def call(inp, say='', nick='', input=None, db=None, bot=None):
         try:
             voice.login()
         except:
-            return "Google Voice login error, please try again in a few minutes."
+            return (
+                "Google Voice login error, please try again in a few minutes."
+            )
         voice.call(outgoingNumber, forwardingNumber)
         say("Calling %s from %s..." % (outgoingNumber, forwardingNumber))
     else:

@@ -7,16 +7,16 @@ import random
 # variables
 
 colors = collections.OrderedDict([
-    ('red',    '\x0304'),
+    ('red', '\x0304'),
     ('ornage', '\x0307'),
     ('yellow', '\x0308'),
-    ('green',  '\x0309'),
-    ('cyan',   '\x0303'),
+    ('green', '\x0309'),
+    ('cyan', '\x0303'),
     ('ltblue', '\x0310'),
     ('rylblue', '\x0312'),
-    ('blue',   '\x0302'),
+    ('blue', '\x0302'),
     ('magenta', '\x0306'),
-    ('pink',   '\x0313'),
+    ('pink', '\x0313'),
     ('maroon', '\x0305')
 ])
 

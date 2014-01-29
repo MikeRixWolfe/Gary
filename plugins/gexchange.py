@@ -40,6 +40,18 @@ def gex(inp):
     except:
         return "Google Exchange API error, please try again in a few minutes."
     try:
-        return '%s %s to %s = %s (rate: %s)' % (query[0], data["from"], data["to"], data["v"], data["rate"])
+        return (
+            '%s %s to %s = %s (rate: %s)' % (
+                query[0],
+                data["from"],
+                data["to"],
+                data["v"],
+                data["rate"])
+        )
     except:
-        return "I could not convert %s %s to %s; please check your input." % (query[0], query[1], query[2])
+        return (
+            "I could not convert %s %s to %s; please check your input." % (
+                query[0],
+                query[1],
+                query[2])
+        )

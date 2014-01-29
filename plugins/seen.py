@@ -30,7 +30,7 @@ def seeninput(paraml, input=None, db=None, bot=None):
 
 
 @hook.command(autohelp=False)
-def around(inp, nick='', chan='', say='',  db=None, input=None):
+def around(inp, nick='', chan='', say='', db=None, input=None):
     ".around [minutes] - Lists what nicks have been active in the last [minutes] minutes, defaults to 15"
     db_init(db)
     minutes = 15

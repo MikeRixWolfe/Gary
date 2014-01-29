@@ -10,5 +10,5 @@ def explain(inp):
 
     try:
         return explain_c_declaration(inp)
-    except Exception, e:
+    except Exception as e:
         return 'error: %s' % e

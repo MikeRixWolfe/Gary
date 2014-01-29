@@ -80,7 +80,8 @@ def cron(paraml, nick='', conn=None, db=None):
             rows = get_events(db, datestamp, paraml[0])
             for row in rows:
                 conn.send(
-                    "PRIVMSG {} :{}".format(paraml[0], "%s: %s" % (row[1], row[0])))
+                    "PRIVMSG {} :{}".format(paraml[0], "%s: %s" %
+                                            (row[1], row[0])))
                 if row[3] == False:
                     remove_event(db, datestamp, row[2], row[0], row[1])
             clean_db(db, datestamp, paraml[0])
@@ -100,7 +101,9 @@ def remindme(inp, nick='', chan='', db=None):
         try:
             set_event(db, timestamp, chan, message, nick, False)
         except:
-            return "There was an error inserting your event, please try again later."
+            return (
+                "There was an error inserting your event, please try again later."
+            )
         return "Okay, at %s I will remind you of '%s'." % (timestamp, message)
     elif new_event and new_event.group(1) < str(datetime.datetime.now(EST()))[:16]:
         return "Please choose a date/time in the future."

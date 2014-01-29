@@ -27,12 +27,12 @@ def sieve_suite(bot, input, func, kind, args):
             if input.chan.lower() in denied_channels:
                 return None
 
-    if args.get('adminonly') == True:
+    if args.get('adminonly'):
         admins = bot.config.get('admins', [])
         if input.nick.strip(' ~@%+') not in admins:  # or input.chan[0] != "#":
             return None
 
-    if args.get('operonly') == True:
+    if args.get('operonly'):
         admins = bot.config.get('admins', [])
         opers = bot.config.get('opers', [])
         # or input.chan[0] != "#":

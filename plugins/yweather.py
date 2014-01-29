@@ -88,7 +88,7 @@ def forecast(inp):
     for f in forecast:
         forecast_string += "\x02" + f.items()[0][1] + ", " + f.items()[1][1] + "\x0F: L " + \
             f.items()[2][1] + "*F, H " + f.items()[3][1] + \
-            "*F, and "  + \
+            "*F, and " + \
             f.items()[4][1] + "; "
     return forecast_string
 

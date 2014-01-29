@@ -25,19 +25,21 @@ def nowplaying(inp, nick='', say=None, api_key=None):
         if inp:  # specified a user name
             return "error: %s" % response["message"]
         else:
-            return "your nick is not a Last.fm account. try '.lastfm username'."
+            return (
+                "your nick is not a Last.fm account. try '.lastfm username'."
+            )
 
     if not "track" in response["recenttracks"] or len(response["recenttracks"]["track"]) == 0:
         return "no recent tracks for user \x02%s\x0F found" % user
 
     tracks = response["recenttracks"]["track"]
 
-    if type(tracks) == list:
+    if isinstance(tracks, list):
         # if the user is listening to something, the tracks entry is a list
         # the first item is the current track
         track = tracks[0]
         status = 'current track'
-    elif type(tracks) == dict:
+    elif isinstance(tracks, dict):
         # otherwise, they aren't listening to anything right now, and
         # the tracks entry is a dict representing the most recent track
         track = tracks
@@ -81,21 +83,25 @@ def toptrack(inp, nick='', say=None, api_key=None):
         if inp:  # specified a user name
             return "Error: %s" % response["message"]
         else:
-            return "Your nick is not a Last.fm account. try '.lastfm username'."
+            return (
+                "Your nick is not a Last.fm account. try '.lastfm username'."
+            )
 
     if not "track" in response["toptracks"] or len(response["toptracks"]["track"]) == 0:
         if period == "1month":
-            return "The 1month flag is currently broken in the LastFM API; a bug report has been filed."
+            return (
+                "The 1month flag is currently broken in the LastFM API; a bug report has been filed."
+            )
         else:
             return "No recent tracks for user \x02%s\x0F found." % user
 
     tracks = response["toptracks"]["track"]
 
-    if type(tracks) == list:
+    if isinstance(tracks, list):
         # if the user is listening to something, the tracks entry is a list
         # the first item is the current track
         track = tracks[0]
-    elif type(tracks) == dict:
+    elif isinstance(tracks, dict):
         # otherwise, they aren't listening to anything right now, and
         # the tracks entry is a dict representing the most recent track
         track = tracks

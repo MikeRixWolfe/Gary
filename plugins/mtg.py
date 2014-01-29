@@ -36,4 +36,10 @@ def mtg(inp):
     type = type.strip()
     text = ' '.join(text.split())
 
-    return ' | '.join((" ".join(name.split()), " ".join(type.split()), " ".join(text.split()), link))
+    return (
+        ' | '.join(
+            (" ".join(name.split()),
+             " ".join(type.split()),
+             " ".join(text.split()),
+             link))
+    )

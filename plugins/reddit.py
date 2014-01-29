@@ -30,12 +30,15 @@ def reddit(inp):
     data = data["data"]["children"]
 
     # get the requested/random post
-    if id_num != None:
+    if id_num is not None:
         try:
             item = data[id_num]["data"]
         except IndexError:
             length = len(data)
-            return "Invalid post number. Number must be between 1 and {}.".format(length)
+            return (
+                "Invalid post number. Number must be between 1 and {}.".format(
+                    length)
+            )
     else:
         item = random.choice(data)["data"]
 

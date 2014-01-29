@@ -100,7 +100,7 @@ def youtube_url(match, bot=None, say=None):
 def tinyurl(inp, say=''):
     try:
         say(http.open(inp.group()).url.strip())
-    except http.URLError, e:
+    except http.URLError as e:
         pass
 
 
@@ -125,7 +125,10 @@ def rdio_url(match, bot=None):
             name = info['name']
             artist = info['artist']
             album = info['album']
-            return u"Rdio track: \x02{}\x02 by \x02{}\x02 - {}".format(name, artist, album)
+            return (
+                u"Rdio track: \x02{}\x02 by \x02{}\x02 - {}".format(name,
+                                                                    artist, album)
+            )
         elif 'artist' in info and not 'album' in info:  # Album
             name = info['name']
             artist = info['artist']

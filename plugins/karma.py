@@ -60,7 +60,7 @@ def setkarma(inp, nick='', chan='', db=None):
     db_init(db)
     word = inp.group(1)
     karma = int(inp.group(3))
-    if inp.group(2) != None:
+    if inp.group(2) is not None:
         karma = -karma
     karma_from_db = int(get_karma(db, chan, word))
     if nick != "extrastout":
