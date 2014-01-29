@@ -17,6 +17,9 @@ def cap_first(line):
 def time_command(inp, bot=None):
     """time <area> - Gets the time in <area>"""
 
+    if inp.lower() == "butts":
+        return "It's always time for butts."
+    
     query = "current time in {}".format(inp)
 
     api_key = bot.config.get("api_keys", {}).get("wolframalpha", None)
