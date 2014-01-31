@@ -23,24 +23,26 @@ def db_init(db):
 
 def get_phonenumber(db, name):
     row = db.execute("select phonenumber from phonebook where name like ?",
-                     (name,)).fetchone()
+        (name,)).fetchone()
     return (row[0] if row else None)
 
 
 def get_name(db, phoneNumber):
     row = db.execute("select name from phonebook where phonenumber like ?",
-                     (phoneNumber,)).fetchone()
+        (phoneNumber,)).fetchone()
     return (row[0] if row else None)
 
 
 def check_smslog(db, msg):
-    row = db.execute("select * from smslog where id like ? and sender like ? and  text like ? and time like ?",
-                     (msg['id'], msg['from'], msg['text'], msg['time'])).fetchone()
+    row = db.execute(
+        "select * from smslog where id like ? and sender like ? and  text like ? and time like ?",
+        (msg['id'], msg['from'], msg['text'], msg['time'])).fetchone()
     return (row[0] if row else None)
 
 
 def mark_as_read(db, msg):
-    db.execute("insert into smslog(id, sender, text, time) values (?,?,?,?)", (msg['id'], msg['from'], msg['text'], msg['time']))
+    db.execute("insert into smslog(id, sender, text, time) values (?,?,?,?)",
+        (msg['id'], msg['from'], msg['text'], msg['time']))
     db.commit()
 
 
@@ -67,7 +69,7 @@ def extractsms(htmlsms):
                 msgitem[cl] = (" ".join(span.findAll(text=True))).strip()
             msgitems.append(msgitem)  # add msg dictionary to list
     return msgitems
-    
+
 
 def outputsms(voice, conn, bot, db):
     db_init(db)
@@ -77,12 +79,13 @@ def outputsms(voice, conn, bot, db):
     voice.sms()
     messages = []
     for message in extractsms(voice.sms.html):
-        recip =  message['from'].strip('+: ')
+        recip = message['from'].strip('+: ')
         if recip.isdigit():  # slice off "+1" and ":"
             recip = recip[-10:]
-        if recip != 'Me' and  recip not in privatelist and not check_smslog(db, message):
+        if recip != 'Me' and recip not in privatelist and not check_smslog(db, message):
             recip_nick = get_name(db, recip)
-            message['out'] = "<{}> {}".format(recip_nick or recip, message['text'])
+            message['out'] = "<{}> {}".format(
+                recip_nick or recip, message['text'])
             messages.append(message)
     for message in messages:
         for chan in conn.channels:
@@ -111,11 +114,12 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
 
 
 @hook.singlethread
-#@hook.event('JOIN')
+@hook.event('JOIN')
 def parseloop(paraml, nick='', conn=None, bot=None, db=None):
     server = "%s:%s" % (conn.server, conn.port)
     if server != "localhost:7666" or paraml[0] != "#geekboy":
         return
+    print(">>> u'Beginning SMS parse loop for %s'" % server)
     while True:
         time.sleep(90)
         try:
@@ -123,7 +127,8 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
                 voice = Voice()
             voice, sms_count = outputsms(voice, conn, bot, db)
             if sms_count:
-                print(">>> u'Outputting {} message(s) complete :{}'".format(sms_count, server))
+                print(
+                    ">>> u'Outputting {} message(s) complete :{}'".format(sms_count, server))
         except googlevoice.util.LoginError as e:
             print(">>> u'Google Voice login error: {} :{}'".format(e, server))
             voice = None
@@ -178,7 +183,7 @@ def call(inp, say='', nick='', db=None, bot=None):
     voice = Voice()
     privatelist = bot.config["gvoice"]["private"]
     recip = inp.strip().encode('ascii', 'ignore')
-        
+
     if recip.isdigit():
         outgoingNumber = recip[-10]
     else:
@@ -263,6 +268,6 @@ def remove_privatecontact(inp, bot=None):
         privatelist.remove(contact)
         privatelist.sort()
         json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
-        return  "%s has been removed as a private contact." % format(contact)
+        return "%s has been removed as a private contact." % format(contact)
     else:
         return "%s is not a private contact." % format(contact)
