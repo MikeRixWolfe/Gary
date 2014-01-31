@@ -33,7 +33,10 @@ def define(inp):
 
     url = 'http://ninjawords.com/'
 
-    h = http.get_html(url + http.quote_plus(inp))
+    try:
+        h = http.get_html(url + http.quote_plus(inp))
+    except:
+        return "API error; please try again in a few minutes."
 
     definition = h.xpath('//dd[@class="article"] | '
                          '//div[@class="definition"] |'
