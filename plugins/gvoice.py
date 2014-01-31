@@ -3,63 +3,45 @@ sms.py written by MikeFightsBears September 2013
 requires pygooglevoice
 """
 
-import time
 import re
 import sys
-import BeautifulSoup
+import time
 import json
+import BeautifulSoup
+import googlevoice.util
 from util import hook, text
 from googlevoice import Voice
-from googlevoice.util import input
 
 
 def db_init(db):
     db.execute("create table if not exists phonebook(name, phonenumber,"
                "primary key(name))")
-    db.execute("create table if not exists smslog(msgId,"
-               "primary key(msgId))")
+    db.execute("create table if not exists smslog(id, sender, text, time,"
+               "primary key(id, sender, text, time))")
     db.commit()
 
 
 def get_phonenumber(db, name):
     row = db.execute("select phonenumber from phonebook where name like ?",
                      (name,)).fetchone()
-    if row:
-        return row[0]
-    else:
-        return None
+    return (row[0] if row else None)
 
 
 def get_name(db, phoneNumber):
     row = db.execute("select name from phonebook where phonenumber like ?",
                      (phoneNumber,)).fetchone()
-    if row:
-        return row[0]
-    else:
-        return None
+    return (row[0] if row else None)
 
 
-def check_smslog(db, msgId):
-    row = db.execute("select msgId from smslog where msgId like ?",
-                     (msgId,)).fetchone()
-    if row:
-        return row[0]
-    else:
-        return None
+def check_smslog(db, msg):
+    row = db.execute("select * from smslog where id like ? and sender like ? and  text like ? and time like ?",
+                     (msg['id'], msg['from'], msg['text'], msg['time'])).fetchone()
+    return (row[0] if row else None)
 
 
-def mark_as_read(db, msgId):
-    db.execute("insert into smslog(msgId) values(?)", (msgId,))
+def mark_as_read(db, msg):
+    db.execute("insert into smslog(id, sender, text, time) values (?,?,?,?)", (msg['id'], msg['from'], msg['text'], msg['time']))
     db.commit()
-    return
-
-
-def voice_login(voice=Voice()):
-    try:
-        voice.login()
-    except:
-        print(">>> u'Error logging in to Google Voice :%s'" % server)
-    return voice
 
 
 def extractsms(htmlsms):
@@ -85,39 +67,98 @@ def extractsms(htmlsms):
                 msgitem[cl] = (" ".join(span.findAll(text=True))).strip()
             msgitems.append(msgitem)  # add msg dictionary to list
     return msgitems
+    
+
+def outputsms(voice, conn, bot, db):
+    db_init(db)
+    privatelist = bot.config["gvoice"]["private"]
+    if not voice.special:
+        voice.login()
+    voice.sms()
+    messages = []
+    for message in extractsms(voice.sms.html):
+        recip =  message['from'].strip('+: ')
+        if recip.isdigit():  # slice off "+1" and ":"
+            recip = recip[-10:]
+        if recip != 'Me' and  recip not in privatelist and not check_smslog(db, message):
+            recip_nick = get_name(db, recip)
+            message['out'] = "<{}> {}".format(recip_nick or recip, message['text'])
+            messages.append(message)
+    for message in messages:
+        for chan in conn.channels:
+            conn.send("PRIVMSG {} :{}".format(chan, message['out']))
+        mark_as_read(db, message)
+    return voice, len(messages)
+
+
+@hook.command(adminonly=False, autohelp=False)
+def parsesms(inp, say='', conn=None, bot=None, db=None):
+    ".parsesms - force an sms check from Google Voice"
+    voice = Voice()
+    say("Checking for unread SMS...")
+    try:
+        voice, sms_count = outputsms(voice, conn, bot, db)
+        if sms_count:
+            say("Outputting {} message(s) complete.".format(sms_count))
+        else:
+            say("No new SMS found.")
+    except googlevoice.util.LoginError:
+        say("Error logging in to Google Voice; please try again in a few minutes.")
+    except googlevoice.util.ParsingError:
+        say("Error parsing data from Google Voice; please try again in a few minutes.")
+    except:
+        say("Ouch! I've encountered an unexpected error (and it hurt).")
+
+
+@hook.singlethread
+#@hook.event('JOIN')
+def parseloop(paraml, nick='', conn=None, bot=None, db=None):
+    server = "%s:%s" % (conn.server, conn.port)
+    if server != "localhost:7666" or paraml[0] != "#geekboy":
+        return
+    while True:
+        time.sleep(90)
+        try:
+            if not voice:
+                voice = Voice()
+            voice, sms_count = outputsms(voice, conn, bot, db)
+            if sms_count:
+                print(">>> u'Outputting {} message(s) complete :{}'".format(sms_count, server))
+        except googlevoice.util.LoginError as e:
+            print(">>> u'Google Voice login error: {} :{}'".format(e, server))
+            voice = None
+        except googlevoice.util.ParsingError:
+            print(">>> u'Google Voice parse error: {} :{}'".format(e, server))
+        except Exception as e:
+            print(">>> u'Google Voice error: {} :{}'".format(e, server))
 
 
 @hook.command()
-def sms(inp, nick='', chan='', say='', input=None, db=None, bot=None):
+def sms(inp, nick='', chan='', db=None, bot=None):
     ".sms <10 digit number|name in phonebook> <message> - sends a text message to a specified number or recipient via Google Voice"
-    if input.chan[0] != '#':
+    if chan[0] != '#':
         return "Can only SMS from public channels to control abuse."
     db_init(db)
     voice = Voice()
     privatelist = bot.config["gvoice"]["private"]
-    try:
-        inp = inp.strip().encode('ascii', 'ignore')
-    except:
-        return "Error sending SMS; message contains unsupported characters"
-
+    inp = inp.strip().encode('ascii', 'ignore')
     operands = inp.split(' ', 1)
     if len(operands) < 2:
         return "Please check your input and try again."
-    name_or_num = operands[0].strip()
+    recip = operands[0].strip()
     text = "<" + nick + "> " + operands[1].strip()
 
-    if len(name_or_num) == 10 and name_or_num.isdigit():
-        phoneNumber = name_or_num
+    if recip.isdigit():
+        phoneNumber = recip[-10:]
     else:
-        num_from_db = get_phonenumber(db, name_or_num.lower())
-        if num_from_db is not None:
-            phoneNumber = num_from_db
+        recip_number = get_phonenumber(db, recip.lower())
+        if recip_number:
+            phoneNumber = recip_number
         else:
             return "Sorry, I don't have that user in my phonebook."
 
-    if phoneNumber in privatelist:
-        say("I'm sorry %s, I'm afraid I can't do that." % nick)
-        return
+    if "+1" + phoneNumber[-10:] in privatelist or phoneNumber in privatelist:
+        return "I'm sorry %s, I'm afraid I can't do that." % nick
 
     try:
         voice.login()
@@ -128,141 +169,34 @@ def sms(inp, nick='', chan='', say='', input=None, db=None, bot=None):
 
 
 @hook.command(adminonly=True)
-def call(inp, say='', nick='', input=None, db=None, bot=None):
+def call(inp, say='', nick='', db=None, bot=None):
     ".call <10 digit number|user in phonebook> - calls specified <number|user> and connects the call to your number from .phonebook via Google Voice"
     db_init(db)
-    privatelist = bot.config["gvoice"]["private"]
     forwardingNumber = get_phonenumber(db, nick)
-    if forwardingNumber is not None:
-        voice = Voice()
-        name_or_num = inp.strip(' ').decode('utf8', 'ignore')
-        if not name_or_num.isdigit():
-            outgoingNumber = get_phonenumber(db, name_or_num)
-            if outgoingNumber is None:
-                return "That user isn't in my phonebook."
-        else:
-            if len(name_or_num) == 10 and name_or_num.isdigit():
-                outgoingNumber = name_or_num
-            else:
-                "Plese make sure the number is a 10 digit numeric."
-        if outgoingNumber in privatelist:
-            say("I'm sorry %s, I'm afraid I caan't do that." % nick)
-            return
-        try:
-            voice.login()
-        except:
-            return "Google Voice login error, please try again in a few minutes."
-        voice.call(outgoingNumber, forwardingNumber)
-        say("Calling %s from %s..." % (outgoingNumber, forwardingNumber))
-    else:
-        return "Your number needs to be in my phonebook to use this function"
-
-
-@hook.singlethread
-@hook.event('JOIN')
-def parseloop(paraml, nick='', conn=None, bot=None, db=None):
-    server = "%s:%s" % (conn.server, conn.port)
-    # Ensure it runs on the right channel, on the right server
-    if server != "localhost:7666" or paraml[0] != "#geekboy":
-        return
-    print(">>> u'Beginning SMS parse loop for %s'" % server)
-    db_init(db)
-    privatelist = bot.config["gvoice"]["private"]
+    if not forwardingNumber:
+        return "Your number needs to be in my phonebook to use this function."
     voice = Voice()
+    privatelist = bot.config["gvoice"]["private"]
+    recip = inp.strip().encode('ascii', 'ignore')
+        
+    if recip.isdigit():
+        outgoingNumber = recip[-10]
+    else:
+        outgoingNumber = get_phonenumber(db, recip)
+        if not outgoingNumber:
+            return "That user isn't in my phonebook."
+
+    if outgoingNumber in privatelist:
+        return "I'm sorry, I'm afraid I can't do that."
+
     try:
         voice.login()
+        voice.call(outgoingNumber, forwardingNumber)
+        say("Calling %s from %s..." % (outgoingNumber, forwardingNumber))
+        time.sleep(30)
+        voice.cancel(outgoingNumber, forwardingNumber)
     except:
-        print(">>> u'Error logging in to Google Voice :%s'" % server)
-        return
-    while True:
-        time.sleep(90)
-        try:
-            voice.sms()
-            messagecounter = 0
-            for message in extractsms(voice.sms.html):
-                if check_smslog(db, message['id']) is None and message['from'][:-1] not in privatelist:
-                    messagecounter = messagecounter + 1
-                    number = message['from'][2:-1]  # slice off "+1" and ":"
-                    recip_nick = get_name(db, number)
-                    if recip_nick is not None:
-                        text = "<" + recip_nick + "> " + message['text']
-                        for chn in conn.channels:
-                            out = "PRIVMSG {} :{}".format(chn, text)
-                            conn.send(out)
-                        mark_as_read(db, str(message['id']))
-                    else:
-                        text = "<" + number + "> " + message['text']
-                        for chn in conn.channels:
-                            out = "PRIVMSG {} :{}".format(chn, text)
-                            conn.send(out)
-                        mark_as_read(db, str(message['id']))
-            if messagecounter == 0:
-                pass
-            elif messagecounter == 1:
-                print(">>> u'Outputting " +
-                      str(messagecounter) +
-                      " message complete :%s'" % server)
-            else:
-                print(">>> u'Outputting " +
-                      str(messagecounter) +
-                      " messages complete :%s'" % server)
-        except:
-            print(">>> u'Error parsing data from Google Voice :%s'" % server)
-            del voice
-            voice = Voice()
-            try:
-                voice.login()
-            except:
-                print(">>> u'Error relogging in to Google Voice :%s'" % server)
-            continue
-
-
-@hook.command(adminonly=False, autohelp=False)
-def parsesms(inp, say='', conn=None, bot=None, db=None):
-        ".parsesms - force an sms check from Google Voice"
-        db_init(db)
-        privatelist = bot.config["gvoice"]["private"]
-        voice = Voice()
-        try:
-            voice.login()
-        except:
-            say("Error logging in to Google Voice, please try again in a few minutes.")
-            return
-        try:
-            voice.sms()
-        except:
-            say("Error parsing data from Google Voice.")
-            return
-        say("Checking for unread SMS...")
-        messagecounter = 0
-        for message in extractsms(voice.sms.html):
-            if check_smslog(db, message['id']) is None \
-                    and message['from'][:-1] not in privatelist:
-                messagecounter = messagecounter + 1
-                number = message['from'][2:-1]  # slice off "+1" and ":"
-                recip_nick = get_name(db, number)
-                if recip_nick is not None:
-                    text = "<" + recip_nick + "> " + message['text']
-                    for chn in conn.channels:
-                        out = "PRIVMSG {} :{}".format(chn, text)
-                        conn.send(out)
-                    mark_as_read(db, str(message['id']))
-                else:
-                    text = "<" + number + "> " + message['text']
-                    for chn in conn.channels:
-                        out = "PRIVMSG {} :{}".format(chn, text)
-                        conn.send(out)
-                    mark_as_read(db, str(message['id']))
-        if messagecounter == 0:
-            say("'No new SMS found.")
-        elif messagecounter == 1:
-            say("Outputting " +
-                str(messagecounter) +
-                " message complete.")
-        else:
-            say("Outputting " +
-                str(messagecounter) +
-                " messages complete.")
+        return "Google Voice API error, please try again in a few minutes."
 
 
 @hook.command
@@ -270,66 +204,65 @@ def phonebook(inp, nick='', input=None, db=None, bot=None):
     ".phonebook <name|10 digit number|delete> - gets a users phone number, or sets/deletes your phone number"
     db_init(db)
     privatelist = bot.config["gvoice"]["private"]
-    name_or_num = inp.strip()
-    if name_or_num in privatelist:
+    recip = inp.strip().encode('ascii', 'ignore')
+    if recip in privatelist:
         return "Nope."
-    if name_or_num.isdigit():
-        if len(name_or_num) == 10:
-            db.execute("insert or replace into phonebook(name, phonenumber)"
-                       "values(?, ?)", (nick.lower(), name_or_num))
-            db.commit()
-            return "Number saved!"
-        else:
-            return "Please be sure your are inputting a 10 digit number."
-    if name_or_num == 'delete':
-        db.execute("delete from phonebook where "
-                   "name = (?)", (nick.lower(),))
+    if recip.isdigit():
+        if len(recip) < 10:
+            return "Please check your input and try again."
+        db.execute("insert or replace into phonebook(name, phonenumber)"
+                   "values(?, ?)", (nick.lower(), recip[-10:]))
+        db.commit()
+        return "Number saved!"
+    elif recip == 'delete':
+        db.execute("delete from phonebook where name = (?)", (nick.lower(),))
+        db.commit()
         return "Your number has been removed from my phonebook."
     else:
-        num_from_db = get_phonenumber(db, name_or_num.lower())
-        if num_from_db is not None:
-            return name_or_num + "'s number is " + num_from_db
+        recip_number = get_phonenumber(db, recip.lower())
+        if recip_number is not None:
+            return recip + "'s number is " + recip_number
         else:
-            return "User does not have a registered phone number"
+            return "User does not have a registered phone number."
 
 
 @hook.command(adminonly=True, autohelp=False)
-def privatecontacts(inp, notice=None, bot=None, say=None):
+def privatecontacts(inp, bot=None, say=None):
     """.privateContacts - Lists private contacts."""
     privatelist = bot.config["gvoice"]["private"]
     if privatelist:
         say("Private contacts: %s" % format(", ".join(privatelist)))
     else:
-        say("You currently have no private contacts.")
-    return
+        return "You currently have no private contacts."
 
 
 @hook.command(adminonly=True)
-def add_privatecontact(inp, say=None, notice=None, bot=None, config=None):
+def add_privatecontact(inp, bot=None):
     """.add_privateContact <number|contact> - adds <number|contact> to private contact list."""
-    target = inp.strip()
+    contact = inp.strip('+: ').encode('ascii', 'ignore')
     privatelist = bot.config["gvoice"]["private"]
-    if target in privatelist:
-        say("%s is already a private contact." % format(target))
+    if contact.isdigit():  # Format number to Google Voice Format
+        contact = "+1" + contact[-10:]
+    if contact in privatelist:
+        return "%s is already a private contact." % format(contact)
     else:
-        admins = bot.config.get('admins', [])
-        say("%s has been added as a private contact." % format(target))
-        privatelist.append(target)
+        privatelist.append(contact)
         privatelist.sort()
         json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
-    return
+        return "%s has been added as a private contact." % format(contact)
 
 
 @hook.command(adminonly=True)
-def remove_privatecontact(inp, say=None, notice=None, bot=None, config=None):
+def remove_privatecontact(inp, bot=None):
     """.remove_privateContact <number|contact> - removes <number|contact> from private contact list."""
-    target = inp.strip()
+    contact = inp.strip('+: ').encode('ascii', 'ignore')
     privatelist = bot.config["gvoice"]["private"]
-    if target in privatelist:
-        say("%s has been removed as a private contact." % format(target))
-        privatelist.remove(target)
+    if contact.isdigit():  # Format number to Google Voice Format
+        contact = "+1" + contact[-10:]
+    if contact in privatelist:
+        privatelist.remove(contact)
         privatelist.sort()
         json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
+        return  "%s has been removed as a private contact." % format(contact)
     else:
-        say("%s is not a private contact." % format(target))
-    return
+        return "%s is not a private contact." % format(contact)
