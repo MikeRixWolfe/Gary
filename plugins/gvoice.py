@@ -80,7 +80,7 @@ def outputsms(voice, conn, bot, db):
     messages = []
     for message in extractsms(voice.sms.html):
         recip = message['from'].strip('+: ')
-        if recip.isdigit():  # slice off "+1" and ":"
+        if recip.isdigit():
             recip = recip[-10:]
         if recip != 'Me' and recip not in privatelist and not check_smslog(db, message):
             recip_nick = get_name(db, recip)
@@ -130,11 +130,11 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
             if sms_count:
                 print(
                     ">>> u'Outputting {} message(s) complete :{}'".format(sms_count, server))
-        except googlevoice.util.LoginError as e:
-            print(">>> u'Google Voice login error: {} :{}'".format(e, server))
+        except googlevoice.util.LoginError:
+            print(">>> u'Google Voice login error :{}'".format(server))
             voice = None
         except googlevoice.util.ParsingError:
-            print(">>> u'Google Voice parse error: {} :{}'".format(e, server))
+            print(">>> u'Google Voice parse error :{}'".format(server))
         except Exception as e:
             print(">>> u'Google Voice error: {} :{}'".format(e, server))
 
@@ -153,7 +153,6 @@ def sms(inp, nick='', chan='', db=None, bot=None):
         return "Please check your input and try again."
     recip = operands[0].strip()
     text = "<" + nick + "> " + operands[1].strip()
-
     if recip.isdigit():
         phoneNumber = recip[-10:]
     else:
@@ -162,10 +161,8 @@ def sms(inp, nick='', chan='', db=None, bot=None):
             phoneNumber = recip_number
         else:
             return "Sorry, I don't have that user in my phonebook."
-
     if "+1" + phoneNumber[-10:] in privatelist or phoneNumber in privatelist:
         return "I'm sorry %s, I'm afraid I can't do that." % nick
-
     try:
         voice.login()
         voice.send_sms(phoneNumber, text)
@@ -176,7 +173,7 @@ def sms(inp, nick='', chan='', db=None, bot=None):
 
 @hook.command(adminonly=True)
 def call(inp, say='', nick='', db=None, bot=None):
-    ".call <10 digit number|user in phonebook> - calls specified <number|user> and connects the call to your number from .phonebook via Google Voice"
+    ".call <number|nick> - calls specified <number|nick> and connects the call to your number from .phonebook via Google Voice"
     db_init(db)
     forwardingNumber = get_phonenumber(db, nick)
     if not forwardingNumber:
@@ -184,17 +181,14 @@ def call(inp, say='', nick='', db=None, bot=None):
     voice = Voice()
     privatelist = bot.config["gvoice"]["private"]
     recip = inp.strip().encode('ascii', 'ignore')
-
     if recip.isdigit():
         outgoingNumber = recip[-10]
     else:
         outgoingNumber = get_phonenumber(db, recip)
         if not outgoingNumber:
             return "That user isn't in my phonebook."
-
     if outgoingNumber in privatelist:
         return "I'm sorry, I'm afraid I can't do that."
-
     try:
         voice.login()
         voice.call(outgoingNumber, forwardingNumber)
@@ -207,7 +201,7 @@ def call(inp, say='', nick='', db=None, bot=None):
 
 @hook.command
 def phonebook(inp, nick='', input=None, db=None, bot=None):
-    ".phonebook <name|10 digit number|delete> - gets a users phone number, or sets/deletes your phone number"
+    ".phonebook <nick|number|delete> - gets a users phone number, or sets/deletes your phone number"
     db_init(db)
     privatelist = bot.config["gvoice"]["private"]
     recip = inp.strip().encode('ascii', 'ignore')

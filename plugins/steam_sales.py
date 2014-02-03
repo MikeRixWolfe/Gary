@@ -142,14 +142,12 @@ def get_sales(mask, flag=False):
 def format_sale_item(item):
     if item["final_price"] == 'Free to Play':
         out = "\x02{}\x0F: {}; ".format(item["name"],
-                                        item["final_price"])
+            item["final_price"])
     else:
         out = "\x02{}\x0F: ${}.{}({}% off); ".format(item["name"],
-                                                     str(item["final_price"])[
-                                                         :-2],
-                                                     str(item["final_price"])[
-                                                         -2:],
-                                                     str(item["discount_percent"]))
+            str(item["final_price"])[:-2],
+            str(item["final_price"])[-2:],
+            str(item["discount_percent"]))
     return out
 
 
