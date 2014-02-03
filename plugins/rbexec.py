@@ -35,8 +35,11 @@ def ruby(inp, say=None):
     code = inp.split(" ")[0:]
     code = " ".join(code)
 
-    response = get_response(code)
-    document, url = response
-    output = parse_html(document)
+    try:
+        response = get_response(code)
+        document, url = response
+        output = parse_html(document)
+    except Exception as e:
+        return e
 
     return output[-1].encode("ascii", "ignore")
