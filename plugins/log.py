@@ -31,6 +31,22 @@ irc_color_re = re.compile(r'(\x03(\d+,\d+|\d)|[\x0f\x02\x16\x1f])')
 def db_init(db):
     db.execute("create table if not exists log(time, server, chan, nick, user,"
                " action, msg, uts, primary key(time, server, chan, nick))")
+    db.execute("create table if not exists seen(time, server, chan, nick, user,"
+               " action, msg, uts, primary key(time, server, chan, nick))")
+    db.commit()
+
+
+def log_chat(db, server, chan, nick, user, host, action, msg):
+    db.execute("insert into log(time, server, chan, nick, user, action, msg, uts)"
+               " values(?, lower(?), lower(?), lower(?), lower(?), upper(?), ?, ?)",
+               (datetime.now(), server, chan, nick, user + "@" + host, action, msg, time.time()))
+    db.commit()
+
+
+def log_seen(db, server, chan, nick, user, host, action, msg):
+    db.execute("insert or replace into seen(time, server, chan, nick, user, action, msg, uts)"
+               " values(?, lower(?), lower(?), lower(?), lower(?), upper(?), ?, ?)",
+               (datetime.now(), server, chan, nick, user + "@" + host, action, msg, time.time()))
     db.commit()
 
 
@@ -67,21 +83,18 @@ def beautify(input):
 def logtest(paraml, input=None, bot=None, db=None):
     timestamp = localtime(timestamp_format)
     beau = beautify(input)
-
     if beau == '':  # don't log this
         return
-
     if input.chan and input.nick != input.conn.nick and input.command in formats.keys() and (input.chan[0] == '#' or input.chan == input.nick):
         db_init(db)
         log_chat(
             db, input.server, input.chan, input.nick, input.user, input.host,
-            input.command, re.sub(r'^<' + input.nick + '>\ ', '', beau.encode('ascii', 'ignore'), 1))
-
+            input.command, re.sub(r'^<' + input.nick + '>\ ', '',
+            beau.encode('ascii', 'ignore'), 1))
+        if input.command in ('PRIVMSG', 'JOIN', 'PART', 'KICK'):
+            log_seen(
+                db, input.server, input.chan, input.nick,
+                input.user, input.host, input.command,
+                re.sub(r'^<' + input.nick + '>\ ', '',
+                beau.encode('ascii', 'ignore'), 1))
     print timestamp, input.chan, beau.encode('ascii', 'ignore')
-
-
-def log_chat(db, server, chan, nick, user, host, action, msg):
-    db.execute("insert into log(time, server, chan, nick, user, action, msg, uts)"
-               " values(?, lower(?), lower(?), lower(?), lower(?), upper(?), ?, ?)",
-               (datetime.now(), server, chan, nick, user + "@" + host, action, msg, time.time()))
-    db.commit()

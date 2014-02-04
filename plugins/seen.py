@@ -1,6 +1,5 @@
 """
 seen.py - written by MikeFightsBears 2013
-    based on work by sklnd in about two beers July 2009
 """
 
 import time
@@ -12,33 +11,15 @@ def rreplace(s, old, new, occurrence):
     return new.join(li)
 
 
-def db_init(db):
-    "check to see that our db has the the seen table and return a connection."
-    db.execute("create table if not exists seen(name, time, quote, chan, "
-               "primary key(name, chan))")
-    db.commit()
-
-
-@hook.singlethread
-@hook.event('PRIVMSG', ignorebots=False)
-def seeninput(paraml, input=None, db=None, bot=None):
-    db_init(db)
-    db.execute("insert or replace into seen(name, time, quote, chan)"
-               "values(?,?,?,?)", (input.nick.lower(), time.time(), input.msg,
-                                   input.chan))
-    db.commit()
-
-
 @hook.command(autohelp=False)
 def around(inp, nick='', chan='', say='', db=None, input=None):
     ".around [minutes] - Lists what nicks have been active in the last [minutes] minutes, defaults to 15"
-    db_init(db)
     minutes = 15
     if inp.strip().isdigit():
         minutes = int(inp.strip())
     period = time.time() - (minutes * 60)
-    rows = db.execute("select name  from seen where time >= "
-                      " ? and chan = ? order by name", (period, chan)).fetchall()
+    rows = db.execute("select nick from seen where time >= "
+                      " ? and chan = ? order by nick", (period, chan)).fetchall()
 
     if rows:
         raw_list = ""
@@ -66,24 +47,27 @@ def around(inp, nick='', chan='', say='', db=None, input=None):
 def seen(inp, nick='', chan='', db=None, input=None):
     ".seen <nick> - Tell when a nickname was last in active in irc"
     if input.conn.nick.lower() == inp.lower():
-        # user is looking for us, being a smartass
         return "You need to get your eyes checked."
     if inp.lower() == nick.lower():
         return "Have you looked in a mirror lately?"
 
-    db_init(db)
-    last_seen = db.execute("select name, time, quote from seen where name"
-                           " like ? and chan = ?", (inp, chan)).fetchone()
+    last_seen = db.execute("select nick, uts, msg, action, chan, time from seen where nick"
+                           " like ? and chan = ? and server = ?", (inp.lower(), chan,
+                           input.server)).fetchone()
 
     if last_seen:
         reltime = timesince.timesince(last_seen[1])
-        if last_seen[0] != inp.lower():  # for glob matching
-            inp = last_seen[0]
-        if last_seen[2][0:1] == "\x01":
-            return '%s was last seen %s ago: *"%s %s*"' % \
-                (inp, reltime, inp, last_seen[2][8:-1])
-        else:
-            return '%s was last seen %s ago saying: "%s"' % \
-                (inp, reltime, last_seen[2])
+        if last_seen[3] == 'PRIVMSG':
+            return '%s was last seen %s ago saying "%s" [%s]' % \
+                (last_seen[0], reltime, last_seen[2], last_seen[5])
+        elif last_seen[3] == 'JOIN':
+            return '%s was last seen %s ago joining %s [%s]' % \
+                (last_seen[0], reltime, last_seen[4], last_seen[5])
+        elif last_seen[3] == 'PART':
+            return '%s was last seen %s ago leaving %s [%s]' % \
+                (last_seen[0], reltime, last_seen[4], last_seen[5])
+        elif last_seen[3] == 'KICK':
+            return '%s was last seen %s ago being kicked from %s [%s]' % \
+                (last_seen[0], reltime, last_seen[4], last_seen[5])
     else:
         return "I've never seen %s" % inp
