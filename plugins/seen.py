@@ -18,7 +18,7 @@ def around(inp, nick='', chan='', say='', db=None, input=None):
     if inp.strip().isdigit():
         minutes = int(inp.strip())
     period = time.time() - (minutes * 60)
-    rows = db.execute("select nick from seen where time >= "
+    rows = db.execute("select distinct nick from seen where time >= "
                       " ? and chan = ? order by nick", (period, chan)).fetchall()
 
     if rows:
