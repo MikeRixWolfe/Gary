@@ -4,46 +4,26 @@ chatlog.py: written by MikeFightsBears 2013
 
 import datetime
 import time
-from util import hook
+from util import hook, timesince
 
 
 @hook.command
 def last(inp, nick='', input=None, db=None, say=None):
     ".last <phrase> - finds the last occurence of a phrase"
     regex_msg = '%' + inp.strip() + '%'
-
-    # Long query to overcome the fact that this command has already been
-    # logged and would be the last logged instance of the word
-    row = db.execute(
-        "select time, nick, msg from log where msg like ? and uts = (select max(uts) from log where msg like ? and uts !=  (select max(uts) from log where msg like ?)) and chan = ?",
+    row = db.execute("select time, nick, msg, uts from log where msg like ?"
+        " and uts = (select max(uts) from log where msg like ? and"
+        " uts != (select max(uts) from log where msg like ?))"
+        " and chan = ?",
         (regex_msg, regex_msg, regex_msg, input.chan)).fetchone()
     if row:
-        #.strftime("%Y-%m-%d %H:%M:%S"),
-        delta = datetime.datetime.now() - \
-            datetime.datetime.strptime(
-                row[0], '%Y-%m-%d %H:%M:%S.%f')
-        years = delta.days / 365
-        days = delta.days % 365
-        hours = delta.seconds / 60 / 60
-        minutes = delta.seconds / 60 % 60
-        seconds = delta.seconds % 60
-        if years > 0:
-            say("%s last said \"%s\" on %s (%s years, %s days, %s hours, %s minutes, and %s seconds ago)" %
-                (row[1], row[2], row[0][:-7], years, days, hours, minutes, seconds))
-        elif days > 0 and years == 0:
-            say("%s last said \"%s\" on %s (%s days, %s hours, %s minutes, and %s seconds ago)" %
-                (row[1], row[2], row[0][:-7], days, hours, minutes, seconds))
-        elif hours > 0 and days == 0:
-            say("%s last said \"%s\" on %s (%s hours, %s minutes, and %s seconds ago)" %
-                (row[1], row[2], row[0][:-7], hours, minutes, seconds))
-        elif minutes > 0 and hours == 0:
-            say("%s last said \"%s\" on %s (%s minutes, and %s seconds ago)" %
-                (row[1], row[2], row[0][:-7], minutes, seconds))
+        if row[1] == 'asdf':#nick:
+            say("Seriously? You said it like, just now...")
+        elif row[0] == 'not this':
+            say("Seriously? %s said it like, just now..." % row[1])
         else:
-            if row[1] == nick:
-                say("Seriously? You said it like, just now...")
-            else:
-                say("Seriously? %s said it like, just now..." % row[1])
+            say("%s last said \"%s\" on %s (%s ago)" %
+                (row[1], row[2], row[0][:-7], timesince.timesince(row[3])))
     else:
         say("Never!")
 
@@ -53,33 +33,11 @@ def first(inp, input=None, db=None, say=None):
     ".first <phrase> - finds the first occurence of a phrase"
     regex_msg = '%' + inp.strip() + '%'
     row = db.execute(
-        "select * from log where msg like ? and uts = (select min(uts) from log where msg like ? ) and chan = ?",
+        "select time, nick, msg, uts from log where msg like ? and uts = (select min(uts) from log where msg like ? ) and chan = ?",
         (regex_msg, regex_msg, input.chan)).fetchone()
     if row:
-        #.strftime("%Y-%m-%d %H:%M:%S"),
-        delta = datetime.datetime.now() - \
-            datetime.datetime.strptime(
-                row[0], '%Y-%m-%d %H:%M:%S.%f')
-        years = delta.days / 365
-        days = delta.days % 365
-        hours = delta.seconds / 60 / 60
-        minutes = delta.seconds / 60 % 60
-        seconds = delta.seconds % 60
-        if years > 0:
-            say("%s first said \"%s\" on %s (%s years, %s days, %s hours, %s minutes, and %s seconds ago)" %
-                (row[1], row[2], row[0][:-7], years, days, hours, minutes, seconds))
-        elif days > 0 and years == 0:
-            say("%s first said \"%s\" on %s (%s days, %s hours, %s minutes, and %s seconds ago)" %
-                (row[1], row[2], row[0][:-7], days, hours, minutes, seconds))
-        elif hours > 0 and days == 0:
-            say("%s first said \"%s\" on %s (%s hours, %s minutes, and %s seconds ago)" %
-                (row[1], row[2], row[0][:-7], hours, minutes, seconds))
-        elif minutes > 0 and hours == 0:
-            say("%s first said \"%s\" on %s (%s minutes, and %s seconds ago)" %
-                (row[1], row[2], row[0][:-7], minutes, seconds))
-        else:
-            say("%s first said \"%s\" on %s (%s seconds ago)" %
-                (row[1], row[2], row[0][:-7], seconds))
+        say("%s first said \"%s\" on %s (%s ago)" %
+            (row[1], row[2], row[0][:-7], timesince.timesince(row[3])))
     else:
         say("Never!")
 
@@ -144,5 +102,7 @@ def rreplace(s, old, new, occurrence):
 # def userstats():
 
 # def dailylines():
+
+# def dailystats():
 
 # def lines():

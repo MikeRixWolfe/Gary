@@ -59,15 +59,15 @@ def seen(inp, nick='', chan='', db=None, input=None):
         reltime = timesince.timesince(last_seen[1])
         if last_seen[3] == 'PRIVMSG':
             return '%s was last seen %s ago saying "%s" [%s]' % \
-                (last_seen[0], reltime, last_seen[2], last_seen[5])
+                (last_seen[0], reltime, last_seen[2], last_seen[5][:-7])
         elif last_seen[3] == 'JOIN':
             return '%s was last seen %s ago joining %s [%s]' % \
-                (last_seen[0], reltime, last_seen[4], last_seen[5])
+                (last_seen[0], reltime, last_seen[4], last_seen[5][:-7])
         elif last_seen[3] == 'PART':
             return '%s was last seen %s ago leaving %s [%s]' % \
-                (last_seen[0], reltime, last_seen[4], last_seen[5])
+                (last_seen[0], reltime, last_seen[4], last_seen[5][:-7])
         elif last_seen[3] == 'KICK':
             return '%s was last seen %s ago being kicked from %s [%s]' % \
-                (last_seen[0], reltime, last_seen[4], last_seen[5])
+                (last_seen[0], reltime, last_seen[4], last_seen[5][:-7])
     else:
         return "I've never seen %s" % inp
