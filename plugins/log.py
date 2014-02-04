@@ -32,7 +32,7 @@ def db_init(db):
     db.execute("create table if not exists log(time, server, chan, nick, user,"
                " action, msg, uts, primary key(time, server, chan, nick))")
     db.execute("create table if not exists seen(time, server, chan, nick, user,"
-               " action, msg, uts, primary key(time, server, chan, nick))")
+               " action, msg, uts, primary key(server, chan, nick))")
     db.commit()
 
 
