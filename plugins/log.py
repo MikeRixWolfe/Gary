@@ -92,6 +92,8 @@ def logtest(paraml, input=None, bot=None, db=None):
             input.command, re.sub(r'^<' + input.nick + '>\ ', '',
             beau.encode('ascii', 'ignore'), 1))
         if input.command in ('PRIVMSG', 'JOIN', 'PART', 'KICK'):
+            if input.command == 'KICK':
+                input.nick = paraml[1]
             log_seen(
                 db, input.server, input.chan, input.nick,
                 input.user, input.host, input.command,
