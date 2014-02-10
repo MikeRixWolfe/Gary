@@ -178,7 +178,7 @@ def rpenis(inp, say=None):
             inp = 110
         shaft = "8"
         i = 0
-        while i <= int(inp):
+        while i < int(inp):
             shaft += "="
             i = i + 1
         shaft = shaft + "D"
