@@ -6,8 +6,8 @@ from util import hook, http
 
 
 @hook.command
-def domainr(inp):
-    """domainr <domain> - Use domain.nr's API to search for a domain, and similar domains."""
+def domainr(inp, say=''):
+    ".domainr <domain> - Use domai.nr's API to search for a domain, and similar domains."
     try:
         data = http.get_json('http://domai.nr/api/json/search?q=' + inp)
     except (http.URLError, http.HTTPError) as e:
@@ -18,4 +18,4 @@ def domainr(inp):
     for domain in data['results']:
         domains.append(("\x034" if domain['availability'] == "taken" else (
             "\x033" if domain['availability'] == "available" else "\x038")) + domain['domain'] + "\x0f" + domain['path'])
-    return "Domains: " + ", ".join(domains)
+    say("Domains: {} [http://domai.nr/{}]".format(", ".join(domains), inp.strip()))
