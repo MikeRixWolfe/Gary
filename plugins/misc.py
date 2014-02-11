@@ -9,7 +9,6 @@ socket.setdefaulttimeout(10)  # global setting
 
 
 def get_version():
-    return 1, 1
     p = subprocess.Popen(['git', 'log', '--oneline'], stdout=subprocess.PIPE)
     stdout, _ = p.communicate()
     p.wait()
@@ -24,22 +23,34 @@ def get_version():
     return shorthash, revnumber
 
 
-# autorejoin channels
+@hook.event('JOIN')
+def onjoin(paraml, nick=None, conn=None):
+    if nick == conn.nick and paraml[0] not in conn.channels:
+            conn.channels.append(paraml[0])
+
+
+@hook.event('PART')
+def onpart(paraml, nick=None, conn=None):
+    if nick == conn.nick and paraml[0] in conn.channels:
+            conn.channels.remove(paraml[0])
+
+
 @hook.event('KICK')
-def rejoin(paraml, conn=None):
-    if paraml[1] == conn.nick:
-        if paraml[0].lower() in conn.channels:
+def onkick(paraml, conn=None, bot=None):
+    if paraml[1] == conn.nick and paraml[0].lower() in conn.channels:
+        if bot.config.get('rejoin', ''):
             conn.join(paraml[0])
+        else:
+            conn.channels.remove(paraml[0])
 
 
-# join channels when invited
 @hook.event('INVITE')
-def invite(paraml, conn=None):
+def oninvite(paraml, conn=None):
     conn.join(paraml[-1])
 
 
 @hook.event('004')
-def onjoin(paraml, conn=None):
+def onconnect(paraml, conn=None):
     # identify to services
     nickserv_password = conn.conf.get('nickserv_password', '')
     nickserv_name = conn.conf.get('nickserv_name', 'nickserv')
@@ -62,7 +73,7 @@ def onjoin(paraml, conn=None):
     ident, rev = get_version()
 
 
-@hook.regex(r'^\x01VERSION\x01$')
+#@hook.regex(r'^\x01VERSION\x01$')
 def version(inp, notice=None):
     ident, rev = get_version()
     notice('\x01VERSION Gary %s r%d - http://github.com/MikeRixWolfe/'
