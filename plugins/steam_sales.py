@@ -10,8 +10,6 @@ from util import hook, http
 from datetime import datetime
 
 debug = False
-running_sale_loops = []
-
 
 def log_sales_data(filename):
     # Create dr to log sales for debug purposes
@@ -209,12 +207,10 @@ def steamsales(inp, say='', chan=''):
 @hook.singlethread
 @hook.event('JOIN')
 def saleloop(paraml, nick='', conn=None):
-    global running_sale_loops
     # If specified chan or not running; can remove first condition for
     # multi-channel
-    if paraml[0] != '#test' or paraml[0] in running_sale_loops:
+    if paraml[0] != '#test':
         return
-    running_sale_loops.append(paraml[0])
     prev_sales = {}
     print(">>> u'Beginning Steam sale check loop :{}'".format(paraml[0]))
     while True:
