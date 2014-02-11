@@ -9,9 +9,12 @@ import socket
 @hook.command
 def dns(inp):
     "dns <domain> - resolves IP of Domain"
-    socket.setdefaulttimeout(5)
-    ip = socket.gethostbyname(inp)
-    return "%s resolves to %s" % (inp, ip)
+    try:
+        socket.setdefaulttimeout(15)
+        ip = socket.gethostbyname(inp)
+        return "%s resolves to %s" % (inp, ip)
+    except:
+        return "I could not find {}".format(inp)
 
 
 @hook.command
