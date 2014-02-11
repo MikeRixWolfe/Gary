@@ -37,13 +37,14 @@ def around(inp, nick='', chan='', say='', db=None, input=None):
 
     if rows:
         out = "Users around in the last {} minutes: ".format(minutes)
+        out2 = " {} others"
         while rows:
-            if len(out) + len(rows[0]) + len (str(minutes)) + len(rows) < 455:
+            if len(out) + len(rows[0]) + len(out2) + len(str(len(rows))) < 450:
                 out += rows.pop(0) + ", "
             else:
                 break
-        if len(rows):
-            out += " {} others".format(len(rows))
+        if rows:
+            out += out2.format(len(rows))
         say(rreplace(out.strip(', '), ', ', ', and ', 1))
     else:
         say("No one!")

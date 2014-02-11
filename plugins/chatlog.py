@@ -7,6 +7,11 @@ import time
 from util import hook, timesince
 
 
+def rreplace(s, old, new, occurrence):
+    li = s.rsplit(old, occurrence)
+    return new.join(li)
+
+
 @hook.command
 def last(inp, nick='', input=None, db=None, say=None):
     ".last <phrase> - finds the last occurence of a phrase"
@@ -17,10 +22,11 @@ def last(inp, nick='', input=None, db=None, say=None):
         " and chan = ?",
         (regex_msg, regex_msg, regex_msg, input.chan)).fetchone()
     if row:
-        if row[1] == 'asdf':#nick:
-            say("Seriously? You said it like, just now...")
-        elif row[0] == 'not this':
-            say("Seriously? %s said it like, just now..." % row[1])
+        if time.time() - row[3] <= 90:
+            if row[1] == nick.lower():
+                say("Seriously? You said it like, just now...")
+            else:
+                say("Seriously? %s said it like, just now..." % row[1])
         else:
             say("%s last said \"%s\" on %s (%s ago)" %
                 (row[1], row[2], row[0][:-7], timesince.timesince(row[3])))
@@ -68,36 +74,27 @@ def king(inp, input=None, db=None, say=None, bot=None):
 def said(inp, input=None, db=None, say=None):
     ".said <phrase> - finds anywho who has said a phrase"
     regex_msg = '%' + inp.strip() + '%'
+
     rows = db.execute(
         "select distinct nick from log where msg like ? and chan = ? order by nick",
         (regex_msg, input.chan)).fetchall()
+    rows = ([row[0] for row in rows] if rows else None)
+
     if rows:
-        raw_list = ""
-        overflow_counter = 0
-        for row in rows:
-            return_string = "%s have said %s" % (raw_list[:-2], input.msg[6:])
-            if len(regex_msg) + len(return_string) + len(str(overflow_counter)) < 450:
-                raw_list += row[0] + ", "
+        out = ''
+        out2 =  ' have said "{}"'.format(inp)
+        while rows:
+            if len(out) + len(rows[0]) + len(out2) + len(str(len(rows))) < 450:
+                out += rows.pop(0) + ", "
             else:
-                overflow_counter += 1
-        if overflow_counter == 0 and len(rows) == 1:
-            return_string = "%s has said \"%s\"" % (
-                raw_list[:-2], input.msg[6:])
-        elif overflow_counter == 0 and len(rows) > 1:
-            return_string = "%s have said \"%s\"" % (
-                raw_list[:-2], input.msg[6:])
-        else:
-            return_string = "%s%s others have all said \"%s\"" % (
-                raw_list, overflow_counter, input.msg[6:])
-        formatted_string = rreplace(return_string, ', ', ', and ', 1)
-        say(formatted_string)
+                break
+        if rows:
+            out += "{} others".format(len(rows))
+        out = rreplace(out.strip(', '), ', ', ', and ', 1)
+        say(out + out2)
     else:
         say("No one!")
 
-
-def rreplace(s, old, new, occurrence):
-    li = s.rsplit(old, occurrence)
-    return new.join(li)
 
 # def userstats():
 
