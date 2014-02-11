@@ -135,6 +135,7 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
             voice = None
         except googlevoice.util.ParsingError:
             print(">>> u'Google Voice parse error :{}'".format(server))
+            voice = None
         except Exception as e:
             print(">>> u'Google Voice error: {} :{}'".format(e, server))
 
