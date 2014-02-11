@@ -95,6 +95,8 @@ def said(inp, input=None, db=None, say=None):
 
 # def dailylines():
 
+#def chanstats():
+
 # def dailystats():
 
 # def lines():

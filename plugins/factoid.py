@@ -16,14 +16,10 @@ def get_factoid(db, chan, word):
     row = db.execute(
         "select data from factoids where chan=? and word=lower(?)",
         (chan.lower(), word.lower())).fetchone()
-    if row:
-        return row[0]
-    else:
-        return None
-
-# @hook.regex(r'^(no\ )?(?:G|g)ary(?:\:\ |\,\ |\ )([^\.][\S]+|.*)\ (?:is)\ (also\ )?\<reply\>(.+)') #m2 style
+    return (row[0] if row else None)
 
 
+# @hook.regex(r'^(no\ )?(?:G|g)ary(?:\:\ |\,\ |\ )([^\.][\S]+|.*)\ (?:is)\ (also\ )?\<(reply|rreply|exec)\>(.+)') #m2 style
 @hook.singlethread
 # Geekboy Style
 @hook.regex(r'^(no\ )?(?:G|g)ary(?:\:\ |\,\ |\ )([^\(].*?[^\)]|\(.*\))\ (?:is)\ (also\ )?(.+)')

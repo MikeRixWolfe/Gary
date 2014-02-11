@@ -26,7 +26,7 @@ def nowplaying(inp, nick='', say=None, api_key=None):
             return "error: %s" % response["message"]
         else:
             return (
-                "Your nick is not a Last.fm account. try '.lastfm username'."
+                "Your nick is not a Last.fm account. Try '.lastfm username'."
             )
 
     if not "track" in response["recenttracks"] or len(response["recenttracks"]["track"]) == 0:
