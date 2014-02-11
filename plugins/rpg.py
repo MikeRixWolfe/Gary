@@ -15,7 +15,7 @@ o======o
 
 """
 
-import namegen
+from util import namegen
 import random
 import shelve
 from util import hook
