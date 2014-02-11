@@ -149,6 +149,11 @@ def truncate_str(content, length=100, suffix='...'):
         return content[:length].rsplit(' ', 1)[0] + suffix
 
 
+def rreplace(s, old, new, occurrence):
+    li = s.rsplit(old, occurrence)
+    return new.join(li)
+
+
 # ALL CODE BELOW THIS LINE IS COVERED BY THE FOLLOWING AGREEMENT:
 
 # Copyright (c) Django Software Foundation and individual contributors.

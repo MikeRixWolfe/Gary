@@ -3,7 +3,7 @@ seen.py - written by MikeFightsBears 2013
 """
 
 import time, re
-from util import hook, timesince
+from util import hook, timesince, text
 
 formats = {
     'PRIVMSG': 'in %(chan)s saying "%(msg)s"',
@@ -15,11 +15,6 @@ formats = {
     'QUIT': 'quitting IRC with reason: %(msg)s',
     'NICK': 'in %(chan)s changing nick to %(msg)s'
 }
-
-
-def rreplace(s, old, new, occurrence):
-    li = s.rsplit(old, occurrence)
-    return new.join(li)
 
 
 @hook.command(autohelp=False)
@@ -45,7 +40,7 @@ def around(inp, nick='', chan='', say='', db=None, input=None):
                 break
         if rows:
             out += out2.format(len(rows))
-        say(rreplace(out.strip(', '), ', ', ', and ', 1))
+        say(text.rreplace(out.strip(', '), ', ', ', and ', 1))
     else:
         say("No one!")
 

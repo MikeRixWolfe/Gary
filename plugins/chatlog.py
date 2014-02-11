@@ -4,12 +4,7 @@ chatlog.py: written by MikeFightsBears 2013
 
 import datetime
 import time
-from util import hook, timesince
-
-
-def rreplace(s, old, new, occurrence):
-    li = s.rsplit(old, occurrence)
-    return new.join(li)
+from util import hook, timesince, text
 
 
 @hook.command
@@ -90,7 +85,7 @@ def said(inp, input=None, db=None, say=None):
                 break
         if rows:
             out += "{} others".format(len(rows))
-        out = rreplace(out.strip(', '), ', ', ', and ', 1)
+        out = text.rreplace(out.strip(', '), ', ', ', and ', 1)
         say(out + out2)
     else:
         say("No one!")
