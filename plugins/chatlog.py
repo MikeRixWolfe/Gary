@@ -33,8 +33,8 @@ def first(inp, input=None, db=None, say=None):
     ".first <phrase> - finds the first occurence of a phrase"
     regex_msg = '%' + inp.strip() + '%'
     row = db.execute(
-        "select time, nick, msg, uts from log where msg like ? and uts = (select min(uts) from log where msg like ? ) and chan = ?",
-        (regex_msg, regex_msg, input.chan)).fetchone()
+        "select time, nick, msg, uts from log where msg like ? and uts = (select min(uts) from log where msg like ? and chan = ?) and chan = ?",
+        (regex_msg, regex_msg, input.chan, input.chan)).fetchone()
     if row:
         say("%s first said \"%s\" on %s (%s ago)" %
             (row[1], row[2], row[0][:-7], timesince.timesince(row[3])))

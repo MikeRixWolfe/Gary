@@ -10,22 +10,28 @@ from util import hook
 
 timestamp_format = '%H:%M:%S'
 
-formats = {'PRIVMSG': '<%(nick)s> %(msg)s',
-           'PART': '-!- %(nick)s [%(user)s@%(host)s] has left %(chan)s',
-           'JOIN': '-!- %(nick)s [%(user)s@%(host)s] has joined %(param0)s',
-           'MODE': '-!- mode/%(chan)s [%(param_tail)s] by %(nick)s',
-           'KICK':
-           '-!- %(param1)s was kicked from %(chan)s by %(nick)s [%(msg)s]',
-           'TOPIC': '-!- %(nick)s changed the topic of %(chan)s to: %(msg)s',
-           'QUIT': '-!- %(nick)s has quit [%(msg)s]',
-           'NICK': '',
-           'PING': '',
-           'NOTICE': ''
-           }
+formats = {
+    'PRIVMSG': '<%(nick)s> %(msg)s',
+    'PART': '-!- %(nick)s [%(user)s@%(host)s] has left %(chan)s [%(msg)s]',
+    'JOIN': '-!- %(nick)s [%(user)s@%(host)s] has joined %(param0)s',
+    'MODE': '-!- mode/%(chan)s [%(param_tail)s] by %(nick)s',
+    'KICK': '-!- %(param1)s was kicked from %(chan)s by %(nick)s [%(msg)s]',
+    'TOPIC': '-!- %(nick)s changed the topic of %(chan)s to: %(msg)s',
+    'QUIT': '-!- %(nick)s has quit IRC [%(msg)s]',
+    'NICK': '-!- %(nick)s [%(user)s@%(host)s] is now known as %(msg)s',
+    'PING': '',
+    'NOTICE': ''
+}
 
-ctcp_formats = {'ACTION': '* %(nick)s %(ctcpmsg)s'}
+ctcp_formats = {
+    'ACTION': '* %(nick)s %(ctcpmsg)s',
+    'VERSION': '',
+    'PING': '',
+    'TIME': '',
+    'FINGER': ''
+}
 
-irc_color_re = re.compile(r'(\x03(\d+,\d+|\d)|[\x0f\x02\x16\x1f])')
+irc_color_re = re.compile(r'(\x03(\d+)|[\x0f\x02\x16\x1f])')
 
 
 def db_init(db):
@@ -37,16 +43,18 @@ def db_init(db):
 
 
 def log_chat(db, server, chan, nick, user, host, action, msg):
+    mask = user.lower() + "@" + host.lower()
     db.execute("insert into log(time, server, chan, nick, user, action, msg, uts)"
                " values(?, lower(?), lower(?), lower(?), lower(?), upper(?), ?, ?)",
-               (datetime.now(), server, chan, nick, user + "@" + host, action, msg, time.time()))
+               (datetime.now(), server, chan, nick, mask, action, msg, time.time()))
     db.commit()
 
 
 def log_seen(db, server, chan, nick, user, host, action, msg):
+    mask = user.lower() + "@" + host.lower()
     db.execute("insert or replace into seen(time, server, chan, nick, user, action, msg, uts)"
                " values(?, lower(?), lower(?), lower(?), lower(?), upper(?), ?, ?)",
-               (datetime.now(), server, chan, nick, user + "@" + host, action, msg, time.time()))
+               (datetime.now(), server, chan, nick, mask, action, msg, time.time()))
     db.commit()
 
 
@@ -71,32 +79,46 @@ def beautify(input):
         if len(ctcp) == 1:
             ctcp += ['']
         args['ctcpcmd'], args['ctcpmsg'] = ctcp
-        format = ctcp_formats.get(args['ctcpcmd'],
-                                  '%(nick)s [%(user)s@%(host)s] requested unknown CTCP '
-                                  '%(ctcpcmd)s from %(chan)s: %(ctcpmsg)s')
+        format = ctcp_formats.get(args['ctcpcmd'], '')
 
     return format % args
 
 
 @hook.singlethread
 @hook.event('*')
-def logtest(paraml, input=None, bot=None, db=None):
+def log(paraml, input=None, bot=None, db=None):
     timestamp = localtime(timestamp_format)
+
+    if input.command == 'QUIT':  # these are temporary fixes until proper
+        input.chan = 'quit'      # presence tracking is implemented
+    if input.command == 'NICK':  # fix me please
+        input.chan = 'nick'
+
     beau = beautify(input)
-    if beau == '':  # don't log this
+    if not beau:  # don't log this
         return
-    if input.chan and input.nick != input.conn.nick and input.command in formats.keys() and (input.chan[0] == '#' or input.chan == input.nick):
+
+    if input.chan and input.nick and input.user \
+        and input.command in formats.keys() \
+        and input.nick != input.conn.nick:
         db_init(db)
-        log_chat(
-            db, input.server, input.chan, input.nick, input.user, input.host,
-            input.command, re.sub(r'^<' + input.nick + '>\ ', '',
-            beau.encode('ascii', 'ignore'), 1))
-        if input.command in ('PRIVMSG', 'JOIN', 'PART', 'KICK'):
-            if input.command == 'KICK':
-                input.nick = paraml[1]
-            log_seen(
-                db, input.server, input.chan, input.nick,
-                input.user, input.host, input.command,
-                re.sub(r'^<' + input.nick + '>\ ', '',
-                beau.encode('ascii', 'ignore'), 1))
-    print timestamp, input.chan, beau.encode('ascii', 'ignore')
+
+        # format data
+        input.msg = irc_color_re.sub('', input.msg)
+        if input.command == 'PRIVMSG' and input.msg.count('\x01') >= 2:
+            input.msg = "* {} {}".format(input.nick,
+                input.msg.split('\x01', 2)[1].split(' ', 1)[1])
+        if input.command == 'KICK':
+            input.msg = "{} [{}]".format(paraml[1], input.msg)
+        if input.command == 'MODE':
+            input.msg = ' '.join(paraml[1:])
+        if input.command == 'JOIN':
+            input.msg = ''
+
+        log_chat(db, input.server, input.chan, input.nick,
+            input.user, input.host, input.command, input.msg)
+        if input.command not in ('MODE', 'TOPIC', 'NICK'):
+            log_seen(db, input.server, input.chan, input.nick,
+                input.user, input.host, input.command, input.msg)
+
+        print timestamp, input.chan, beau.encode('ascii', 'ignore')
