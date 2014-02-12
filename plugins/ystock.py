@@ -4,22 +4,21 @@ ystock.py - rewritten by MikeFightsBears 2013
 
 import random
 import datetime
-from util import hook, http
+from util import hook, http, web
 
 
 @hook.command
 def stock(inp):
     '''.stock <symbol> - gets stock information from Yahoo.'''
-
-    url = ('http://query.yahooapis.com/v1/public/yql?format=json&'
-           'env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys')
-
     try:
         # heh, SQLI
-        parsed = http.get_json(
-            url, q='select * from yahoo.finance.quote where symbol in ("%s")' % inp)
-        quote = parsed['query']['results']['quote']
+        #parsed = http.get_json(
+        #    url, q='select * from yahoo.finance.quote where symbol in ("%s")' % inp)
+        #quote = parsed['query']['results']['quote']
+        query = "SELECT * FROM yahoo.finance.quote WHERE symbol=@symbol LIMIT 1"
+        quote = web.query(query, {"symbol": inp}).one()
     except:
+        #print parsed
         return "Yahoo Fianance API error, please try again in a few minutes"
 
     # if we dont get a company name back, the symbol doesn't match a company
@@ -48,15 +47,12 @@ def stock(inp):
 @hook.command
 def stockhistory(inp):
     '''.stockhisoryt <symbol> - gets stock history information from Yahoo.'''
-
-    url = ('http://query.yahooapis.com/v1/public/yql?format=json&'
-           'env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys')
-
     try:
         parsed = http.get_json(url, q='select * from yahoo.finance.quote '
-                               'where symbol in ("%s")' % inp)  # heh, SQLI
+                               'where symbol in ("%s")' % inp)
         quote = parsed['query']['results']['quote']
     except:
+        print parsed
         return "Yahoo Fianance API error, please try again in a few minutes"
 
     # if we dont get a company name back, the symbol doesn't match a company
@@ -99,7 +95,6 @@ def stockhistory(inp):
         quote['volcolor'] = "3"
 
     quote['PercentVolChange'] = 100 * volchange / (vol - volchange)
-    print quote['volcolor']
 
     ret = "%(Name)s - $%(LastTradePriceOnly)s " \
           "\x03%(color)s%(YearChange)s (%(PercentChange).2f%%)\x03 " \
