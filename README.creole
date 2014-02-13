@@ -14,9 +14,10 @@
 * Easy plugin development with automatic reloading and a simple hooking API.
 
 ==Requirements==
-* Gary requires a minimum of Python 2.6. 
-* Many of the plugins require [[http://codespeak.net/lxml/|lxml]].
-* Many plugins require BeautifulSoup4.
+* >= Python 2.6
+* [[http://codespeak.net/lxml/|lxml]]
+* BeautifulSoup4
+* yql
 * GVoice plugin requires pygooglevoice, I recommend [[https://github.com/MikeRixWolfe/pygooglevoice|my fork]].
 
 ==Special Thanks==

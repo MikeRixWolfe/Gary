@@ -3,18 +3,15 @@ ystock.py - rewritten by MikeFightsBears 2013
 '''
 
 import random
-import datetime
+from datetime import date, timedelta
 from util import hook, http, web
 
 
 @hook.command
-def stock(inp):
+def stock(inp, say=''):
     '''.stock <symbol> - gets stock information from Yahoo.'''
     try:
         # heh, SQLI
-        #parsed = http.get_json(
-        #    url, q='select * from yahoo.finance.quote where symbol in ("%s")' % inp)
-        #quote = parsed['query']['results']['quote']
         query = "SELECT * FROM yahoo.finance.quote WHERE symbol=@symbol LIMIT 1"
         quote = web.query(query, {"symbol": inp}).one()
     except:
@@ -35,72 +32,67 @@ def stock(inp):
 
     quote['PercentChange'] = 100 * change / (price - change)
 
-    ret = "%(Name)s - $%(LastTradePriceOnly)s "                   \
+    say ("%(Name)s - $%(LastTradePriceOnly)s "                   \
           "\x03%(color)s%(Change)s (%(PercentChange).2f%%)\x03 "        \
           "H: $%(DaysHigh)s L: $%(DaysLow)s " \
           "MCAP: %(MarketCapitalization)s " \
-          "Volume: %(Volume)s" % quote
-
-    return ret
+          "Volume: %(Volume)s" % quote)
 
 
 @hook.command
-def stockhistory(inp):
-    '''.stockhisoryt <symbol> - gets stock history information from Yahoo.'''
+def stockhistory(inp, say=''):
+    '''.stockhisory <symbol> - gets stock history information from Yahoo.'''
     try:
-        parsed = http.get_json(url, q='select * from yahoo.finance.quote '
-                               'where symbol in ("%s")' % inp)
-        quote = parsed['query']['results']['quote']
+        query = "SELECT * FROM yahoo.finance.historicaldata WHERE symbol=@symbol and startDate=@start and endDate=@end"
+        quote = web.query(query,
+            {"symbol": inp,
+            "start": str(date.today()-timedelta(days=365)),
+            "end": str(date.today())})
+        start = quote.rows[-1]
+        end = quote.rows[0]
+        query2 = "SELECT * FROM yahoo.finance.quote WHERE symbol=@symbol LIMIT 1"
+        current = web.query(query2, {"symbol": inp}).one()
     except:
-        print parsed
         return "Yahoo Fianance API error, please try again in a few minutes"
 
-    # if we dont get a company name back, the symbol doesn't match a company
-    if quote['Change'] is None:
-        return "Unknown ticker symbol %s" % inp
+    if not quote.raw['count']:
+        return 'Historical data unavailable for "%s"' % inp
 
-    parsed2 = http.get_json(url, q='select * from yahoo.finance.historicaldata'
-                            ' where symbol = "%s" and startDate = "%s-01-01" and endDate = "%s-01-03"' % (inp, str(datetime.date.today())[:4], str(datetime.date.today())[:4]))  # heh, SQLI
+    #quotehistory = dict(zip(start.keys(),["%.2f" % (float(x)-float(y)) if isFloat(x) else x for x,y in zip(quote.rows[0].values(), quote.rows[-1])]))
+    out = {}
+    out['Name'] = current['Name']
+    out['YearClose'] = end['Close']
+    out['YearHigh'] = max([float(i['Close']) for i in quote.rows])
+    out['YearLow'] = min([float(i['Close']) for i in quote.rows])
+    out['YearAverage'] = sum([float(i['Close']) for i in quote.rows]) / quote.count
 
-    try:
-        quotehistory = parsed2['query']['results']['quote'][-1]
-    except TypeError:
-        return "Historical data not available for %s" % inp
-
-    yearopen = float(quotehistory['Open'])
-    price = float(quote['LastTradePriceOnly'])
-
-    change = price - yearopen
+    change = float(end['Close']) - float(start['Open'])
+    print change
 
     if change < 0:
-        quote['color'] = "5"
-        strchange = '-' + str(change).strip("0")
+        out['Color'] = "5"
+        out['YearChange'] = '-%.2f' % abs(round(change, 2))
     else:
-        quote['color'] = "3"
-        strchange = '+' + str(change).strip("0")
+        out['Color'] = "3"
+        out['YearChange'] = '+%.2f' % abs(round(change, 2))
 
-    quote['YearChange'] = strchange
-
-    quote['PercentChange'] = 100 * change / (price - change)
-
-    yearopenvol = int(quotehistory['Volume'])
-    vol = int(quote['Volume'])
-
-    volchange = vol - yearopenvol
-    quote['YearVolChange'] = volchange
+    out['PercentChange'] = 100 *  change / (float(end['Close']) - change)
+    out['YearVolume'] = end['Volume']
+    volchange = float(end['Volume']) - float(start['Volume'])
 
     if volchange < 0:
-        quote['volcolor'] = "5"
+        out['VolColor'] = "5"
+        out['VolumeChange'] = '-%d' % int(abs(round(volchange, 2)))
     else:
-        quote['volcolor'] = "3"
+        out['VolColor'] = "3"
+        out['VolumeChange'] = '+%d' % int(abs(round(volchange, 2)))
 
-    quote['PercentVolChange'] = 100 * volchange / (vol - volchange)
+    out['PercentVolChange'] = round(100 * volchange / (float(start['Volume']) - volchange))
+    out['AverageVolume'] = int(round(sum([float(i['Volume']) for i in quote.rows]) / quote.count))
 
-    ret = "%(Name)s - $%(LastTradePriceOnly)s " \
-          "\x03%(color)s%(YearChange)s (%(PercentChange).2f%%)\x03 " \
-          "Year H: $%(YearHigh)s Year L: $%(YearLow)s; " \
-          "Volume @ %(Volume)s " \
-          "\x03%(volcolor)s%(YearVolChange)s (%(PercentVolChange).2d%%)\x03 " \
-          "Avg Daily Volume: %(AverageDailyVolume)s" % quote
-
-    return ret
+    say("%(Name)s - $%(YearClose)s " \
+          "\x03%(Color)s%(YearChange)s (%(PercentChange).2f%%)\x03 " \
+          "Year H: $%(YearHigh)s Year Avg: $%(YearAverage).2f " \
+          "Year L: $%(YearLow)s; Volume @ %(YearVolume)s " \
+          "\x03%(VolColor)s%(VolumeChange)s (%(PercentVolChange)d%%)\x03 " \
+          "Avg Volume: %(AverageVolume)d" % out)
