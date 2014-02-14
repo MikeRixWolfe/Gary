@@ -8,7 +8,7 @@ def getstock(symbol):
     try:
         quote = json.loads(http.get(url + symbol)[3:])[0]
     except:
-        return False
+        return None
 
     if quote['c'][0] == '-':
         quote['color'] = "5"

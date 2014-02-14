@@ -4,7 +4,8 @@ ystock.py - rewritten by MikeFightsBears 2013
 
 import random
 from datetime import date, timedelta
-from util import hook, http, web, stock
+from util import hook, http, web
+from util import stock as gstock
 
 
 @hook.command
@@ -15,12 +16,8 @@ def stock(inp, say=''):
         query = "SELECT * FROM yahoo.finance.quote WHERE symbol=@symbol LIMIT 1"
         quote = web.query(query, {"symbol": inp}).one()
     except:
-        quote = stock.getstock(inp)
-        if quote:
-            say(quote)
-            return
-        else:
-           return "Yahoo Fianance API error, please try again in a few minutes"
+        say(gstock.getstock(inp) or "Yahoo Fianance API error, please try again in a few minutes")
+        return
 
     # if we dont get a company name back, the symbol doesn't match a company
     if quote['Change'] is None:
@@ -51,30 +48,17 @@ def stockhistory(inp, say=''):
         quote = web.query(query, {"symbol": inp})
         out = quote.one()
     except:
-        quote = stock.getstock(inp)
-        if quote:
-            return quote
-        else:
-           return "Yahoo Fianance API error, please try again in a few minutes"
+        say(gstock.getstock(inp) or "Yahoo Fianance API error, please try again in a few minutes")
+        return
 
     if out['PercentChangeFromYearLow'][0] == '-':
         out['Color'] = "5"
     else:
         out['Color'] = "3"
 
-    volchange = float(out['Volume']) - float(out['AverageDailyVolume'])
-    if volchange < 0:
-        out['VolColor'] = "5"
-        out['VolumeChange'] = '-%d' % int(abs(round(volchange, 2)))
-    else:
-        out['VolColor'] = "3"
-        out['VolumeChange'] = '+%d' % int(abs(round(volchange, 2)))
-    out['PercentVolChange'] = round(100 * volchange / (float(out['Volume']) - volchange))
-
     say("%(Name)s - $%(LastTradePriceOnly)s " \
           "\x03%(Color)s%(ChangeFromYearLow)s (%(PercentChangeFromYearLow)s)\x03 " \
           "Year H: $%(YearHigh)s Year Avg: $%(TwoHundreddayMovingAverage)s " \
           "Year L: $%(YearLow)s; Volume @ %(Volume)s " \
-          #"\x03%(VolColor)s%(VolumeChange)s (%(PercentVolChange)d%%)\x03 " \
-          "Avg Daily Volume: %(AverageDailyVolume)s " \
+          "(Avg Daily Volume: %(AverageDailyVolume)s) " \
           "[%(LastTradeTime)s]" % out)
