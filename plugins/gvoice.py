@@ -72,10 +72,8 @@ def extractsms(htmlsms):
 
 
 def outputsms(voice, conn, bot, db):
-    db_init(db)
     privatelist = bot.config["gvoice"]["private"]
-    if not voice.special:
-        voice.login()
+    if not voice.special: voice.login()
     voice.sms()
     messages = []
     for message in extractsms(voice.sms.html):
@@ -97,6 +95,7 @@ def outputsms(voice, conn, bot, db):
 @hook.command(adminonly=False, autohelp=False)
 def parsesms(inp, say='', conn=None, bot=None, db=None):
     ".parsesms - force an sms check from Google Voice"
+    db_init(db)
     voice = Voice()
     say("Checking for unread SMS...")
     try:
@@ -116,6 +115,7 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
 @hook.singlethread
 @hook.event('JOIN')
 def parseloop(paraml, nick='', conn=None, bot=None, db=None):
+    db_init(db)
     server = "%s:%s" % (conn.server, conn.port)
     if server != "localhost:7666" or paraml[0] != "#geekboy":
         return
@@ -124,12 +124,10 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
     while True:
         time.sleep(90)
         try:
-            if not voice:
-                voice = Voice()
+            if not voice: voice = Voice()
             voice, sms_count = outputsms(voice, conn, bot, db)
             if sms_count:
-                print(
-                    ">>> u'Outputting {} message(s) complete :{}'".format(sms_count, server))
+                print(">>> u'Outputting {} message(s) complete :{}'".format(sms_count, server))
         except googlevoice.util.LoginError:
             print(">>> u'Google Voice login error :{}'".format(server))
             voice = None
