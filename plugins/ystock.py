@@ -61,7 +61,7 @@ def stock(inp, say=''):
 
     say("%(Name)s - $%(LastTradePriceOnly)s " \
           "\x03%(Color)s%(Change)s (%(PercentChange)s)\x03 " \
-          "H:$%(DaysHigh)s L:$%(DaysLow)s O:$%(Open)s" \
+          "H:$%(DaysHigh)s L:$%(DaysLow)s O:$%(Open)s " \
           "Volume:%(Volume)s [%(LastTradeTime)s]" % quote)
 
 
