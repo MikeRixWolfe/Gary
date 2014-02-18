@@ -1,6 +1,6 @@
 import random
 
-from util import hook, http
+from util import hook, http, web
 
 
 def api_get(query, key, is_image=None, num=1):
@@ -17,7 +17,7 @@ def gis(inp, api_key=None):
     parsed = api_get(inp, api_key, is_image=True, num=10)
     if 'items' not in parsed:
         return 'no images found'
-    return random.choice(parsed['items'])['link']
+    return web.try_isgd(random.choice(parsed['items'])['link'])
 
 
 @hook.api_key('google')
