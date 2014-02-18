@@ -56,7 +56,7 @@ def whereis(inp):
 
 @hook.command
 def map(inp):
-    ".map <origin> to <destination> - generates Google Maps route"
+    ".map <origin> to <destination> - Generates Google Maps route"
     if not re.match(r'^(.+)?(\ to\ )(.+)', inp):
         return map.__doc__
     else:
