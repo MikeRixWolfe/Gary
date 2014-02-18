@@ -13,10 +13,8 @@ datetimemask = '%Y-%m-%d %H:%M'
 
 
 class EST(datetime.tzinfo):
-
     def utcoffset(self, dt):
         return datetime.timedelta(hours=-5)
-
     def dst(self, dt):
         return datetime.timedelta(0)
 
@@ -35,10 +33,7 @@ def get_events(db, time, chan):
     rows = db.execute(
         "select msg, set_by, chan, recurring from cron where time<=? and chan=lower(?)",
         (time, chan.lower())).fetchall()
-    if rows:
-        return rows
-    else:
-        return []
+    return rows or []
 
 
 def set_event(db, time, chan, msg, set_by, recurring):
@@ -46,7 +41,6 @@ def set_event(db, time, chan, msg, set_by, recurring):
         "insert or replace into cron(time, chan, msg, set_by, recurring) values(?,?,?,?,?)",
         (time, chan.lower(), msg, set_by, recurring))
     db.commit()
-    return
 
 
 def remove_event(db, time, chan, msg, set_by):
@@ -54,7 +48,6 @@ def remove_event(db, time, chan, msg, set_by):
         "delete from cron where time=? and chan=lower(?) and msg=? and set_by=?",
         (time, chan.lower(), msg, set_by))
     db.commit()
-    return
 
 
 def clean_db(db, time, chan):
@@ -62,7 +55,6 @@ def clean_db(db, time, chan):
         "delete from cron where time<? and chan=lower(?) and recurring!='1'",
         (time, chan.lower()))
     db.commit()
-    return
 
 
 @hook.event('JOIN')
