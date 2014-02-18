@@ -57,8 +57,5 @@ def whereis(inp):
 @hook.command
 def map(inp):
     ".map <origin> to <destination> - Generates Google Maps route"
-    if not re.match(r'^(.+)?(\ to\ )(.+)', inp):
-        return map.__doc__
-    else:
-        return web.try_isgd('https://www.google.com/maps/?q=' +
-                            '+'.join(inp.split(' ')))
+    return web.try_isgd('https://www.google.com/maps/?q=' +
+        '+'.join(inp.split(' ')))
