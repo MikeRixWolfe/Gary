@@ -78,6 +78,7 @@ def beautify(input):
         ctcp = input.msg.split('\x01', 2)[1].split(' ', 1)
         if len(ctcp) == 1:
             ctcp += ['']
+        ctcp[1] = irc_color_re.sub('', ctcp[1])
         args['ctcpcmd'], args['ctcpmsg'] = ctcp
         format = ctcp_formats.get(args['ctcpcmd'], '')
 
@@ -106,8 +107,9 @@ def log(paraml, input=None, bot=None, db=None):
         # format data
         input.msg = irc_color_re.sub('', input.msg)
         if input.command == 'PRIVMSG' and input.msg.count('\x01') >= 2:
-            input.msg = "* {} {}".format(input.nick,
+            input.msg = irc_color_re.sub('',
                 input.msg.split('\x01', 2)[1].split(' ', 1)[1])
+            input.msg = "* {} {}".format(input.nick, input.msg)
         if input.command == 'KICK':
             input.msg = "{} [{}]".format(paraml[1], input.msg)
         if input.command == 'MODE':
