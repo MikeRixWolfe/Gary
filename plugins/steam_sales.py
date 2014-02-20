@@ -11,7 +11,7 @@ from datetime import datetime
 
 debug = False
 
-def log_sales_data(filename):
+def log_sales_data(sales, filename):
     # Create dr to log sales for debug purposes
     if not os.path.exists('persist/steamsales_history'):
         os.makedirs('persist/steamsales_history')
@@ -20,39 +20,44 @@ def log_sales_data(filename):
     with open('persist/steamsales_history/' +
               time.strftime('%Y%m%d%H%M', time.localtime()) +
               '-' + filename + '.json', 'w+') as f:
-        json.dump(sales, f, sort_keys=False, indent=2)
-
-    return
+        json.dump(sales, f, sort_keys=True, indent=2)
 
 
 def get_featured():
     sales_url = "http://store.steampowered.com/api/featured/"
-    sales = http.get_json(sales_url)
+    try:
+        sales = http.get_json(sales_url)
+    except:
+        sales = {}
 
     # Log sales for debug purposes
     if debug:
-        log_sales_data("featured")
+        log_sales_data(sales, "featured")
 
     return sales
 
 
 def get_featuredcategories():
     sales_url = "http://store.steampowered.com/api/featuredcategories/"
-    sales = http.get_json(sales_url)
+    try:
+        sales = http.get_json(sales_url)
+    except:
+        sales = {}
 
     # Log sales for debug purposes
     if debug:
-        log_sales_data("featuredcategories")
+        log_sales_data(sales, "featuredcategories")
 
     return sales
 
 
-def get_sales(mask, flag=False):
+def get_sales(mask):
     # Fetch data
-    try:
-        data = get_featuredcategories()
-        flash_data = get_featured()
-    except:
+    data = get_featuredcategories()
+    flash_data = get_featured()
+
+    # Break if either return empty - might be unnecessary
+    if not data or not flash_data:
         return {}
 
     # Aggregate data
@@ -72,20 +77,17 @@ def get_sales(mask, flag=False):
             data["featured"]["items"].append(item)
 
     # Mask Data
-    if flag:
-        data = {k: v for k,
-                v in data.items() if isinstance(v, dict) and v["name"] in mask}
-    else:
-        data = {k: v for k,
-                v in data.items() if isinstance(v, dict) and k not in mask}
+    data = {k: v for k, v in data.items() if isinstance(v, dict)
+            and k not in mask}
 
     # Log sales for debug purposes
     if debug:
-        log_sales_data("data")
+        log_sales_data(data, "data")
 
     # Format data
     sales = {}
     for category in data:
+        #if not data[category]["items"]: sales[data[category]["name"]] = []
         for item in data[category]["items"]:
             # Prepare item data
             try:
@@ -113,12 +115,8 @@ def get_sales(mask, flag=False):
             # Begin work for discounted item
             if item["discounted"]:
                 # Clean Item
-                item["id"] = str(item["id"])
-                try:
-                    item["name"] = item["name"].encode("ascii", "ignore")
-                except:
-                    pass
-                item = {k: v for k, v in item.items() if k in
+                item["name"] = item["name"].encode("ascii", "ignore")
+                item = {k: str(v) for k, v in item.items() if k in
                         ["discount_expiration", "discounted",
                          "name", "currency", "final_price",
                          "discount_percent", "id"]}
@@ -126,12 +124,11 @@ def get_sales(mask, flag=False):
                 if data[category]["name"] not in sales.keys():
                     sales[data[category]["name"]] = []
                 sales[data[category]["name"]].append(item)
-
     sales = {k: sorted(v, key=lambda v: v["name"]) for k, v in sales.items()}
 
     # Log sales for debug purposes
     if debug:
-        log_sales_data("sales")
+        log_sales_data(sales, "sales")
 
     # Return usable data
     return sales
@@ -139,69 +136,64 @@ def get_sales(mask, flag=False):
 
 def format_sale_item(item):
     if item["final_price"] == 'Free to Play':
-        out = "\x02{}\x0F: {}; ".format(item["name"],
+        return "\x02{}\x0F: {}".format(item["name"],
             item["final_price"])
     else:
-        out = "\x02{}\x0F: ${}.{}({}% off); ".format(item["name"],
+        return "\x02{}\x0F: ${}.{}({}% off)".format(item["name"],
             str(item["final_price"])[:-2],
             str(item["final_price"])[-2:],
             str(item["discount_percent"]))
-    return out
 
 
 @hook.singlethread
 @hook.command()
 def steamsales(inp, say='', chan=''):
-    ".steamsales <flash|featured|specials|top_sellers|daily|all> - Check Steam for specified sales; Displays special event deals on top of chosen deals."
-    options = {"flash": "Flash Sales",
-               "featured": "Featured Sales",
-               "specials": "Specials",
-               "top_sellers": "Top Sellers",
-               "daily": "Daily Deal",
-               "all": "All"}
+    ".steamsales <space seperated options> - Check Steam for specified sales; Displays special event deals on top of chosen deals. Options: daily flash featured specials top_sellers all"
+    options = {"Flash Sales": "flash",
+               "Featured Sales": "featured",
+               "Specials": "specials",
+               "Top Sellers": "top_sellers",
+               "Daily Deal": "daily",
+               "All": "all"}
+    mask = ["coming_soon", "new_releases", "genres",
+            "trailerslideshow", "status"]
 
     # Bool flag denoting strict or non-strict masking
-    flag = re.match(r'^.*(-strict).*', inp)
+    flag = False
+    if '-strict' in inp:
+        flag = True
 
-    # Verify and stage input data
-    if flag:
-        inp = [options[line.strip(', ')] for line in inp.lower().split()
-               if line in options.keys()]
-    else:
-        inp = [line.strip(', ') for line in inp.lower().split()
-               if line in options.keys()]
+    # Clean input data
+    inp = [line.strip(', ') for line in inp.lower().split()
+           if line in options.values()]
 
     # Check for bad input
     if not inp:
         return steamsales.__doc__
 
     # Construct Mask
-    mask = ["coming_soon", "new_releases", "genres",
-            "trailerslideshow", "status"]
-    if any(x in ["all", "All"] for x in inp):
-            flag = False
-    elif flag:
-        mask = inp
-    else:
-        mask += [option for option in options.keys() if option not in inp]
+    if 'all' not in inp:
+        mask +=  [option for option in options.values() if option not in inp]
 
     # Get data
-    try:
-        sales = get_sales(mask, flag)
-    except Exception as e:
-        print(">>> u'Error getting steam sales: {} :{}'".format(e, chan))
+    sales = get_sales(mask)
+
+    # If sales not returned
+    if not sales:
         return "Steam Store API error, please try again in a few minutes."
 
     # Output appropriate data
+    if flag:
+        sales = {k: v for k, v in sales.items() if options.get(k, '') in inp}
+        if not sales:
+            return "No specified sales found."
+
     for category in sales:
-        message = "\x02" + category + "\x0F: "
-        for item in sales[category]:
-            message += format_sale_item(item)
-        message = message.strip(':; ')
-        if message != "\x02" + category + "\x0F":
-            say(message)
-        elif any(x in [k for k, v in options.items() if v == category] for x in inp):
-            say("{}: None found".format(message))
+        items = [format_sale_item(item) for item in sales[category]]
+        if len(items):
+            say("\x02{}\x0F: {}".format(category, '; '.join(items)))
+        elif options.get(category, False):
+            say("\x02{}\x0F: {}".format(category, "None found"))
 
 
 @hook.singlethread
@@ -211,6 +203,8 @@ def saleloop(paraml, nick='', conn=None):
     # multi-channel
     if paraml[0] != '#test':
         return
+    mask = ["specials", "coming_soon", "top_sellers", "new_releases",
+            "genres", "trailerslideshow", "status"]
     prev_sales = {}
     print(">>> u'Beginning Steam sale check loop :{}'".format(paraml[0]))
     while True:
@@ -218,33 +212,24 @@ def saleloop(paraml, nick='', conn=None):
             time.sleep(1200)
 
             # Get data
-            mask = ["specials", "coming_soon", "top_sellers", "new_releases",
-                    "genres", "trailerslideshow", "status"]
-            try:
-                sales = get_sales(mask)
-            except Exception as e:
-                print(
-                    ">>> u'Error getting Steam sales: {} :{}'".format(e, paraml[0]))
-                continue
+            sales = get_sales(mask)
+            if not sales:
+                print(">>> u'Error getting Steam sales :{}'".format(paraml[0]))
 
             # Handle restarts and empty requests
-            if prev_sales == {}:
+            if not prev_sales:
                 prev_sales = sales
 
             # Output appropriate data
             for category in sales:
-                message = "\x02New " + category + "\x0F: "
-                for item in sales[category]:
-                    if item not in (x for v in prev_sales for x in prev_sales[v]):
-                        message += format_sale_item(item)
-                message = message.strip(':; ')
-                if message != "\x02New " + category + "\x0F":
-                    out = "PRIVMSG {} :{}".format(paraml[0], message)
-                    conn.send(out)
+                items = [format_sale_item(item) for item in sales[category]
+                         if (item['name'], item['final_price']) not in
+                         [(x['name'], x['final_price']) for x in
+                         prev_sales.get(category, [])]]
+                if len(items):
+                    conn.send("\x02New {}\x0F: {}".format(category, '; '.join(items)))
 
             # Update dict of previous sales if appropriate
-            if sales != {}:
-                prev_sales = sales
+            prev_sales = sales
         except Exception as e:
             print(">>> u'Steam saleloop error: {} :{}'".format(e, paraml[0]))
-            continue
