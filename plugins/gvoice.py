@@ -73,7 +73,8 @@ def extractsms(htmlsms):
 
 def outputsms(voice, conn, bot, db):
     privatelist = bot.config["gvoice"]["private"]
-    if not voice.special: voice.login()
+    if not voice.special:
+        voice.login()
     voice.sms()
     messages = []
     for message in extractsms(voice.sms.html):
@@ -124,7 +125,8 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
     while True:
         time.sleep(90)
         try:
-            if not voice: voice = Voice()
+            if not voice:
+                voice = Voice()
             voice, sms_count = outputsms(voice, conn, bot, db)
             if sms_count:
                 print(">>> u'Outputting {} message(s) complete :{}'".format(sms_count, server))
