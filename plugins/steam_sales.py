@@ -192,7 +192,7 @@ def steamsales(inp, say='', chan=''):
         items = [format_sale_item(item) for item in sales[category]]
         if len(items):
             say("\x02{}\x0F: {}".format(category, '; '.join(items)))
-        elif options.get(category, False):
+        elif not options.get(category, False):
             say("\x02{}\x0F: {}".format(category, "None found"))
 
 
