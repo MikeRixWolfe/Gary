@@ -8,7 +8,7 @@ from util import hook, http
 
 @hook.api_key('twitter')
 @hook.command
-def twitter(inp, api_key=None):
+def twitter(inp, say='', api_key=None):
     ".twitter <user>/<user> <n>/<id>/#<search>/#<search> <n> - " \
         "get <user>'s last/<n>th tweet/get tweet <id>/do <search>/get <n>th <search> result"
 
@@ -79,4 +79,4 @@ def twitter(inp, api_key=None):
     time = strftime('%Y-%m-%d %H:%M:%S',
                     strptime(time, '%a %b %d %H:%M:%S +0000 %Y'))
 
-    return "%s %s: %s" % (time, screen_name, text)
+    say("%s: %s [%s]" % (screen_name, text, time))

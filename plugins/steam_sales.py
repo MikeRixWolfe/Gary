@@ -30,7 +30,6 @@ def get_featured():
     except:
         sales = {}
 
-    # Log sales for debug purposes
     if debug:
         log_sales_data(sales, "featured")
 
@@ -44,7 +43,6 @@ def get_featuredcategories():
     except:
         sales = {}
 
-    # Log sales for debug purposes
     if debug:
         log_sales_data(sales, "featuredcategories")
 
@@ -80,7 +78,6 @@ def get_sales(mask):
     data = {k: v for k, v in data.items() if isinstance(v, dict)
             and k not in mask}
 
-    # Log sales for debug purposes
     if debug:
         log_sales_data(data, "data")
 
@@ -126,7 +123,6 @@ def get_sales(mask):
                 sales[data[category]["name"]].append(item)
     sales = {k: sorted(v, key=lambda v: v["name"]) for k, v in sales.items()}
 
-    # Log sales for debug purposes
     if debug:
         log_sales_data(sales, "sales")
 
