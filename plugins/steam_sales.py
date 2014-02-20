@@ -76,7 +76,7 @@ def get_sales(mask):
 
     # Mask Data
     data = {k: v for k, v in data.items() if isinstance(v, dict)
-            and k not in mask}
+        and k not in mask}
 
     if debug:
         log_sales_data(data, "data")
@@ -114,9 +114,7 @@ def get_sales(mask):
                 # Clean Item
                 item["name"] = item["name"].encode("ascii", "ignore")
                 item = {k: str(v) for k, v in item.items() if k in
-                        ["discount_expiration", "discounted",
-                         "name", "currency", "final_price",
-                         "discount_percent", "id"]}
+                    ["name", "final_price", "discount_percent"]}
                 # Add item to sales
                 if data[category]["name"] not in sales.keys():
                     sales[data[category]["name"]] = []
@@ -136,9 +134,9 @@ def format_sale_item(item):
             item["final_price"])
     else:
         return "\x02{}\x0F: ${}.{}({}% off)".format(item["name"],
-            str(item["final_price"])[:-2],
-            str(item["final_price"])[-2:],
-            str(item["discount_percent"]))
+            item["final_price"][:-2],
+            item["final_price"][-2:],
+            item["discount_percent"])
 
 
 @hook.singlethread
@@ -161,7 +159,7 @@ def steamsales(inp, say='', chan=''):
 
     # Clean input data
     inp = [line.strip(', ') for line in inp.lower().split()
-           if line in options.values()]
+        if line in options.values()]
 
     # Check for bad input
     if not inp:
@@ -195,9 +193,8 @@ def steamsales(inp, say='', chan=''):
 @hook.singlethread
 @hook.event('JOIN')
 def saleloop(paraml, nick='', conn=None):
-    # If specified chan or not running; can remove first condition for
-    # multi-channel
-    if paraml[0] != '#test':
+    # If specified chan or not running; alter for multi-channel
+    if paraml[0] != '#geekboy':
         return
     mask = ["specials", "coming_soon", "top_sellers", "new_releases",
             "genres", "trailerslideshow", "status"]
@@ -212,20 +209,20 @@ def saleloop(paraml, nick='', conn=None):
             if not sales:
                 print(">>> u'Error getting Steam sales :{}'".format(paraml[0]))
 
-            # Handle restarts and empty requests
+            # Handle restarts
             if not prev_sales:
                 prev_sales = sales
 
             # Output appropriate data
             for category in sales:
                 items = [format_sale_item(item) for item in sales[category]
-                         if (item['name'], item['final_price']) not in
-                         [(x['name'], x['final_price']) for x in
-                         prev_sales.get(category, [])]]
+                    if item not in prev_sales.get(category, [])]
                 if len(items):
-                    conn.send("\x02New {}\x0F: {}".format(category, '; '.join(items)))
+                    prev_sales[category] = sales[category]  # Update prev
+                    log_sales_data(sales, "new_sales")
+                    log_sales_data(prev_sales, "prev_sales")
+                    conn.send("PRIVMSG {} :{}".format(paraml[0],
+                        "\x02New {}\x0F: {}".format(category, '; '.join(items))))
 
-            # Update dict of previous sales if appropriate
-            prev_sales = sales
         except Exception as e:
             print(">>> u'Steam saleloop error: {} :{}'".format(e, paraml[0]))
