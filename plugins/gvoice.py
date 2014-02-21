@@ -79,6 +79,8 @@ def outputsms(voice, conn, bot, db):
     messages = []
     for message in extractsms(voice.sms.html):
         recip = message['from'].strip('+: ')
+        if not recip:  # Google Voice error messages
+            continue
         if recip.isdigit():
             recip = recip[-10:]
         if recip != 'Me' and recip not in privatelist and not check_smslog(db, message):
