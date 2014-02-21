@@ -15,10 +15,8 @@ import re
 import time
 import locale
 import random
-from bs4 import BeautifulSoup
 from util import hook, http, web, text
 from random import choice
-from steam import get_steam_info
 
 html_re = (r'https?\://(www\.)?\w+\.[a-zA-Z]{2,5}(\S)+', re.I)
 
@@ -189,6 +187,6 @@ def spotify_parse_uri(inp, say=None):
 steam_re = (r'(.*:)//(store.steampowered.com)(:[0-9]+)?(.*)', re.I)
 
 
-@hook.regex(*steam_re)
+#@hook.regex(*steam_re)
 def steam_url(match):
     return get_steam_info("http://store.steampowered.com" + match.group(4))

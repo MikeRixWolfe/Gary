@@ -3,7 +3,6 @@ steam_sales.py - Written by MikeRixWolfe 2013
 """
 
 import time
-import re
 import json
 import os
 from util import hook, http
