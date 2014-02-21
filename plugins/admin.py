@@ -21,7 +21,6 @@ def stop(inp, nick=None, conn=None):
     else:
         conn.cmd("QUIT", ["Killed by {}.".format(nick)])
     time.sleep(5)
-#    os.execl("./Gary", "Gary", "stop")
     os.kill(os.getpid(), signal.SIGTERM)
 
 
