@@ -5,7 +5,7 @@ steam_sales.py - Written by MikeRixWolfe 2013
 import time
 import json
 import os
-from util import hook, http
+from util import hook, http, web
 from datetime import datetime
 
 debug = False
@@ -87,7 +87,7 @@ def get_sales(mask):
         for item in data[category]["items"]:
             # Prepare item data
             try:
-                if "url" in item.keys() and item["url"]:  # Midweek Madness/etc
+                if "url" in item.keys() and "id" not in item.keys():  # Midweek Madness/etc
                     data[category]["name"] = item["name"]
                     appid = str(item["url"])[34:-1]
                     appdata = http.get_json(
@@ -102,14 +102,23 @@ def get_sales(mask):
                             "data"]["price_overview"]["final"]
                         item["discount_percent"] = appdata[appid][
                             "data"]["price_overview"]["discount_percent"]
-                    if "discounted" not in item.keys() and item["discount_percent"] > 0:
+                    if item["discount_percent"] > 0:
                         item["discounted"] = True
                     else:
                         item["discounted"] = False
-            except:
+                elif set(["id","url"]).issubset(set(item.keys())):
+                    # Bundles
+                    if not item["final_price"] and not item["discounted"]:
+                        item["discounted"] = True
+                        item["final_price"] = web.try_isgd(item["url"])
+            except:  # Unusuable Catagory e.g. Banner Announcments
                 continue
             # Begin work for discounted item
             if item["discounted"]:
+                # Check for calculation errors
+                if item["final_price"].isdigit() and int(item["original_price"] * (1 -
+                        (.01 * item["discount_percent"]))) != item["final_price"]:
+                    continue
                 # Clean Item
                 item["name"] = item["name"].encode("ascii", "ignore")
                 item = {k: str(v) for k, v in item.items() if k in
@@ -128,7 +137,7 @@ def get_sales(mask):
 
 
 def format_sale_item(item):
-    if item["final_price"] == 'Free to Play':
+    if not item["final_price"].isdigit():
         return "\x02{}\x0F: {}".format(item["name"],
             item["final_price"])
     else:
@@ -185,7 +194,7 @@ def steamsales(inp, say='', chan=''):
         items = [format_sale_item(item) for item in sales[category]]
         if len(items):
             say("\x02{}\x0F: {}".format(category, '; '.join(items)))
-        elif not options.get(category, False):
+        elif category in options.keys():
             say("\x02{}\x0F: {}".format(category, "None found"))
 
 
@@ -193,7 +202,7 @@ def steamsales(inp, say='', chan=''):
 @hook.event('JOIN')
 def saleloop(paraml, nick='', conn=None):
     # If specified chan or not running; alter for multi-channel
-    if paraml[0] != '#geekboy':
+    if paraml[0] != '#test' or nick != conn.nick:
         return
     mask = ["specials", "coming_soon", "top_sellers", "new_releases",
             "genres", "trailerslideshow", "status"]
