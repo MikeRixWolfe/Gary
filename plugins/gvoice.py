@@ -120,7 +120,7 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
 def parseloop(paraml, nick='', conn=None, bot=None, db=None):
     db_init(db)
     server = "%s:%s" % (conn.server, conn.port)
-    if server != "localhost:7666" or paraml[0] != "#geekboy":
+    if server != "localhost:7666" or paraml[0] != "#geekboy" or nick != conn.nick:
         return
     voice = Voice()
     print(">>> u'Beginning SMS parse loop for %s'" % server)
