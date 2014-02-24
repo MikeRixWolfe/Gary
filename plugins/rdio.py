@@ -4,6 +4,39 @@ import re
 from util import hook
 import oauth2 as oauth
 
+rdio_re = (r'(.*:)//(rd.io|www.rdio.com|rdio.com)(:[0-9]+)?(.*)', re.I)
+
+
+@hook.regex(*rdio_re)
+def rdio_url(match, bot=None):
+    api_key = bot.config.get("api_keys", {}).get("rdio_key")
+    api_secret = bot.config.get("api_keys", {}).get("rdio_secret")
+    if not api_key:
+        return None
+    url = match.group(1) + "//" + match.group(2) + match.group(4)
+    consumer = oauth.Consumer(api_key, api_secret)
+    client = oauth.Client(consumer)
+    response = client.request('http://api.rdio.com/1/', 'POST',
+                              urllib.urlencode({'method': 'getObjectFromUrl', 'url': url}))
+    data = json.loads(response[1])
+    info = data['result']
+    if 'name' in info:
+        if 'artist' in info and 'album' in info:  # Track
+            name = info['name']
+            artist = info['artist']
+            album = info['album']
+            return (
+                u"Rdio track: \x02{}\x02 by \x02{}\x02 - {}".format(name,
+                                                                    artist, album)
+            )
+        elif 'artist' in info and not 'album' in info:  # Album
+            name = info['name']
+            artist = info['artist']
+            return u"Rdio album: \x02{}\x02 by \x02{}\x02".format(name, artist)
+        else:  # Artist
+            name = info['name']
+            return u"Rdio artist: \x02{}\x02".format(name)
+
 
 def getdata(inp, types, api_key, api_secret):
     consumer = oauth.Consumer(api_key, api_secret)

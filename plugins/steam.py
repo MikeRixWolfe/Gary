@@ -2,6 +2,13 @@ import re
 import json
 from util import hook, http, web, text
 
+steam_re = (r'(.*:)//(store.steampowered.com)(:[0-9]+)?(.*)', re.I)
+
+
+@hook.regex(*steam_re)
+def steam_url(match):
+    return get_steam_info("http://store.steampowered.com" + match.group(4))
+
 
 def get_steam_info(url):
     appid = re.match(r'.*?/app/(.+)/', url).group(1)

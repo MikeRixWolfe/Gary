@@ -27,6 +27,32 @@ def region_filter(data):
     return None
 
 
+@hook.regex(r"(http://open\.spotify\.com/track/\S*)", re.I)
+def spotify_parse(inp, say=None):
+    url = inp.group(0)
+    response = http.get_html(url)
+
+    title_parse = response.xpath("//h1[@itemprop='name']")
+    artist_parse = response.xpath("//h2/a")
+    title = title_parse[0].text_content()
+    artist = artist_parse[0].text_content()
+
+    say("Spotify: %s - %s" % (artist, title))
+
+
+@hook.regex(r"spotify:track:(\S*)", re.I)
+def spotify_parse_uri(inp, say=None):
+    url = "http://open.spotify.com/track/%s" % inp.group(1)
+    response = http.get_html(url)
+
+    title_parse = response.xpath("//h1[@itemprop='name']")
+    artist_parse = response.xpath("//h2/a")
+    title = title_parse[0].text_content()
+    artist = artist_parse[0].text_content()
+
+    say("Spotify: %s - %s" % (artist, title))
+
+
 @hook.command
 def spotify(inp, say=None):
     ".spotify <query> - Searches the Spotify database for URL's to any matching songs. Replies with the first result."
