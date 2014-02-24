@@ -147,10 +147,10 @@ class IRC(object):
         thread.start_new_thread(self.conn.run, ())
         self.set_pass(self.conf.get('server_password'))
         self.set_nick(self.nick)
-        self.cmd("USER",
-            [conf.get('user', 'Gary'), "3", "*", conf.get('realname','Gary')])
+        self.cmd("USER", [conf.get('user', 'Gary'), "3",
+                "*", conf.get('realname','Gary')])
 
-    def parse_loop(self):
+    def parse_loop(self):  #codes=[], terminators=[]):
         while True:
             msg = self.conn.iqueue.get()
 
@@ -173,6 +173,16 @@ class IRC(object):
                     paramlist, lastparam])
             if command == "PING":
                 self.cmd("PONG", paramlist)
+            #if command in codes:
+            #    if not terminators:
+            #        return msg
+            #    print "Yield"#yield msg
+            #if command in kill:
+            #    return msg
+
+    #def cmd_reply(self, raw_cmd, codes, terminators=[]):
+    #    self.send(raw_cmd)
+    #    return self.parse_loop(codes, terminators)
 
     def set_pass(self, password):
         if password:
