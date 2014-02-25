@@ -4,19 +4,31 @@ from util import hook
 
 @hook.sieve
 def sieve_suite(bot, input, func, kind, args):
+    admins = bot.config.get('admins', [])
+    opers = bot.config.get('opers', [])
+    voices = bot.config['voice']
+    disabled = bot.config.get('disabled', [])
+    ignored = bot.config.get('ignored', [])
+    muted = bot.config.get('muted', [])
+    restricted = bot.config.get('restrictedmode', [])
+    acl = bot.config.get('acls', {})
+
     if kind == "event":
-        return input
+        if func.__name__.lower() in disabled:
+            return None
 
     if kind == "command":
-        if input.trigger in bot.config.get('disabled', []) and input.nick not in bot.config.get('admins', []):
+        if input.trigger.lower() in disabled and input.nick.lower() not in admins:
+            return None
+
+    if kind == "regex":
+        if func.__name__.lower() in disabled and input.nick.lower() not in admins:
             return None
 
     fn = re.match(r'^plugins/(.+\.py$)', func._filename)
-    disabled = bot.config.get('disabled', [])
     if fn and fn.group(1).lower() in disabled:
         return None
 
-    acl = bot.config.get('acls', {}).get(func.__name__)
     if acl:
         if 'deny-except' in acl:
             allowed_channels = map(unicode.lower, acl['deny-except'])
@@ -28,36 +40,26 @@ def sieve_suite(bot, input, func, kind, args):
                 return None
 
     if args.get('adminonly'):
-        admins = bot.config.get('admins', [])
-        if input.nick.strip(' ~@%+') not in admins:  # or input.chan[0] != "#":
+        if input.nick.lower() not in admins:
             return None
 
     if args.get('operonly'):
-        admins = bot.config.get('admins', [])
-        opers = bot.config.get('opers', [])
-        # or input.chan[0] != "#":
-        if input.nick.strip(' ~@%+') not in admins and input.nick.strip(' ~@%+') not in opers:
+        if input.nick.lower() not in admins+opers:
             return None
 
-    ignored = bot.config.get('ignored', [])
-    admins = bot.config.get('admins', [])
-    if input.host in ignored or input.nick in ignored or input.nick.lower() in ignored or input.chan in ignored:
-        if input.user.strip(' ~') not in admins and input.nick not in admins:
-            return None
-
-    muted = bot.config.get('muted', [])
-    if input.chan in muted:
-        admins = bot.config.get('admins', [])
-        if input.user.strip(' ~') not in admins and input.nick not in admins:
-            return None
-
-    chans = bot.config["restrictedmode"]
-    if input.chan in chans:
-        voicers = bot.config["voice"]
-        opers = bot.config["opers"]
-        admins = bot.config.get('admins', [])
+    if input.chan in restricted:
         allowlist = admins + opers + voicers
-        if input.nick not in allowlist:
+        if input.nick.lower() not in allowlist:
+            return None
+
+    # Possibly move into command/regex above
+    if input.host.lower() in ignored or input.user.lower() in ignored or \
+            input.nick.lower() in ignored or input.chan.lower() in ignored:
+        if input.nick.lower() not in admins:
+            return None
+
+    if input.chan in muted:
+        if input.nick.lower() not in admins:
             return None
 
     return input
