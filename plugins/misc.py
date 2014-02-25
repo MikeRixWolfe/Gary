@@ -44,7 +44,7 @@ def onkick(paraml, conn=None, bot=None):
             conn.channels.remove(paraml[0])
 
 
-@hook.event('INVITE')
+@hook.event('INVITE', adminonly=True)
 def oninvite(paraml, conn=None):
     conn.join(paraml[-1])
 
