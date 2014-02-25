@@ -116,7 +116,7 @@ def get_sales(mask):
             # Begin work for discounted item
             if item["discounted"]:
                 # Check for calculation errors
-                if item["final_price"].isdigit() and int(item["original_price"] * (1 -
+                if str(item["final_price"]).isdigit() and int(item["original_price"] * (1 -
                         (.01 * item["discount_percent"]))) != item["final_price"]:
                     continue
                 # Clean Item
