@@ -60,7 +60,7 @@ def clean_db(db, time, chan):
 @hook.event('JOIN')
 def cron(paraml, nick='', conn=None, db=None):
     global running_cron_loops
-    if paraml[0] != '#geekboy' or paraml[0] in running_cron_loops:
+    if paraml[0] != '#geekboy' or nick != conn.nick or paraml[0] in running_cron_loops:
         return
     running_cron_loops.append(paraml[0])
     print ">>> u'Beginning cron loop :%s'" % paraml[0]

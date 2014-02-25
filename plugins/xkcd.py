@@ -31,7 +31,7 @@ def xkcd_search(term):
         return "No results found!"
 
 
-#@hook.regex(*xkcd_re)
+@hook.regex(*xkcd_re)
 def xkcd_url(match):
     xkcd_id = match.group(3).split(" ")[0].split("/")[1]
     return xkcd_info(xkcd_id)
