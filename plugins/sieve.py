@@ -2,9 +2,17 @@ import re
 from util import hook
 
 
+def is_admin(bot, nick):
+    # here will be the nickserv admin check
+    #ident = conn.rpl_cmd("PRIVMSG nickserv :info  " + inp, 'NOTICE', kill = [])
+    admins = bot.config.get('admins', [])
+    if nick.lower() in admins:
+        return True
+    else:
+        return False
+
 @hook.sieve
 def sieve_suite(bot, input, func, kind, args):
-    admins = bot.config.get('admins', [])
     opers = bot.config.get('opers', [])
     voices = bot.config['voice']
     disabled = bot.config.get('disabled', [])
@@ -18,11 +26,11 @@ def sieve_suite(bot, input, func, kind, args):
             return None
 
     if kind == "command":
-        if input.trigger.lower() in disabled and input.nick.lower() not in admins:
+        if input.trigger.lower() in disabled and not is_admin(bot, input.nick):
             return None
 
     if kind == "regex":
-        if func.__name__.lower() in disabled and input.nick.lower() not in admins:
+        if func.__name__.lower() in disabled and not is_admin(bot, input.nick):
             return None
 
     fn = re.match(r'^plugins/(.+\.py$)', func._filename)
@@ -40,26 +48,26 @@ def sieve_suite(bot, input, func, kind, args):
                 return None
 
     if args.get('adminonly'):
-        if input.nick.lower() not in admins:
+        if not is_admin(bot, input.nick):
             return None
 
     if args.get('operonly'):
-        if input.nick.lower() not in admins+opers:
+        if input.nick.lower() not in opers or not is_admin(bot, input.nick):
             return None
 
     if input.chan in restricted:
-        allowlist = admins + opers + voicers
-        if input.nick.lower() not in allowlist:
+        allowlist = opers + voicers
+        if input.nick.lower() not in allowlist or not is_admin(bot, input.nick):
             return None
 
     # Possibly move into command/regex above
     if input.host.lower() in ignored or input.user.lower() in ignored or \
             input.nick.lower() in ignored or input.chan.lower() in ignored:
-        if input.nick.lower() not in admins:
+        if not is_admin(bot, input.nick):
             return None
 
     if input.chan in muted:
-        if input.nick.lower() not in admins:
+        if not is_admin(bot, input.nick):
             return None
 
     return input
