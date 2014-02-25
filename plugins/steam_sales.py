@@ -137,7 +137,7 @@ def get_sales(mask):
 
 
 def format_sale_item(item):
-    if not item["final_price"].isdigit():
+    if not str(item["final_price"]).isdigit():
         return "\x02{}\x0F: {}".format(item["name"],
             item["final_price"])
     else:
