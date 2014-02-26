@@ -100,6 +100,8 @@ def get_sales(mask):
                     else:
                         item["final_price"] = appdata[appid][
                             "data"]["price_overview"]["final"]
+                        item["original_price"] = appdata[appid][
+                            "data"]["price_overview"]["initial"]
                         item["discount_percent"] = appdata[appid][
                             "data"]["price_overview"]["discount_percent"]
                     if item["discount_percent"] > 0:
@@ -116,8 +118,9 @@ def get_sales(mask):
             # Begin work for discounted item
             if item["discounted"]:
                 # Check for calculation errors
-                if str(item["final_price"]).isdigit() and int(item["original_price"] * (1 -
-                        (.01 * item["discount_percent"]))) != item["final_price"]:
+                if str(item["final_price"]).isdigit() and item["final_price"] and \
+                        int(item["original_price"] * (1 - (.01 *
+                        item["discount_percent"]))) != item["final_price"]:
                     continue
                 # Clean Item
                 item["name"] = item["name"].encode("ascii", "ignore")

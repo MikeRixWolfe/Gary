@@ -56,7 +56,7 @@ def readtitle(match, say=None, nick=None):
 
 
 @hook.regex(r'(?i)http://(?:www\.)?[tinyurl.com|j.mp]/([A-Za-z0-9\-]+)')
-def tinyurl(inp, say=''):
+def tiny_url(inp, say=''):
     try:
         say(http.open(inp.group()).url.strip())
     except http.URLError as e:

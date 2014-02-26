@@ -26,11 +26,11 @@ def sieve_suite(bot, input, func, kind, args):
             return None
 
     if kind == "command":
-        if input.trigger.lower() in disabled and not is_admin(bot, input.nick):
+        if func.__name__.lower() in disabled and not is_admin(bot, input.nick):
             return None
 
     if kind == "regex":
-        if func.__name__.lower() in disabled and not is_admin(bot, input.nick):
+        if func.__name__.lower() in disabled:
             return None
 
     fn = re.match(r'^plugins/(.+\.py$)', func._filename)

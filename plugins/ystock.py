@@ -76,7 +76,7 @@ def stockhistory(inp, say=''):
     if quote.get('Volume', None) in (None, 'N/A'):
         return "Unknown ticker symbol '%s'" % inp
 
-    if float(quote['Change']) < 0:
+    if float(quote['ChangeFromYearLow']) < 0:
         quote['Color'] = "5"
     else:
         quote['Color'] = "3"
