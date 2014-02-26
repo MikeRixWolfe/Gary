@@ -62,7 +62,7 @@ def localtime(format):
     return time.strftime(format, time.localtime())
 
 
-def beautify(input):
+def format_output(input):
     format = formats.get(input.command, '%(raw)s')
     args = dict(input)
 
@@ -95,8 +95,8 @@ def log(paraml, input=None, bot=None, db=None):
     if input.command == 'NICK':  # fix me please
         input.chan = 'nick'
 
-    beau = beautify(input)
-    if not beau:  # don't log this
+    out = format_output(input)
+    if not out:  # don't log this
         return
 
     if input.chan and input.nick and input.user \
@@ -123,4 +123,4 @@ def log(paraml, input=None, bot=None, db=None):
             log_seen(db, input.server, input.chan, input.nick,
                 input.user, input.host, input.command, input.msg)
 
-        print timestamp, input.chan, beau.encode('ascii', 'ignore')
+        print timestamp, input.chan, out.encode('ascii', 'ignore')
