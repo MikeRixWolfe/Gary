@@ -56,6 +56,6 @@ def whereis(inp):
 
 @hook.command
 def map(inp):
-    ".map <origin> to <destination> - Generates Google Maps route"
+    ".map <place>|<origin> to <destination> - Gets a Map of place or route from Google Maps"
     return web.try_isgd('https://www.google.com/maps/?q=' +
         '+'.join(inp.split(' ')))
