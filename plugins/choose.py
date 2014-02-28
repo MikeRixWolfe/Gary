@@ -5,7 +5,7 @@ from util import hook
 
 @hook.command
 def choose(inp):
-    ".choose <choice1>, <choice2>, ... <choicen> - Makes a decision"
+    ".choose <choice1>, <choice2>, ... <choice n> - Makes a decision"
     c = re.findall(r'([^,]+)', inp)
     if len(c) == 1:
         c = re.findall(r'(\S+)', inp)
