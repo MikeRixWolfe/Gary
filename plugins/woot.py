@@ -83,8 +83,8 @@ def woot(inp, chan='', say=''):
         say("\x02{}\x0F: {}".format(k, format_woot(v)))
 
 
-#@hook.singlethread
-#@hook.event('JOIN')
+@hook.singlethread
+@hook.event('JOIN')
 def wootloop(paraml, nick='', conn=None):
     # If specified chan or not running; alter for multi-channel
     if paraml[0] != '#test' or nick != conn.nick:
@@ -101,14 +101,15 @@ def wootloop(paraml, nick='', conn=None):
                 print(">>> u'Error getting Woots :{}'".format(paraml[0]))
 
             # Handle restarts
-            if not prev_wootssales:
+            if not prev_woots:
                 prev_woots = woots
 
             # Output appiropriate data
+            out = []
             for k, v in woots.items():
-                if prev_woots.get(k, '') != v:
+                if prev_woots.get(k, '').get("product", '') != v["product"]:
                     prev_woots[k] = v
-                    conn.send("PRIVMSG {} :{}".format(paraml[0],
-                        "\x02New {}\x0F: {}".format(k, format_woot(v))))
+                    out.append("\x02New {}\x0F: {}".format(k, v["product"]))
+            conn.send("PRIVMSG {} :{}".format(paraml[0], "; ".join(out)))
         except Exception as e:
-            print(">>> u'Steam saleloop error: {} :{}'".format(e, paraml[0]))
+            print(">>> u'Woot saleloop error: {} :{}'".format(e, paraml[0]))
