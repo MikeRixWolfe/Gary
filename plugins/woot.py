@@ -61,10 +61,10 @@ def format_woot(w):
 @hook.singlethread
 @hook.command()
 def woot(inp, chan='', say=''):
-    ".woot <space seperated options> - Gets woots! Options: " \
+    ".woot <option> - Gets woots! Options: " \
     "woot wine sellout shirt kids sport tools home tech accessories"
     # Clean input data
-    inp = inp.lower().split(' ')
+    inp = inp.lower().split(' ')[0]
     inp = {k: v for k, v in sites.items() if k in inp}
 
     # Check for bad input
@@ -81,6 +81,21 @@ def woot(inp, chan='', say=''):
     # Output appiropriate data
     for k, v in woots.items():
         say("\x02{}\x0F: {}".format(k, format_woot(v)))
+
+
+@hook.singlethread
+@hook.command(autohelp=False)
+def wootlist(inp, nick='', say=''):
+    # Get data
+    woots = get_woots(sites)
+    if not woots:
+        return "Error getting Woots, please try again in a few minutes.."
+
+    # Output appiropriate data
+    out = []
+    for k, v in woots.items():
+        out.append("\x02{}\x0F: {}".format(k, v["product"]))
+    say("; ".join(out))
 
 
 @hook.singlethread
