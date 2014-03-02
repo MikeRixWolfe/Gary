@@ -7,7 +7,6 @@ sites = {"woot": "www.woot.com",
          "wine": "wine.woot.com",
          "sellout": "sellout.woot.com",
          "shirt": "shirt.woot.com",
-         "kids": "kids.woot.com",
          "sport": "sports.woot.com",
          "tools": "tools.woot.com",
          "home": "home.woot.com",
@@ -62,7 +61,7 @@ def format_woot(w):
 @hook.command()
 def woot(inp, chan='', say=''):
     ".woot <option> - Gets woots! Options: " \
-    "woot wine sellout shirt kids sport tools home tech accessories"
+    "woot wine sellout shirt sport tools home tech accessories"
     # Clean input data
     inp = inp.lower().split(' ')[0]
     inp = {k: v for k, v in sites.items() if k in inp}
