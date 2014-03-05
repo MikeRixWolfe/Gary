@@ -8,13 +8,13 @@ def save(conf):
 
 if not os.path.exists('config'):
     open('config', 'w').write(inspect.cleandoc(
-        r'''
-        {
+        r'''{
           "acls": {},
           "admins": [
             "bears"
           ],
           "api_keys": {
+            "giphy": "",
             "google": "",
             "googletranslate": "",
             "lastfm": "",
@@ -22,6 +22,7 @@ if not os.path.exists('config'):
             "rdio_key": "",
             "rdio_secret": "",
             "rottentomatoes": "",
+            "steam_key": "",
             "twitter": {
               "access": "",
               "access_secret": "",
@@ -41,43 +42,46 @@ if not os.path.exists('config'):
             "nigger"
           ],
           "connections": {
-            "local irc 1": {
+            "bearsircd": {
               "channels": [
-                "#geekboy"
+                "#test"
               ],
               "nick": "Gary",
-              "nickserv_password": "2secret4you",
-              "port": 7666,
+              "nickserv_password": "xxxx",
               "realname": "Gary",
               "server": "localhost",
               "user": "Gary"
             },
-            "local irc 2": {
+            "dot": {
               "channels": [
                 "#geekboy"
               ],
               "nick": "Gary",
-              "nickserv_password": "2secret4you",
+              "nickserv_password": "xxxx",
+              "port": 7666,
               "realname": "Gary",
               "server": "localhost",
               "user": "Gary"
             }
           },
-          "disabled": [
-            "get_version",
-            "someplugin.py"
+        "disabled": [
+            "beats",
+            "cron.py",
+            "cypher",
+            "decypher",
+            "gibberish"
           ],
           "gvoice": {
             "private": [
-              "Me"
+              "Gary"
             ]
-          },    
-          "ignored": [
-            "geekboy"
-          ],
+          },
+          "ignored": [],
           "muted": [],
           "opers": [],
-          "restrictedmode": []
+        "rejoin": true,
+          "restrictedmode": [],
+          "voice": []
         }''') + '\n')
 
 
