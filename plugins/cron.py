@@ -67,7 +67,7 @@ def cron(paraml, nick='', conn=None, db=None):
     db_init(db)
     while True:
         try:
-            time.sleep(30)
+            time.sleep(60)
             datestamp = str(datetime.datetime.now(EST()))[:16]
             rows = get_events(db, datestamp, paraml[0])
             for row in rows:

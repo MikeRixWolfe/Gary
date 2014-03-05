@@ -176,8 +176,8 @@ class IRC(object):
             #if command in codes:
             #    if not terminators:
             #        return msg
-            #    print "Yield"#yield msg
-            #if command in kill:
+            #    return msg #yield msg
+            #if command in terminators:
             #    return msg
 
     #def cmd_reply(self, raw_cmd, codes, terminators=[]):

@@ -117,13 +117,6 @@ def get_sales(mask):
                 continue
             # Begin work for discounted item
             if item["discounted"]:
-                # Check for calculation errors
-                #if str(item["final_price"]).isdigit() and \
-                #        "original_price" in item.keys() and \
-                #        round((.01 * item["original_price"]) * \
-                #        (1 - (.01 * item["discount_percent"]))) != \
-                #        round(.01 * item["final_price"]):
-                #    continue
                 # Clean Item
                 item["name"] = item["name"].encode("ascii", "ignore")
                 item = {k: str(v) for k, v in item.items() if k in
