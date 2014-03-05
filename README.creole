@@ -19,10 +19,3 @@
 * BeautifulSoup4
 * yql
 * GVoice plugin requires pygooglevoice, I recommend [[https://github.com/MikeRixWolfe/pygooglevoice|my fork]].
-
-==Special Thanks==
-* [[https://github.com/rmmh/skybot|rmmh]]
-* [[https://github.com/lahwran/skybot|lahwran]]
-* [[https://github.com/NoiSek/classhole|NoiSek]]
-* [[https://github.com/ClouDev/CloudBot|CloudDev]]
-

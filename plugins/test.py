@@ -16,11 +16,6 @@ def kitchensink(inp, nick='', say=None):
     return "This function is still in development."
 
 
-@hook.command(autohelp=False)
-def mulched(inp, nick='', say=None):
-    say("Get mulched %s." % nick)
-
-
 @hook.regex(r'^bot roll call')
 def rollcall(inp, chan='', say=None):
     say("Ah shut up ya dirty shisno")
