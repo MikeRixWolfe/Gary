@@ -6,10 +6,30 @@ import json
 import urllib2
 import lxml.etree
 from util import hook, http
-#from xml.dom import minidom
 
 wurl = 'http://xml.weather.yahoo.com/forecastrss?p=%s'
+
 wser = 'http://xml.weather.yahoo.com/ns/rss/1.0'
+
+cards = {
+    0: "N",
+    22.5: "NNE",
+    45: "NE",
+    67.5: "ENE",
+    90: "E",
+    112.5: "ESE",
+    135: "SE",
+    157.5: "SSE",
+    180: "S",
+    202.5: "SSW",
+    225: "SW",
+    257.5: "WSW",
+    270: "W",
+    292.5: "WNW",
+    315: "NW",
+    337.5: "NWN",
+    360: "N"
+}
 
 
 @hook.command
@@ -56,7 +76,7 @@ def weather(inp):
         atmosphere[0].items()[0][1] + \
         "%, visibility at " +  \
         atmosphere[0].items()[1][1] + \
-        " miles, barometric pressure is " + \
+        " miles, barometric pressure at " + \
         atmosphere[0].items()[2][1] + \
         "."
         #"(delta " + atmosphere[0].items()[3][1] + ")"
@@ -91,23 +111,3 @@ def forecast(inp):
             "*F, and " + \
             f.items()[4][1] + "; "
     return forecast_string
-
-cards = {
-    0: "N",
-    22.5: "NNE",
-    45: "NE",
-    67.5: "ENE",
-    90: "E",
-    112.5: "ESE",
-    135: "SE",
-    157.5: "SSE",
-    180: "S",
-    202.5: "SSW",
-    225: "SW",
-    257.5: "WSW",
-    270: "W",
-    292.5: "WNW",
-    315: "NW",
-    337.5: "NWN",
-    360: "N"
-}
