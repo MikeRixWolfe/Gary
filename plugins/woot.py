@@ -124,6 +124,7 @@ def wootloop(paraml, nick='', conn=None):
                 if prev_woots.get(k, '').get("product", '') != v["product"]:
                     prev_woots[k] = v
                     out.append("\x02New {}\x0F: {}".format(k, v["product"]))
-            conn.send("PRIVMSG {} :{}".format(paraml[0], "; ".join(out)))
+            if out:
+                conn.send("PRIVMSG {} :{}".format(paraml[0], "; ".join(out)))
         except Exception as e:
             print(">>> u'Woot saleloop error: {} :{}'".format(e, paraml[0]))

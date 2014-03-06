@@ -33,7 +33,7 @@ def unicode_dictreader(utf8_data, **kwargs):
 @hook.command('sc')
 @hook.command
 def steamcalc(inp, reply=None):
-    """steamcalc <vanity id> [currency] - Gets value of steam account and total hours played. Uses steamcommunity.com/id/<nickname>. """
+    """.steamcalc <vanity id> [currency] - Gets value of steam account and total hours played. Uses steamcommunity.com/id/<nickname>. """
 
     name = inp.strip()
 

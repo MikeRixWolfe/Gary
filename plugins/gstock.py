@@ -15,7 +15,7 @@ def get_stock(symbol):
     else:
         quote['color'] = "3"
 
-    return "%(t)s - $%(l_cur)s \x03%(color)s%(c)s (%(cp)s)\x03 [%(lt)s]" % quote
+    return "%(t)s - $%(l_cur)s \x03%(color)s%(c)s (%(cp)s%%)\x03 [%(lt)s]" % quote
 
 @hook.command()
 def gstock(inp, say=None):
