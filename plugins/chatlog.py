@@ -8,37 +8,29 @@ from util import hook, timesince, text
 
 
 @hook.command
-def last(inp, nick='', input=None, db=None, say=None):
+def last(inp, nick='', chan='', input=None, db=None, say=None):
     ".last <phrase> - finds the last occurence of a phrase"
-    regex_msg = '%' + inp.strip() + '%'
-    row = db.execute("select time, nick, msg, uts from log where msg like ?"
-        " and uts = (select max(uts) from log where msg like ? and"
-        " uts != (select max(uts) from log where msg like ?))"
-        " and chan = ?",
-        (regex_msg, regex_msg, regex_msg, input.chan)).fetchone()
+    row = db.execute("select time, nick, msg, uts from log where msg like ? "
+        "and uts < ? and chan = ? order by uts desc limit 1",
+        (('%' + inp.strip() + '%'), (time.time() - 1), chan)).fetchone()
     if row:
-        if time.time() - row[3] <= 90:
-            if row[1] == nick.lower():
-                say("Seriously? You said it like, just now...")
-            else:
-                say("Seriously? %s said it like, just now..." % row[1])
-        else:
-            say("%s last said \"%s\" on %s (%s ago)" %
-                (row[1], row[2], row[0][:-7], timesince.timesince(row[3])))
+        xtime, xnick, xmsg, xuts = row
+        say("%s last said \"%s\" on %s (%s ago)" %
+            (xnick, xmsg, xtime[:-7], timesince.timesince(xuts)))
     else:
         say("Never!")
 
 
 @hook.command
-def first(inp, input=None, db=None, say=None):
+def first(inp, chan='', input=None, db=None, say=None):
     ".first <phrase> - finds the first occurence of a phrase"
-    regex_msg = '%' + inp.strip() + '%'
-    row = db.execute(
-        "select time, nick, msg, uts from log where msg like ? and uts = (select min(uts) from log where msg like ? and chan = ?) and chan = ?",
-        (regex_msg, regex_msg, input.chan, input.chan)).fetchone()
+    row = db.execute("select time, nick, msg, uts from log where msg like ? "
+        "and chan = ? order by uts asc limit 1",
+        (('%' + inp.strip() + '%'), chan)).fetchone()
     if row:
-        say("%s first said \"%s\" on %s (%s ago)" %
-            (row[1], row[2], row[0][:-7], timesince.timesince(row[3])))
+        xtime, xnick, xmsg, xuts = row
+        say("%s last said \"%s\" on %s (%s ago)" %
+            (xnick, xmsg, xtime[:-7], timesince.timesince(xuts)))
     else:
         say("Never!")
 
@@ -48,7 +40,7 @@ def king(inp, input=None, db=None, say=None, bot=None):
     ".king - gets the user with the most used commands"
     query_string = "select nick, count(nick) as nick_occ from log where ("
     for command in bot.commands.keys():
-        query_string = query_string + "msg like '." + command + "%' or "
+        query_string += "msg like '." + command + "%' or "
     query_string = query_string.strip('or ')
     query_string = query_string + ") and nick != 'bears' "
     query_string = query_string + \
@@ -66,27 +58,24 @@ def king(inp, input=None, db=None, say=None, bot=None):
 
 
 @hook.command
-def said(inp, input=None, db=None, say=None):
-    ".said <phrase> - finds anywho who has said a phrase"
-    regex_msg = '%' + inp.strip() + '%'
-
+def said(inp, chan='', input=None, db=None, say=None):
+    ".said <phrase> - finds users who has said a phrase."
     rows = db.execute(
         "select distinct nick from log where msg like ? and chan = ? order by nick",
-        (regex_msg, input.chan)).fetchall()
+        ('%' + inp.strip() + '%', chan)).fetchall()
     rows = ([row[0] for row in rows] if rows else None)
 
     if rows:
         out = ''
-        out2 =  ' have said "{}"'.format(inp)
         while rows:
-            if len(out) + len(rows[0]) + len(out2) + len(str(len(rows))) < 450:
+            if len(out) + len(rows[0]) + len(str(len(rows))) < 440:
                 out += rows.pop(0) + ", "
             else:
                 break
         if rows:
             out += "{} others".format(len(rows))
         out = text.rreplace(out.strip(', '), ', ', ', and ', 1)
-        say(out + out2)
+        say(out + ' have said "{}"'.format(inp))
     else:
         say("No one!")
 

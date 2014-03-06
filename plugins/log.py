@@ -39,6 +39,10 @@ def db_init(db):
                " action, msg, uts, primary key(time, server, chan, nick))")
     db.execute("create table if not exists seen(time, server, chan, nick, user,"
                " action, msg, uts, primary key(server, chan, nick))")
+    db.execute("create index if not exists uts_idx on log(uts)")
+    db.execute("create index if not exists msg_idx on log(msg)")
+    db.execute("create index if not exists chan_idx on log(chan)")
+    db.execute("create index if not exists nick_idx on log(nick)")
     db.commit()
 
 
