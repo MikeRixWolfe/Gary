@@ -19,7 +19,7 @@ def dotnetpad(lang, code, timeout=30):
 
     try:
         conn = httplib.HTTPConnection("dotnetpad.net", 80, timeout=timeout)
-        conn.request("POST", "/Skybot", params, headers)
+        conn.request("POST", "/Gary", params, headers)
         response = conn.getresponse()
     except httplib.HTTPException:
         conn.close()
