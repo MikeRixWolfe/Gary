@@ -5,7 +5,7 @@
 
 ##Overview ##
 
-Skybot continually scans the `plugins/` directory for new or changed .py
+Gary continually scans the `plugins/` directory for new or changed .py
 files. When it finds one, it runs it and examines each function to see whether
 it is a plugin hook.
 
@@ -26,13 +26,13 @@ def echo(inp):
 
 usage:
 
-    <rmmh> .echo hots
-    <skybot> Scaevolus: hotshots
+    <MikeFightsBears> .echo hots
+    <Gary> Bears: hotshots
 
 
 This plugin example defines a command that replies with twice its input. It
 can be invoked by saying phrases in a channel the bot is in, notably ".echo",
-"skybot: echo", and "skybot, echo" (assuming the bot's nick is "skybot").
+"Gary: echo", and "Gary, echo" (assuming the bot's nick is "Gary").
 
 
 ## Plugin hooks ##
@@ -146,3 +146,4 @@ To cancel a call, return None.
 ### The db object ###
 
 ### The input object ###
+
