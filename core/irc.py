@@ -150,8 +150,9 @@ class IRC(object):
         self.cmd("USER", [conf.get('user', 'Gary'), "3",
                 "*", conf.get('realname','Gary')])
 
-    def parse_loop(self):  #codes=[], terminators=[]):
+    def parse_loop(self): #, msg='', codes=[], terminators=[]):
         while True:
+            #if not msg:
             msg = self.conn.iqueue.get()
 
             if msg == StopIteration:
@@ -169,6 +170,7 @@ class IRC(object):
                 if paramlist[-1].startswith(':'):
                     paramlist[-1] = paramlist[-1][1:]
                 lastparam = paramlist[-1]
+            #if not codes:
             self.out.put([msg, prefix, command, params, nick, user, host,
                     paramlist, lastparam])
             if command == "PING":
@@ -180,9 +182,8 @@ class IRC(object):
             #if command in terminators:
             #    return msg
 
-    #def cmd_reply(self, raw_cmd, codes, terminators=[]):
-    #    self.send(raw_cmd)
-    #    return self.parse_loop(codes, terminators)
+    def cmd_reply(self, msg, codes, terminators=[]):
+        return self.parse_loop(msg, codes, terminators)
 
     def set_pass(self, password):
         if password:
