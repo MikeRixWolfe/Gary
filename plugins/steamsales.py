@@ -200,7 +200,7 @@ def steamsales(inp, say='', chan=''):
 @hook.event('JOIN')
 def saleloop(paraml, nick='', conn=None):
     # If specified chan or not running; alter for multi-channel
-    if paraml[0] != '#test' or nick != conn.nick:
+    if paraml[0] != '#geekboy' or nick != conn.nick:
         return
     mask = ["specials", "coming_soon", "top_sellers", "new_releases",
             "genres", "trailerslideshow", "status"]

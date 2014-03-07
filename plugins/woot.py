@@ -101,7 +101,7 @@ def wootlist(inp, nick='', say=''):
 @hook.event('JOIN')
 def wootloop(paraml, nick='', conn=None):
     # If specified chan or not running; alter for multi-channel
-    if paraml[0] != '#test' or nick != conn.nick:
+    if paraml[0] != '#geekboy' or nick != conn.nick:
         return
     prev_woots = {}
     print(">>> u'Beginning Woot check loop :{}'".format(paraml[0]))
