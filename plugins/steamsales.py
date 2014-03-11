@@ -49,7 +49,9 @@ def get_featuredcategories():
 
 
 def get_sales(mask):
-    # Fetch data
+    # Fetch data, get it twice to avoid errors - DON'T QUESTION IT
+    data = get_featuredcategories()
+    flash_data = get_featured()
     data = get_featuredcategories()
     flash_data = get_featured()
 
