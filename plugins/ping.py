@@ -11,4 +11,4 @@ def ping(inp):
     process.wait()
     result = process.stdout.read()
     result = result.split('\n')
-    return result[1]
+    return result[1] or "Host not found"
