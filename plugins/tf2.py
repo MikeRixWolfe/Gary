@@ -50,13 +50,12 @@ def hats(inp):
                 hats += 1
 
     # get backpack worth
-    url3 = 'http://backpack.tf/api/IGetUsers/v2/?steamids=%s&format=json' % \
+    url3 = 'http://backpack.tf/api/IGetUsers/v3/?steamids=%s&format=json' % \
         (steamid64)
     user_profile = http.get_json(url3)
-    backpack_value = user_profile['response']['players']['0']['backpack_value']
+    print url3
+    backpack_value = user_profile['response']['players'][0]['backpack_value']['440']
 
-# return '%s  had %s dropped items out of items and %s hats drop (%s hats
-# total), with a backpack worth %s ref' %  \
+    # return '%s  had %s dropped items out of items and %s hats drop (%s hats total), with a backpack worth %s ref' %  \
     return '%s has %s items, %s hats, and %s unusuals (%s/%s/%s of the items/hats/unusals were from drops) and has a backpack worth %s ref' %  \
-        (inp, total, hats + dhats, un + dun,
-         dropped, dhats, dun, backpack_value)
+        (inp, total, hats + dhats, un + dun, dropped, dhats, dun, backpack_value)
