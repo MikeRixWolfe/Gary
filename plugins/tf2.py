@@ -1,37 +1,36 @@
 """
-tf.py: rewritten by MikeFightsBears 2013, inspired by ipsum
+tf.py: written by MikeFightsBears 2013, inspired by ipsum
 """
 
 from util import hook, http
 
+steam_key = '5519ACA4E3711C3A52AA7CEC7169C6E6'
 
+#@hook.api_key('steam_key')
 @hook.command
 def hats(inp):
-    """.hats <Steam Vanity URL|Numeric Steam ID> - Shows backpack information for TF2."""
+    ".hats <Steam Vanity URL|Numeric Steam ID> - Shows backpack information for TF2."
 
+    # Get SteamID
     if inp.isdigit():
         steamid64 = inp
     else:
-        url2 = 'http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=5519ACA4E3711C3A52AA7CEC7169C6E6&vanityurl=%s' % \
-            (http.quote(inp.encode('utf8'), safe=''))
         try:
-            steamprofile = http.get_json(url2)
-        except KeyError:
-            return '%s is not a valid VANITY URL' % inp
-        try:
-            steamid64 = steamprofile['response']['steamid']
-        except KeyError:
-            return '%s is not a valid VANITY URL' % inp
+            id_url = 'http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=%s&vanityurl=%s' % \
+                (steam_key, http.quote(inp.encode('utf8'), safe=''))
+            steamid64 = http.get_json(id_url)['response']['steamid']
+        except:
+            return "Error getting numeric Steam ID, please try format '.hats <Numeric Steam ID>'"
 
-    url = 'http://api.steampowered.com/IEconItems_440/GetPlayerItems/v0001/?SteamID=%s&key=5519ACA4E3711C3A52AA7CEC7169C6E6' % \
-        (steamid64)
-
-    # check if profile exists
+    # Get Steam User's TF2 Inventory/Check for User
     try:
-        inv = http.get_json(url)
-    except ValueError:
-        return '%s is not a valid profile' % inp
+        inv_url = 'http://api.steampowered.com/IEconItems_440/GetPlayerItems/v0001/?SteamID=%s&key=%s' % \
+            (steamid64, steam_key)
+        inv = http.get_json(inv_url)
+    except:
+        return "Sorry, I couldn't find '%s''s Steam inventory." % inp
 
+    # Count Items into Categories
     total, dropped, dhats, dun, un, hats = 0, 0, 0, 0, 0, 0
     for x in inv["result"]["items"]:
         total += 1
@@ -49,13 +48,12 @@ def hats(inp):
             if 47 <= ind <= 55 or 94 <= ind <= 126 or 134 <= ind <= 152:
                 hats += 1
 
-    # get backpack worth
-    url3 = 'http://backpack.tf/api/IGetUsers/v3/?steamids=%s&format=json' % \
+    # Get Market Price for Backpack
+    backpack_url = 'http://backpack.tf/api/IGetUsers/v3/?steamids=%s&format=json' % \
         (steamid64)
-    user_profile = http.get_json(url3)
-    print url3
-    backpack_value = user_profile['response']['players'][0]['backpack_value']['440']
+    backpack = http.get_json(backpack_url)
+    ref = backpack['response']['players'][0]['backpack_value']['440']
 
-    # return '%s  had %s dropped items out of items and %s hats drop (%s hats total), with a backpack worth %s ref' %  \
-    return '%s has %s items, %s hats, and %s unusuals (%s/%s/%s of the items/hats/unusals were from drops) and has a backpack worth %s ref' %  \
-        (inp, total, hats + dhats, un + dun, dropped, dhats, dun, backpack_value)
+    return '%s has %s items, %s hats, and %s unusuals (%s/%s/%s of the ' \
+        'items/hats/unusals were from drops) and has a backpack worth %s ref' %  \
+        (inp, total, hats + dhats, un + dun, dropped, dhats, dun, ref)
