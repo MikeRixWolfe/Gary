@@ -85,27 +85,22 @@ def get_sales(mask):
     # Format data
     sales = {}
     for category in data:
-        #if not data[category]["items"]: sales[data[category]["name"]] = []
+        if "items" not in data[category].keys():
+            data[category]["items"] = []
         for item in data[category]["items"]:
             # Prepare item data
             try:
                 if "url" in item.keys() and "id" not in item.keys():  # Midweek Madness/etc
                     data[category]["name"] = item["name"]
-                    appid = str(item["url"])[34:-1]
-                    appdata = http.get_json(
-                        "http://store.steampowered.com/api/appdetails/?appids={}".format(appid))
-                    item["name"] = appdata[appid]["data"]["name"]
-                    item["id"] = appdata[appid]["data"]["steam_appid"]
-                    if "Free to Play" in appdata[appid]["data"]["genres"]:
+                    item["id"] = str(item["url"])[34:-1]
+                    appdata = http.get_json("http://store.steampowered.com/api/appdetails/?appids={}".format(item["id"]))[item["id"]]["data"]
+                    item["name"] = appdata["name"]
+                    if "Free to Play" in appdata["genres"]:
                         item["final_price"] = 'Free to Play'
                         item["discount_percent"] = '100'
                     else:
-                        item["final_price"] = appdata[appid][
-                            "data"]["price_overview"]["final"]
-                        item["original_price"] = appdata[appid][
-                            "data"]["price_overview"]["initial"]
-                        item["discount_percent"] = appdata[appid][
-                            "data"]["price_overview"]["discount_percent"]
+                        item["final_price"] = appdata["price_overview"]["final"]
+                        item["discount_percent"] = appdata["price_overview"]["discount_percent"]
                     if item["discount_percent"] > 0:
                         item["discounted"] = True
                     else:
@@ -115,12 +110,21 @@ def get_sales(mask):
                     if not item["final_price"] and not item["discounted"]:
                         item["discounted"] = True
                         item["final_price"] = web.try_isgd(item["url"])
+                item["verified"] = True
             except:  # Unusuable Catagory e.g. Banner Announcments
                 continue
             # Begin work for discounted item
             if item["discounted"]:
                 # Clean Item
                 item["name"] = item["name"].encode("ascii", "ignore")
+                # Try to get accurate prices
+                try:
+                    if "verified" not in item.keys():
+                        appdata = http.get_json("http://store.steampowered.com/api/appdetails/?appids={}".format(item["id"]))[item["id"]]["data"]
+                        item["final_price"] = appdata["price_overview"]["final"]
+                        item["discount_percent"] = appdata["price_overview"]["discount_percent"]
+                except:
+                    pass
                 item = {k: str(v) for k, v in item.items() if k in
                     ["name", "final_price", "discount_percent"]}
                 # Add item to sales
@@ -227,7 +231,7 @@ def saleloop(paraml, nick='', conn=None):
                     if item not in prev_sales.get(category, [])]
                 if len(items):
                     prev_sales[category] = sales[category]  # Update prev
-                    conn.send("PRIVMSG {} :{}".format(paraml[0],
+                    conn.send("PRIVMSG {} :{}".format('#steamsales',
                         "\x02New {}\x0F: {}".format(category, '; '.join(items))))
 
         except Exception as e:
