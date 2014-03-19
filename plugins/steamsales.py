@@ -101,7 +101,7 @@ def get_sales(mask):
                         data[category]["name"] = item["name"]
                         item["id"] = str(item["url"])[34:-1]
                     appdata = http.get_json("http://store.steampowered.com/api/appdetails/?appids={}".format(item["id"]))[item["id"]]["data"]
-                    item["name"] = item["name"].encode("ascii", "ignore")
+                    item["name"] = appdata["name"].encode("ascii", "ignore")
                     if "Free to Play" in appdata["genres"]:
                         item["final_price"] = 'Free to Play'
                         item["discount_percent"] = '100'
