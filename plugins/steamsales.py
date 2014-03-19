@@ -171,6 +171,11 @@ def steamsales(inp, say='', chan=''):
     inp = [line.strip(', ') for line in inp.lower().split()
         if line in options.values()]
 
+    # Replace input for all and -strict
+    if flag and 'all' in inp:
+        inp = [item for item in options.values() if
+            item != 'all']
+
     # Check for bad input
     if not inp:
         return steamsales.__doc__
