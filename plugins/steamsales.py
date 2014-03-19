@@ -10,6 +10,7 @@ from datetime import datetime
 
 debug = False
 
+
 def log_sales_data(sales, filename):
     # Create dr to log sales for debug purposes
     if not os.path.exists('persist/steamsales_history'):
@@ -17,8 +18,8 @@ def log_sales_data(sales, filename):
 
     # Log specified data
     with open('persist/steamsales_history/' +
-              time.strftime('%Y%m%d%H%M', time.localtime()) +
-              '-' + filename + '.json', 'w+') as f:
+            time.strftime('%Y%m%d%H%M', time.localtime()) +
+            '-' + filename + '.json', 'w+') as f:
         json.dump(sales, f, sort_keys=True, indent=2)
 
 
@@ -49,9 +50,7 @@ def get_featuredcategories():
 
 
 def get_sales(mask):
-    # Fetch data, get it twice to avoid errors - DON'T QUESTION IT
-    data = get_featuredcategories()
-    flash_data = get_featured()
+    # Fetch data
     data = get_featuredcategories()
     flash_data = get_featured()
 
@@ -90,24 +89,29 @@ def get_sales(mask):
         for item in data[category]["items"]:
             # Prepare item data
             try:
-                if set(["id","url"]).issubset(set(item.keys())): # Bundles
+                if set(["id", "url"]).issubset(set(item.keys())):  # Bundles
                     if not item["final_price"] and not item["discounted"]:
                         item["name"] = item["name"].encode("ascii", "ignore")
                         item["final_price"] = web.try_isgd(item["url"])
-                        item["discount_percent"] = str(item["discount_percent"])
+                        item["discount_percent"] = str(item[
+                            "discount_percent"])
                         item["discounted"] = True
                 else:
-                    if "url" in item.keys() and "id" not in item.keys():  # Midweek Madness/etc
+                    # Midweek Madness, etc
+                    if "url" in item.keys() and "id" not in item.keys():
                         data[category]["name"] = item["name"]
                         item["id"] = str(item["url"])[34:-1]
-                    appdata = http.get_json("http://store.steampowered.com/api/appdetails/?appids={}".format(item["id"]))[item["id"]]["data"]
+                    appdata = http.get_json("http://store.steampowered.com/api/"
+                        "appdetails/?appids={}".format(item["id"]))[item["id"]]["data"]
                     item["name"] = appdata["name"].encode("ascii", "ignore")
                     if "Free to Play" in appdata["genres"]:
                         item["final_price"] = 'Free to Play'
                         item["discount_percent"] = '100'
                     else:
-                        item["final_price"] = appdata["price_overview"]["final"]
-                        item["discount_percent"] = appdata["price_overview"]["discount_percent"]
+                        item["final_price"] = appdata[
+                            "price_overview"]["final"]
+                        item["discount_percent"] = appdata[
+                            "price_overview"]["discount_percent"]
                     if int(item["discount_percent"]) > 0:
                         item["discounted"] = True
                     else:
@@ -145,7 +149,10 @@ def format_sale_item(item):
 @hook.singlethread
 @hook.command()
 def steamsales(inp, say='', chan=''):
-    ".steamsales <space seperated options> - Check Steam for specified sales; Displays special event deals on top of chosen deals. Options: daily flash featured specials top_sellers all"
+    ".steamsales <space seperated options> - Check Steam for specified sales; " \
+    "Displays special event deals on top of chosen deals. " \
+    "Options: daily flash featured specials top_sellers all"
+
     options = {"Flash Sales": "flash",
                "Featured Sales": "featured",
                "Specials": "specials",
@@ -170,7 +177,7 @@ def steamsales(inp, say='', chan=''):
 
     # Construct Mask
     if 'all' not in inp:
-        mask +=  [option for option in options.values() if option not in inp]
+        mask += [option for option in options.values() if option not in inp]
 
     # Get data
     sales = get_sales(mask)
@@ -227,3 +234,4 @@ def saleloop(paraml, nick='', conn=None):
 
         except Exception as e:
             print(">>> u'Steam saleloop error: {} :{}'".format(e, paraml[0]))
+
