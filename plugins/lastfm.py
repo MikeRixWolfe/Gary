@@ -9,43 +9,37 @@ api_url = "http://ws.audioscrobbler.com/2.0/?format=json"
 
 
 @hook.api_key('lastfm')
-@hook.command('np')
+@hook.command('np', autohelp=False)
 @hook.command(autohelp=False)
 def nowplaying(inp, nick='', say=None, api_key=None):
     ".np/.nowplaying <user> - gets a lastfm user's last played track"
-    if inp:
-        user = inp
-    else:
-        user = nick
+    user = inp or nick
 
-    response = http.get_json(api_url, method="user.getrecenttracks",
-                             api_key=api_key, user=user, limit=1)
+    try:
+        response = http.get_json(api_url, method="user.getrecenttracks",
+            api_key=api_key, user=user, limit=1)
+    except:
+        "LastFM API Error, please try again in a few minutes"
 
     if 'error' in response:
-        if inp:  # specified a user name
-            return "error: %s" % response["message"]
-        else:
-            return (
-                "Your nick is not a Last.fm account. Try '.lastfm username'."
-            )
+        return "error: %s" % response["message"] if inp \
+            else "Your nick is not a Last.fm account. Try '.lastfm username'."
 
     if not "track" in response["recenttracks"] or len(response["recenttracks"]["track"]) == 0:
-        return "no recent tracks for user \x02%s\x0F found" % user
+        return "No recent tracks found for \x02%s\x0F." % user
 
     tracks = response["recenttracks"]["track"]
 
-    if isinstance(tracks, list):
-        # if the user is listening to something, the tracks entry is a list
-        # the first item is the current track
+    if isinstance(tracks, list):  # Partially scrobbled track
         track = tracks[0]
         status = 'current track'
-    elif isinstance(tracks, dict):
-        # otherwise, they aren't listening to anything right now, and
-        # the tracks entry is a dict representing the most recent track
+        date = None
+    elif isinstance(tracks, dict):  # Last scrobbled track
         track = tracks
         status = 'last track'
+        date = track["date"]["#text"]
     else:
-        return "error parsing track listing"
+        return "Error parsing track listing."
 
     title = track["name"]
     album = track["album"]["#text"]
@@ -56,6 +50,8 @@ def nowplaying(inp, nick='', say=None, api_key=None):
         ret += " by \x02%s\x0f" % artist
     if album:
         ret += " on \x02%s\x0f" % album
+    if date:
+        ret += " [%s]" % date
 
     say(ret)
 
