@@ -7,6 +7,7 @@ import json
 import os
 from util import hook, http, web
 from datetime import datetime
+from collections import OrderedDict
 
 debug = False
 
@@ -89,12 +90,11 @@ def get_sales(mask):
         for item in data[category]["items"]:
             # Prepare item data
             try:
-                if set(["id", "url"]).issubset(set(item.keys())):  # Bundles
+                # Bundles
+                if set(["id", "url"]).issubset(set(item.keys())):
                     if not item["final_price"] and not item["discounted"]:
                         item["name"] = item["name"].encode("ascii", "ignore")
                         item["final_price"] = web.try_isgd(item["url"])
-                        item["discount_percent"] = str(item[
-                            "discount_percent"])
                         item["discounted"] = True
                 else:
                     # Midweek Madness, etc
@@ -112,13 +112,12 @@ def get_sales(mask):
                             "price_overview"]["final"]
                         item["discount_percent"] = appdata[
                             "price_overview"]["discount_percent"]
-                    if int(item["discount_percent"]) > 0:
-                        item["discounted"] = True
-                    else:
-                        item["discounted"] = False
-            except:  # Unusuable Catagory e.g. Banner Announcments
+                    item["discounted"] = True if int(item["discount_percent"]) > 0 \
+                        else False
+            except:
+                # Unusuable Catagory e.g. Banner Announcments
                 continue
-            # Format and add each discounted item to sales
+            # Add appropriate item data to sales
             if item["discounted"]:
                 item = {k: str(v) for k, v in item.items() if k in
                     ["name", "final_price", "discount_percent"]}
@@ -162,46 +161,36 @@ def steamsales(inp, say='', chan=''):
     mask = ["coming_soon", "new_releases", "genres",
             "trailerslideshow", "status"]
 
-    # Bool flag denoting strict or non-strict masking
-    flag = False
-    if '-strict' in inp:
-        flag = True
-
     # Clean input data
     inp = [line.strip(', ') for line in inp.lower().split()
         if line in options.values()]
-
-    # Replace input for all and -strict
-    if flag and 'all' in inp:
-        inp = [item for item in options.values() if
-            item != 'all']
+    if 'all' in inp:
+        inp = [item for item in options.values() if item != 'all']
 
     # Check for bad input
     if not inp:
         return steamsales.__doc__
 
-    # Construct Mask
-    if 'all' not in inp:
-        mask += [option for option in options.values() if option not in inp]
-
-    # Get data
+    # Get Sales
+    mask += [option for option in options.values() if option not in inp]
     sales = get_sales(mask)
 
     # If sales not returned
     if not sales:
         return "Steam Store API error, please try again in a few minutes."
 
-    # Output appropriate data
-    if flag:
-        sales = {k: v for k, v in sales.items() if options.get(k, '') in inp}
-        if not sales:
-            return "No specified sales found."
+    # Prepare sales
+    for k, v in options.items():
+        if v in inp and k not in sales:
+            sales[k] = []
+    sales = OrderedDict(sorted(sales.items()))
 
+    # Output appropriate data
     for category in sales:
         items = [format_sale_item(item) for item in sales[category]]
         if len(items):
             say("\x02{}\x0F: {}".format(category, '; '.join(items)))
-        elif category in options.keys():
+        else:
             say("\x02{}\x0F: {}".format(category, "None found"))
 
 
