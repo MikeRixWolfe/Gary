@@ -223,7 +223,7 @@ def saleloop(paraml, nick='', conn=None):
                     if item not in prev_sales.get(category, [])]
                 if len(items):
                     prev_sales[category] = sales[category]  # Update prev
-                    conn.send("PRIVMSG {} :{}".format('#steamsales',
+                    conn.send("PRIVMSG {} :{}".format(paraml[0],
                         "\x02New {}\x0F: {}".format(category, '; '.join(items))))
 
         except Exception as e:
