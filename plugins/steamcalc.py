@@ -40,7 +40,7 @@ def steamcalc(inp, reply=None):
     try:
         request = get_data(name)
         do_refresh = True
-    except (http.HTTPError, http.URLError):
+    except:
         try:
             reply("Collecting data, this may take a while.")
             refresh_data(name)

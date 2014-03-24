@@ -8,6 +8,9 @@
 ** multithreading
 ** automatic reloading
 ** extensibility
+* modularity
+** minimal dependancies
+** easy plugin management
 
 ==Features==
 * Multithreaded dispatch and the ability to connect to multiple networks at a time.

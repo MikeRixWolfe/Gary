@@ -32,7 +32,7 @@ def around(inp, nick='', chan='', say='', db=None, input=None):
 
     if rows:
         out = "Users around in the last {} minutes: ".format(minutes)
-        out2 = " {} others"
+        out2 = "{} others"
         while rows:
             if len(out) + len(rows[0]) + len(out2) + len(str(len(rows))) < 450:
                 out += rows.pop(0) + ", "

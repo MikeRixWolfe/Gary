@@ -34,4 +34,4 @@ def rfact(inp, say=False, nick=False):
 
     url = web.try_isgd(link)
 
-    return "{} - {}".format(fact.decode('utf8', 'ignore'), url)
+    return "{} - {}".format(fact.encode('ascii', 'ignore'), url)
