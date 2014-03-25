@@ -61,8 +61,8 @@ def steamcalc(inp, reply=None):
     data = {}
 
     # basic information
-    steam_profile = http.get_xml(steam_api_url.format(name))
     try:
+        steam_profile = http.get_xml(steam_api_url.format(name))
         data["name"] = steam_profile.find('steamID').text
         online_state = steam_profile.find('stateMessage').text
     except AttributeError:

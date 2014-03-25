@@ -49,10 +49,13 @@ def hats(inp):
                 hats += 1
 
     # Get Market Price for Backpack
-    backpack_url = 'http://backpack.tf/api/IGetUsers/v3/?steamids=%s&format=json' % \
-        (steamid64)
-    backpack = http.get_json(backpack_url)
-    ref = backpack['response']['players'][0]['backpack_value']['440']
+    try:
+        backpack_url = 'http://backpack.tf/api/IGetUsers/v3/?steamids=%s&format=json' % \
+            (steamid64)
+        backpack = http.get_json(backpack_url)
+        ref = backpack['response']['players'][0]['backpack_value']['440']
+    except:
+        ref = '???'
 
     return '%s has %s items, %s hats, and %s unusuals (%s/%s/%s of the ' \
         'items/hats/unusals were from drops) and has a backpack worth %s ref' %  \
