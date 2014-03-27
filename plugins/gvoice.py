@@ -24,20 +24,20 @@ def db_init(db):
 def get_phonenumber(db, name):
     row = db.execute("select phonenumber from phonebook where name like ?",
         (name,)).fetchone()
-    return (row[0] if row else None)
+    return row[0] if row else None
 
 
 def get_name(db, phoneNumber):
     row = db.execute("select name from phonebook where phonenumber like ?",
         (phoneNumber,)).fetchone()
-    return (row[0] if row else None)
+    return row[0] if row else None
 
 
 def check_smslog(db, msg):
     row = db.execute(
         "select * from smslog where id like ? and sender like ? and  text like ? and time like ?",
         (msg['id'], msg['from'], msg['text'], msg['time'])).fetchone()
-    return (row[0] if row else None)
+    return row[0] if row else None
 
 
 def mark_as_read(db, msg):
@@ -79,18 +79,15 @@ def outputsms(voice, conn, bot, db):
     messages = []
     for message in extractsms(voice.sms.html):
         recip = message['from'].strip('+: ')
-        if not recip:  # Google Voice error messages
+        if not recip or not recip.isdigit():
             continue
-        if recip.isdigit():
-            recip = recip[-10:]
-        if recip != 'Me' and recip not in privatelist and not check_smslog(db, message):
-            recip_nick = get_name(db, recip)
-            message['out'] = "<{}> {}".format(
-                recip_nick or recip, message['text'])
-            messages.append(message)
+        recip = recip[-10:]
+        recip_nick = get_name(db, recip)
+        if recip_nick and recip not in privatelist and not check_smslog(db, message):
+            messages.append("<{}> {}".format(recip_nick, message['text']))
     for message in messages:
         for chan in conn.channels:
-            conn.send("PRIVMSG {} :{}".format(chan, message['out']))
+            conn.send("PRIVMSG {} :{}".format(chan, message))
         mark_as_read(db, message)
     return voice, len(messages)
 
@@ -150,25 +147,21 @@ def sms(inp, nick='', chan='', db=None, bot=None):
     db_init(db)
     voice = Voice()
     privatelist = bot.config["gvoice"]["private"]
-    inp = inp.strip().encode('ascii', 'ignore')
-    operands = inp.split(' ', 1)
+    operands = inp.strip().encode('ascii', 'ignore').lower().split(' ', 1)
     if len(operands) < 2:
         return "Please check your input and try again."
     recip = operands[0].strip()
-    text = "<" + nick + "> " + operands[1].strip()
-    if recip.isdigit():
-        phoneNumber = recip[-10:]
-    else:
-        recip_number = get_phonenumber(db, recip.lower())
-        if recip_number:
-            phoneNumber = recip_number
-        else:
-            return "Sorry, I don't have that user in my phonebook."
-    if "+1" + phoneNumber[-10:] in privatelist or phoneNumber in privatelist:
+    text = "<" + nick + "> " + operands[1]
+    recip_number = get_phonenumber(db, recip)
+
+    if not recip_number:
+        return "Sorry, I don't have that user in my phonebook."
+    if recip_number in privatelist:
         return "I'm sorry %s, I'm afraid I can't do that." % nick
+
     try:
         voice.login()
-        voice.send_sms(phoneNumber, text)
+        voice.send_sms(recip_number, text)
         return "SMS sent"
     except:
         return "Google Voice API error, please try again in a few minutes."
@@ -183,15 +176,14 @@ def call(inp, say='', nick='', db=None, bot=None):
         return "Your number needs to be in my phonebook to use this function."
     voice = Voice()
     privatelist = bot.config["gvoice"]["private"]
-    recip = inp.strip().encode('ascii', 'ignore')
-    if recip.isdigit():
-        outgoingNumber = recip[-10]
-    else:
-        outgoingNumber = get_phonenumber(db, recip)
-        if not outgoingNumber:
-            return "That user isn't in my phonebook."
+    recip = inp.strip().encode('ascii', 'ignore').lower()
+    outgoingNumber = get_phonenumber(db, recip)
+
+    if not outgoingNumber:
+        return "That user isn't in my phonebook."
     if outgoingNumber in privatelist:
         return "I'm sorry, I'm afraid I can't do that."
+
     try:
         voice.login()
         voice.call(outgoingNumber, forwardingNumber)
@@ -240,12 +232,12 @@ def privatecontacts(inp, bot=None, say=None):
 
 
 @hook.command(adminonly=True)
-def add_privatecontact(inp, bot=None):
-    """.add_privateContact <number|contact> - adds <number|contact> to private contact list."""
+def addprivatecontact(inp, bot=None):
+    """.addprivatecontact <number|contact> - adds <number|contact> to private contact list."""
     contact = inp.strip('+: ').encode('ascii', 'ignore')
     privatelist = bot.config["gvoice"]["private"]
-    if contact.isdigit():  # Format number to Google Voice Format
-        contact = "+1" + contact[-10:]
+    if contact.isdigit():
+        contact = contact[-10:]
     if contact in privatelist:
         return "%s is already a private contact." % format(contact)
     else:
@@ -256,12 +248,12 @@ def add_privatecontact(inp, bot=None):
 
 
 @hook.command(adminonly=True)
-def remove_privatecontact(inp, bot=None):
-    """.remove_privateContact <number|contact> - removes <number|contact> from private contact list."""
+def removeprivatecontact(inp, bot=None):
+    """.removeprivatecontact <number|contact> - removes <number|contact> from private contact list."""
     contact = inp.strip('+: ').encode('ascii', 'ignore')
     privatelist = bot.config["gvoice"]["private"]
-    if contact.isdigit():  # Format number to Google Voice Format
-        contact = "+1" + contact[-10:]
+    if contact.isdigit():
+        contact = contact[-10:]
     if contact in privatelist:
         privatelist.remove(contact)
         privatelist.sort()
