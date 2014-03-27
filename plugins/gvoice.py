@@ -141,7 +141,7 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
 
 @hook.command()
 def sms(inp, nick='', chan='', db=None, bot=None):
-    ".sms <10 digit number|name in phonebook> <message> - sends a text message to a specified number or recipient via Google Voice"
+    ".sms <nick> <message> - sends a text message to specified <nick> from .phonebook via Google Voice"
     if chan[0] != '#':
         return "Can only SMS from public channels to control abuse."
     db_init(db)
@@ -169,7 +169,7 @@ def sms(inp, nick='', chan='', db=None, bot=None):
 
 @hook.command(adminonly=True)
 def call(inp, say='', nick='', db=None, bot=None):
-    ".call <number|nick> - calls specified <number|nick> and connects the call to your number from .phonebook via Google Voice"
+    ".call <nick> - calls specified <nick> and connects the call to your number from .phonebook via Google Voice"
     db_init(db)
     forwardingNumber = get_phonenumber(db, nick)
     if not forwardingNumber:
