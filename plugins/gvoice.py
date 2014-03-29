@@ -84,10 +84,11 @@ def outputsms(voice, conn, bot, db):
         recip = recip[-10:]
         recip_nick = get_name(db, recip)
         if recip_nick and recip not in privatelist and not check_smslog(db, message):
-            messages.append("<{}> {}".format(recip_nick, message['text']))
+            message['out'] = "<{}> {}".format(recip_nick, message['text'])
+            messages.append(message)
     for message in messages:
         for chan in conn.channels:
-            conn.send("PRIVMSG {} :{}".format(chan, message))
+            conn.send("PRIVMSG {} :{}".format(chan, message['out']))
         mark_as_read(db, message)
     return voice, len(messages)
 

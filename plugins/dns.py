@@ -20,6 +20,9 @@ def dns(inp):
 @hook.command
 def rdns(inp):
     "rdns <ip> - resolves Hostname of IP"
-    socket.setdefaulttimeout(5)
-    domain = socket.gethostbyaddr(inp)
-    return "%s resolves to %s" % (inp, domain)
+    try:
+        socket.setdefaulttimeout(5)
+        domain = socket.gethostbyaddr(inp)
+        return "%s resolves to %s" % (inp, domain)
+    except:
+        return "I could not find {}".format(inp)
