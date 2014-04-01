@@ -1,4 +1,5 @@
 import urlparse
+import socket
 from util import hook, http, urlnorm
 
 
@@ -13,7 +14,21 @@ def isup(inp):
     url = urlnorm.normalize(domain, assume_scheme="http")
 
     try:
-        soup = http.get_soup('http://isup.me/' + domain)
+        soup = http.get_soup('http://isup.me/' + domain, timeout = 15)
+    except http.HTTPError as e:
+        errors = {400: 'Bad Request (ratelimited?)',
+                  401: 'Unauthorized Request',
+                  403: 'Forbidden',
+                  404: 'Not Found',
+                  500: 'Internal Server Error',
+                  502: 'Bad Gateway',
+                  503: 'Service Unavailable',
+                  410: 'Resource is Gone'}
+        if e.code in errors:
+            return 'Error: %s: %s' % (e.code, errors[e.code])
+        return 'Error: %s' % e.code
+    except socket.timeout as e:
+        return "Error: %s" % e
     except:
         return "Could not get status."
 

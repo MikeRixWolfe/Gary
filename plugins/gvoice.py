@@ -168,28 +168,29 @@ def sms(inp, nick='', chan='', db=None, bot=None):
         return "Google Voice API error, please try again in a few minutes."
 
 
-@hook.command(adminonly=True)
+@hook.command()
 def call(inp, say='', nick='', db=None, bot=None):
     ".call <nick> - calls specified <nick> and connects the call to your number from .phonebook via Google Voice"
     db_init(db)
+
     forwardingNumber = get_phonenumber(db, nick)
     if not forwardingNumber:
         return "Your number needs to be in my phonebook to use this function."
-    voice = Voice()
-    privatelist = bot.config["gvoice"]["private"]
     recip = inp.strip().encode('ascii', 'ignore').lower()
     outgoingNumber = get_phonenumber(db, recip)
-
     if not outgoingNumber:
         return "That user isn't in my phonebook."
+    privatelist = bot.config["gvoice"]["private"]
     if outgoingNumber in privatelist:
         return "I'm sorry, I'm afraid I can't do that."
+
+    voice = Voice()
 
     try:
         voice.login()
         voice.call(outgoingNumber, forwardingNumber)
         say("Calling %s from %s..." % (outgoingNumber, forwardingNumber))
-        time.sleep(30)
+        time.sleep(90)
         voice.cancel(outgoingNumber, forwardingNumber)
     except:
         return "Google Voice API error, please try again in a few minutes."
