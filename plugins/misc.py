@@ -23,6 +23,40 @@ def get_version():
     return shorthash, revnumber
 
 
+@hook.command(autohelp=False)
+def auth(inp, nick='', conn=None):
+    ".auth - Forces update of a user's NickServ ident status."
+    conn.send("PRIVMSG nickserv :info  " + nick)
+    return "NickServ ident status updated."
+
+
+@hook.event('*')
+def user_tracking(paraml, nick=None, input=None, conn=None):
+    if input.command in ('QUIT', 'NICK', 'JOIN', 'PART'):
+        if input.command in ('JOIN'):
+            if not conn.users.get(nick.lower(), False):
+                conn.send("PRIVMSG nickserv :info  " + nick)
+        elif input.command in ('QUIT', 'PART'):
+            if conn.users.get(nick.lower(), False):
+                del conn.users[nick.lower()]
+        elif input.command == 'NICK':
+            if conn.users.get(nick.lower(), False):
+                del conn.users[nick.lower()]
+            conn.send("PRIVMSG nickserv :info  " + paraml[0])
+
+
+@hook.event('NOTICE')
+def noticed(paraml, input=None, conn=None):
+    if paraml[0] == input.conn.nick and input.chan.lower() == 'nickserv':
+        if "Nickname:" in paraml[1]:
+            if "ONLINE" in paraml[1]:
+                conn.users[str(paraml[1].split()[1]).lower()] = True
+            else:
+                conn.users[str(paraml[1].split()[1]).lower()] = False
+        elif "not registered" in paraml[1]:
+            conn.users[str(paraml[1].split()[2]).lower()[2:-2]] = False
+
+
 @hook.event('JOIN')
 def onjoin(paraml, nick=None, conn=None):
     if nick == conn.nick and paraml[0] not in conn.channels:

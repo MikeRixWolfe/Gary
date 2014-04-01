@@ -2,11 +2,10 @@ import re
 from util import hook
 
 
-def is_admin(bot, nick):
-    # here will be the nickserv admin check
-    #ident = conn.rpl_cmd("PRIVMSG nickserv :info  " + inp, 'NOTICE', kill = [])
+def is_admin(bot, input):
+    nick = input.nick.lower()
     admins = bot.config.get('admins', [])
-    if nick.lower() in admins:
+    if nick in admins and input.conn.users.get(nick, False):
         return True
     else:
         return False
@@ -26,7 +25,7 @@ def sieve_suite(bot, input, func, kind, args):
             return None
 
     if kind == "command":
-        if func.__name__.lower() in disabled and not is_admin(bot, input.nick):
+        if func.__name__.lower() in disabled and not is_admin(bot, input):
             return None
 
     if kind == "regex":
@@ -48,26 +47,26 @@ def sieve_suite(bot, input, func, kind, args):
                 return None
 
     if args.get('adminonly'):
-        if not is_admin(bot, input.nick):
+        if not is_admin(bot, input):
             return None
 
     if args.get('operonly'):
-        if input.nick.lower() not in opers or not is_admin(bot, input.nick):
+        if input.nick.lower() not in opers or not is_admin(bot, input):
             return None
 
     if input.chan in restricted:
         allowlist = opers + voicers
-        if input.nick.lower() not in allowlist or not is_admin(bot, input.nick):
+        if input.nick.lower() not in allowlist or not is_admin(bot, input):
             return None
 
     # Possibly move into command/regex above
     if input.host.lower() in ignored or input.user.lower() in ignored or \
             input.nick.lower() in ignored or input.chan.lower() in ignored:
-        if not is_admin(bot, input.nick):
+        if not is_admin(bot, input):
             return None
 
     if input.chan in muted:
-        if not is_admin(bot, input.nick):
+        if not is_admin(bot, input):
             return None
 
     return input

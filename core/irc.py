@@ -125,12 +125,13 @@ irc_param_ref = re.compile(r'(?:^|(?<= ))(:.*|[^ ]+)').findall
 class IRC(object):
     "handles the IRC protocol"
     #see the docs/ folder for more information on the protocol
-    def __init__(self, server, nick, port=6667, channels=[], conf={}):
+    def __init__(self, server, nick, port=6667, channels=[], conf={}, users={}):
         self.channels = channels
         self.conf = conf
         self.server = server
         self.port = port
         self.nick = nick
+        self.users = users
 
         self.out = Queue.Queue()  # responses from the server are placed here
         # format: [rawline, prefix, command, params,
@@ -150,9 +151,8 @@ class IRC(object):
         self.cmd("USER", [conf.get('user', 'Gary'), "3",
                 "*", conf.get('realname','Gary')])
 
-    def parse_loop(self): #, msg='', codes=[], terminators=[]):
+    def parse_loop(self):
         while True:
-            #if not msg:
             msg = self.conn.iqueue.get()
 
             if msg == StopIteration:
@@ -170,20 +170,11 @@ class IRC(object):
                 if paramlist[-1].startswith(':'):
                     paramlist[-1] = paramlist[-1][1:]
                 lastparam = paramlist[-1]
-            #if not codes:
             self.out.put([msg, prefix, command, params, nick, user, host,
                     paramlist, lastparam])
             if command == "PING":
                 self.cmd("PONG", paramlist)
-            #if command in codes:
-            #    if not terminators:
-            #        return msg
-            #    return msg #yield msg
-            #if command in terminators:
-            #    return msg
 
-    def cmd_reply(self, msg, codes, terminators=[]):
-        return self.parse_loop(msg, codes, terminators)
 
     def set_pass(self, password):
         if password:
@@ -212,9 +203,9 @@ class IRC(object):
 
 class SSLIRC(IRC):
     def __init__(self, server, nick, port=6667, channels=[], conf={},
-                 ignore_certificate_errors=True):
+                 users={}, ignore_certificate_errors=True):
         self.ignore_cert_errors = ignore_certificate_errors
-        IRC.__init__(self, server, nick, port, channels, conf)
+        IRC.__init__(self, server, nick, port, channels, conf, users)
 
     def create_connection(self):
         return crlf_ssl_tcp(self.server, self.port, self.ignore_cert_errors)
