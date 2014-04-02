@@ -30,7 +30,7 @@ def auth(inp, nick='', conn=None):
         return("I am currently not identified with NickServ and am unable to "
             "authenticate nicks; as such, user class based functions are "
             "now disabled. Please notify one of my admin's to this.")
-    conn.send("PRIVMSG nickserv :info " + nick)
+    conn.send("PRIVMSG %s :info %s" % (conn.conf.get('nickserv_name', 'nickserv'), nick))
     return "NickServ ident status updated."
 
 
@@ -39,17 +39,17 @@ def user_tracking(paraml, nick=None, input=None, conn=None):
     if input.command in ('QUIT', 'NICK', 'JOIN', 'PART'):
         if input.command in ('JOIN'):
             if not conn.users.get(nick.lower(), False):
-                conn.send("PRIVMSG nickserv :info " + nick)
+                conn.send("PRIVMSG %s :info %s" % (conn.conf.get('nickserv_name', 'nickserv'), nick))
         elif input.command in ('QUIT', 'PART', 'NICK'):
             if nick.lower() in conn.users.keys():
                 del conn.users[nick.lower()]
             if input.command == 'NICK':
-                conn.send("PRIVMSG nickserv :info  " + paraml[0])
+                conn.send("PRIVMSG %s :info %s" % (conn.conf.get('nickserv_name', 'nickserv'), nick))
 
 
 @hook.event('NOTICE')
 def noticed(paraml, input=None, conn=None):
-    if paraml[0] == input.conn.nick and input.chan.lower() == 'nickserv':
+    if paraml[0] == input.conn.nick and input.chan.lower() == conn.conf.get('nickserv_name', 'nickserv'):
         if "Nickname:" in paraml[1]:
             if "ONLINE" in paraml[1]:
                 conn.users[str(paraml[1].split()[1]).lower()] = True

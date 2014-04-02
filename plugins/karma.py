@@ -76,7 +76,7 @@ def setkarma(inp, nick='', chan='', db=None):
     if nick != "extrastout":
         return  # "Please don't impersonate others."
 
-    if abs(get_karma(db, chan, word)) > abs(karma):
+    if abs(get_karma(db, chan, word)) < abs(karma):
         set_karma(db, chan, word, karma)
         print ">>> u'Karma of %s set to %s :%s'" % (word, karma, chan)
 

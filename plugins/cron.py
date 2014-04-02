@@ -85,17 +85,22 @@ def cron(paraml, nick='', conn=None, db=None):
 def remindme(inp, nick='', chan='', db=None):
     ".remindme YYYY-MM-DD HH:MM <message> - Queues <message> to be output at specified date and time."
     db_init(db)
-    new_event = re.match(r'(\d\d\d\d-\d\d-\d\d\ \d\d:\d\d)\ (.+)', inp)
+    new_event = re.match(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2})\ (.+)', inp)
     if new_event and new_event.group(1) > str(datetime.datetime.now(EST()))[:16]:
         timestamp = new_event.group(1)
         message = new_event.group(2)
 
+        print True if new_event.group(1) < str(datetime.datetime.now(EST()))[:16] else  False
+        print  str(datetime.datetime.now(EST()))[:16]
+        print new_event.group(1)
+
+        return
         try:
             set_event(db, timestamp, chan, message, nick, False)
         except:
             return "There was an error inserting your event, please try again later."
         return "Okay, at %s I will remind you of '%s'." % (timestamp, message)
-    elif new_event and new_event.group(1) < str(datetime.datetime.now(EST()))[:16]:
+    elif new_event and new_event.group(1) <= str(datetime.datetime.now(EST()))[:16]:
         return "Please choose a date/time in the future."
     else:
         return "Please be sure to use the format 'YYYY-MM-DD HH:MM <message>'."

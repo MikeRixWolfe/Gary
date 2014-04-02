@@ -15,10 +15,12 @@
 ==Features==
 * Multithreaded dispatch and the ability to connect to multiple networks at a time.
 * Easy plugin development with automatic reloading and a simple hooking API.
+* NickServ-based user authentication and per-function permissions with the ability to manage access to functions/plugins/the bot from in channel.
+* The ability to send/receive SMS messages and call other users from channel via PyGoogleVoice, without ever touching your phone.
 
 ==Requirements==
-* >= Python 2.6
-* [[http://codespeak.net/lxml/|lxml]]
+* Python 2.7.x
+* lxml
 * BeautifulSoup4
 * yql
 * GVoice plugin requires pygooglevoice, I recommend [[https://github.com/MikeRixWolfe/pygooglevoice|my fork]].
