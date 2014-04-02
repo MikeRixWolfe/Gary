@@ -26,7 +26,11 @@ def get_version():
 @hook.command(autohelp=False)
 def auth(inp, nick='', conn=None):
     ".auth - Forces update of a user's NickServ ident status."
-    conn.send("PRIVMSG nickserv :info  " + nick)
+    if conn.nick.lower() not in conn.users.keys():
+        return("I am currently not identified with NickServ and am unable to "
+            "authenticate nicks; as such, user class based functions are "
+            "now disabled. Please notify one of my admin's to this.")
+    conn.send("PRIVMSG nickserv :info " + nick)
     return "NickServ ident status updated."
 
 
@@ -35,14 +39,12 @@ def user_tracking(paraml, nick=None, input=None, conn=None):
     if input.command in ('QUIT', 'NICK', 'JOIN', 'PART'):
         if input.command in ('JOIN'):
             if not conn.users.get(nick.lower(), False):
-                conn.send("PRIVMSG nickserv :info  " + nick)
-        elif input.command in ('QUIT', 'PART'):
-            if conn.users.get(nick.lower(), False):
+                conn.send("PRIVMSG nickserv :info " + nick)
+        elif input.command in ('QUIT', 'PART', 'NICK'):
+            if nick.lower() in conn.users.keys():
                 del conn.users[nick.lower()]
-        elif input.command == 'NICK':
-            if conn.users.get(nick.lower(), False):
-                del conn.users[nick.lower()]
-            conn.send("PRIVMSG nickserv :info  " + paraml[0])
+            if input.command == 'NICK':
+                conn.send("PRIVMSG nickserv :info  " + paraml[0])
 
 
 @hook.event('NOTICE')
