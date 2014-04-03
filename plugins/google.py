@@ -30,8 +30,10 @@ def google(inp, api_key=None):
     if 'items' not in parsed:
         return 'no results found'
 
-    #out = u'{link} - \x02{title}\x02: "{snippet}"'.format(**parsed['items'][0])
-    out = u'{link} - \x02{title}\x02'.format(**parsed['items'][0])
+    link = web.try_isgd(parsed['items'][0]['link'])
+    title = parsed['items'][0]['title']
+
+    out = u'{} - \x02{}\x02'.format(link, title)
     out = ' '.join(out.split())
 
     if len(out) > 300:
