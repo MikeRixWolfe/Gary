@@ -24,7 +24,7 @@ def db_init(db):
 def get_phonenumber(db, name):
     row = db.execute("select phonenumber, private from phonebook where name like ?",
         (name,)).fetchone()
-    return row or None
+    return row or (None, None)
 
 
 def get_name(db, phoneNumber):
