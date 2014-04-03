@@ -190,8 +190,6 @@ def call(inp, say='', nick='', db=None, bot=None):
         voice.login()
         voice.call(outgoingNumber, forwardingNumber)
         say("Calling %s from %s's phone..." % (recip, nick))
-        time.sleep(90)
-        voice.cancel(outgoingNumber, forwardingNumber)
     except:
         return "Google Voice API error, please try again in a few minutes."
 
@@ -243,7 +241,7 @@ def phonebook(inp, nick='', input=None, db=None, bot=None):
 
 @hook.command(adminonly=True)
 def blacklist(inp, nick='', conn=None, bot=None, say=None):
-    ".blacklist <list|add|del contact|number> - Displays blacklist or adds/dels contacts/numbers to/from blacklist."
+    ".blacklist <list|add|del> [contact|number] - Displays blacklist or adds/dels contacts/numbers to/from blacklist."
     private = bot.config["gvoice"]["private"]
 
     inp = inp.split()
