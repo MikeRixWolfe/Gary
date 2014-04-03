@@ -14,7 +14,7 @@ from googlevoice import Voice
 
 
 def db_init(db):
-    db.execute("create table if not exists phonebook(name, phonenumber,"
+    db.execute("create table if not exists phonebook(name, phonenumber, private,"
                "primary key(name))")
     db.execute("create table if not exists smslog(id, sender, text, time,"
                "primary key(id, sender, text, time))")
@@ -22,9 +22,9 @@ def db_init(db):
 
 
 def get_phonenumber(db, name):
-    row = db.execute("select phonenumber from phonebook where name like ?",
+    row = db.execute("select phonenumber, private from phonebook where name like ?",
         (name,)).fetchone()
-    return row[0] if row else None
+    return row or None
 
 
 def get_name(db, phoneNumber):
@@ -153,7 +153,7 @@ def sms(inp, nick='', chan='', db=None, bot=None):
         return "Please check your input and try again."
     recip = operands[0].strip()
     text = "<" + nick + "> " + operands[1]
-    recip_number = get_phonenumber(db, recip)
+    recip_number, private = get_phonenumber(db, recip)
 
     if not recip_number:
         return "Sorry, I don't have that user in my phonebook."
@@ -173,11 +173,11 @@ def call(inp, say='', nick='', db=None, bot=None):
     ".call <nick> - calls specified <nick> and connects the call to your number from .phonebook via Google Voice"
     db_init(db)
 
-    forwardingNumber = get_phonenumber(db, nick)
+    forwardingNumber, forwardingPrivate = get_phonenumber(db, nick)
     if not forwardingNumber:
         return "Your number needs to be in my phonebook to use this function."
     recip = inp.strip().encode('ascii', 'ignore').lower()
-    outgoingNumber = get_phonenumber(db, recip)
+    outgoingNumber, outgoingPrivate = get_phonenumber(db, recip)
     if not outgoingNumber:
         return "That user isn't in my phonebook."
     blacklist = bot.config["gvoice"]["private"]
@@ -189,7 +189,7 @@ def call(inp, say='', nick='', db=None, bot=None):
     try:
         voice.login()
         voice.call(outgoingNumber, forwardingNumber)
-        say("Calling %s from %s..." % (outgoingNumber, forwardingNumber))
+        say("Calling %s from %s's phone..." % (recip, nick))
         time.sleep(90)
         voice.cancel(outgoingNumber, forwardingNumber)
     except:
@@ -198,7 +198,7 @@ def call(inp, say='', nick='', db=None, bot=None):
 
 @hook.command
 def phonebook(inp, nick='', input=None, db=None, bot=None):
-    ".phonebook <nick|number|delete> - gets a users phone number, or sets/deletes your phone number"
+    ".phonebook <nick|number|delete|private> - Gets a users phone number, or sets/deletes your phone number, or toggles private status."
     db_init(db)
     blacklist = bot.config["gvoice"]["private"]
     recip = inp.strip().encode('ascii', 'ignore')
@@ -207,18 +207,36 @@ def phonebook(inp, nick='', input=None, db=None, bot=None):
     if recip.isdigit():
         if len(recip) < 10:
             return "Please check your input and try again."
-        db.execute("insert or replace into phonebook(name, phonenumber)"
-                   "values(?, ?)", (nick.lower(), recip[-10:]))
+        db.execute("insert or replace into phonebook(name, phonenumber, private)"
+                   "values(?, ?, 0)", (nick.lower(), recip[-10:]))
         db.commit()
         return "Number saved!"
     elif recip == 'delete':
         db.execute("delete from phonebook where name = (?)", (nick.lower(),))
         db.commit()
         return "Your number has been removed from my phonebook."
-    else:
-        recip_number = get_phonenumber(db, recip.lower())
+    elif recip == 'private':
+        recip_number, private = get_phonenumber(db, nick.lower())
         if recip_number is not None:
-            return recip + "'s number is " + recip_number
+            if private:
+                db.execute("update phonebook set private = 0 where name = ?",
+                    (nick.lower(),))
+                db.commit()
+                return "Your number is no longer private."
+            else:
+                db.execute("update phonebook set private = 1 where name = ?",
+                    (nick.lower(),))
+                db.commit()
+                return "Your number is now private."
+        else:
+            return "Your nick does not have a registered phone number."
+    else:
+        recip_number, private = get_phonenumber(db, recip.lower())
+        if recip_number is not None:
+            if private:
+                return recip + "'s number is set to private."
+            else:
+                return recip + "'s number is " + recip_number
         else:
             return "User does not have a registered phone number."
 
