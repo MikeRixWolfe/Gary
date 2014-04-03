@@ -24,3 +24,6 @@
 * BeautifulSoup4
 * yql
 * GVoice plugin requires pygooglevoice, I recommend [[https://github.com/MikeRixWolfe/pygooglevoice|my fork]].
+
+==License==
+This code and all documentation is licensed under the [[https://github.com/MikeRixWolfe/Gary/blob/master/LICENSE|MIT License]].
