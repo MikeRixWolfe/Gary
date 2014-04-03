@@ -241,7 +241,7 @@ def phonebook(inp, nick='', input=None, db=None, bot=None):
             return "User does not have a registered phone number."
 
 
-@hook.command(adminonly=True, autohelp=False)
+@hook.command(adminonly=True)
 def blacklist(inp, nick='', conn=None, bot=None, say=None):
     ".blacklist <list|add|del contact|number> - Displays blacklist or adds/dels contacts/numbers to/from blacklist."
     private = bot.config["gvoice"]["private"]
