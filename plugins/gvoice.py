@@ -72,7 +72,7 @@ def extractsms(htmlsms):
 
 
 def outputsms(voice, conn, bot, db):
-    privatelist = bot.config["gvoice"]["private"]
+    blacklist = bot.config["gvoice"]["private"]
     if not voice.special:
         voice.login()
     voice.sms()
@@ -83,7 +83,7 @@ def outputsms(voice, conn, bot, db):
             continue
         recip = recip[-10:]
         recip_nick = get_name(db, recip)
-        if recip_nick and recip not in privatelist and not check_smslog(db, message):
+        if recip_nick and recip not in blacklist and not check_smslog(db, message):
             message['out'] = "<{}> {}".format(recip_nick, message['text'])
             messages.append(message)
     for message in messages:
@@ -147,7 +147,7 @@ def sms(inp, nick='', chan='', db=None, bot=None):
         return "Can only SMS from public channels to control abuse."
     db_init(db)
     voice = Voice()
-    privatelist = bot.config["gvoice"]["private"]
+    blacklist = bot.config["gvoice"]["private"]
     operands = inp.strip().encode('ascii', 'ignore').lower().split(' ', 1)
     if len(operands) < 2:
         return "Please check your input and try again."
@@ -157,7 +157,7 @@ def sms(inp, nick='', chan='', db=None, bot=None):
 
     if not recip_number:
         return "Sorry, I don't have that user in my phonebook."
-    if recip_number in privatelist:
+    if recip_number in blacklist or recip in blacklist:
         return "I'm sorry %s, I'm afraid I can't do that." % nick
 
     try:
@@ -180,8 +180,8 @@ def call(inp, say='', nick='', db=None, bot=None):
     outgoingNumber = get_phonenumber(db, recip)
     if not outgoingNumber:
         return "That user isn't in my phonebook."
-    privatelist = bot.config["gvoice"]["private"]
-    if outgoingNumber in privatelist:
+    blacklist = bot.config["gvoice"]["private"]
+    if outgoingNumber in blacklist or recip in blacklist:
         return "I'm sorry, I'm afraid I can't do that."
 
     voice = Voice()
@@ -200,9 +200,9 @@ def call(inp, say='', nick='', db=None, bot=None):
 def phonebook(inp, nick='', input=None, db=None, bot=None):
     ".phonebook <nick|number|delete> - gets a users phone number, or sets/deletes your phone number"
     db_init(db)
-    privatelist = bot.config["gvoice"]["private"]
+    blacklist = bot.config["gvoice"]["private"]
     recip = inp.strip().encode('ascii', 'ignore')
-    if recip in privatelist:
+    if recip in blacklist:
         return "Nope."
     if recip.isdigit():
         if len(recip) < 10:
@@ -224,42 +224,36 @@ def phonebook(inp, nick='', input=None, db=None, bot=None):
 
 
 @hook.command(adminonly=True, autohelp=False)
-def privatecontacts(inp, bot=None, say=None):
-    """.privateContacts - Lists private contacts."""
-    privatelist = bot.config["gvoice"]["private"]
-    if privatelist:
-        say("Private contacts: %s" % format(", ".join(privatelist)))
+def blacklist(inp, nick='', conn=None, bot=None, say=None):
+    ".blacklist <list|add|del contact|number> - Displays blacklist or adds/dels contacts/numbers to/from blacklist."
+    private = bot.config["gvoice"]["private"]
+
+    inp = inp.split()
+    if len(inp) == 1 and inp[0] == 'list':
+        if private:
+            say("Blacklist sent via pm")
+            conn.msg(nick, "Blacklist: %s" % format(", ".join(private)))
+        else:
+            return "The blacklist is currently empty."
+    elif len(inp) == 2 and inp[0] in ['add', 'del']:
+        contact = inp[1].strip('+: ').encode('ascii', 'ignore')
+        if contact.isdigit():
+            contact = contact[-10:]
+        if inp[0] == 'add':
+            if contact in private:
+                return "%s is already blacklisted." % format(contact)
+            else:
+                private.append(contact)
+                private.sort()
+                json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
+                return "%s has been blacklisted." % format(contact)
+        else:
+            if contact in private:
+                private.remove(contact)
+                private.sort()
+                json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
+                return "%s has been removed from the blacklist." % format(contact)
+            else:
+                return "%s is not blacklisted." % format(contact)
     else:
-        return "You currently have no private contacts."
-
-
-@hook.command(adminonly=True)
-def addprivatecontact(inp, bot=None):
-    """.addprivatecontact <number|contact> - adds <number|contact> to private contact list."""
-    contact = inp.strip('+: ').encode('ascii', 'ignore')
-    privatelist = bot.config["gvoice"]["private"]
-    if contact.isdigit():
-        contact = contact[-10:]
-    if contact in privatelist:
-        return "%s is already a private contact." % format(contact)
-    else:
-        privatelist.append(contact)
-        privatelist.sort()
-        json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
-        return "%s has been added as a private contact." % format(contact)
-
-
-@hook.command(adminonly=True)
-def removeprivatecontact(inp, bot=None):
-    """.removeprivatecontact <number|contact> - removes <number|contact> from private contact list."""
-    contact = inp.strip('+: ').encode('ascii', 'ignore')
-    privatelist = bot.config["gvoice"]["private"]
-    if contact.isdigit():
-        contact = contact[-10:]
-    if contact in privatelist:
-        privatelist.remove(contact)
-        privatelist.sort()
-        json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
-        return "%s has been removed as a private contact." % format(contact)
-    else:
-        return "%s is not a private contact." % format(contact)
+        return blacklist.__doc__
