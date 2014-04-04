@@ -172,7 +172,6 @@ def sms(inp, nick='', chan='', db=None, bot=None):
 def call(inp, say='', nick='', db=None, bot=None):
     ".call <nick> - calls specified <nick> and connects the call to your number from .phonebook via Google Voice"
     db_init(db)
-
     forwardingNumber, forwardingPrivate = get_phonenumber(db, nick)
     if not forwardingNumber:
         return "Your number needs to be in my phonebook to use this function."
@@ -243,7 +242,6 @@ def phonebook(inp, nick='', input=None, db=None, bot=None):
 def blacklist(inp, nick='', conn=None, bot=None, say=None):
     ".blacklist <list|add|del> [contact|number] - Displays blacklist or adds/dels contacts/numbers to/from blacklist."
     private = bot.config["gvoice"]["private"]
-
     inp = inp.split()
     if len(inp) == 1 and inp[0] == 'list':
         if private:
