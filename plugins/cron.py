@@ -90,11 +90,6 @@ def remindme(inp, nick='', chan='', db=None):
         timestamp = new_event.group(1)
         message = new_event.group(2)
 
-        print True if new_event.group(1) < str(datetime.datetime.now(EST()))[:16] else  False
-        print  str(datetime.datetime.now(EST()))[:16]
-        print new_event.group(1)
-
-        return
         try:
             set_event(db, timestamp, chan, message, nick, False)
         except:
