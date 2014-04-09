@@ -1,3 +1,5 @@
+# metacritic.com scraper
+
 import re
 from urllib2 import HTTPError
 
@@ -6,15 +8,14 @@ from util import hook, http
 
 @hook.command('mc')
 def metacritic(inp):
-    '.mc [all|movie|tv|album|x360|ps3|pc|ds|3ds|wii|psv|xbone|ps4] <title> - gets rating for'\
-        ' <title> from metacritic on the specified medium'
+    '.mc [all|movie|tv|album|x360|ps3|pc|gba|ds|3ds|wii|vita|wiiu|xone|ps4] <title> -- gets rating for'\
+    ' <title> from metacritic on the specified medium'
 
     # if the results suck, it's metacritic's fault
 
     args = inp.strip()
 
-    game_platforms = ('x360', 'ps3', 'pc', 'ds', 'wii',
-                      '3ds', 'gba', 'psv', 'xbone', 'ps4')
+    game_platforms = ('x360', 'ps3', 'pc', 'gba', 'ds', '3ds', 'wii', 'vita', 'wiiu', 'xone', 'ps4')
     all_platforms = game_platforms + ('all', 'movie', 'tv', 'album')
 
     try:
