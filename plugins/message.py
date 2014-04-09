@@ -1,8 +1,3 @@
-"""
-message.py - written by MikeFightsBears 2013
-    based on tell.py: written by sklnd, Scaevolus in July 2009-Jan 2010
-"""
-
 import time
 from util import hook, timesince
 

@@ -1,7 +1,3 @@
-'''
-gexchange.py - written by MikeFightsBears 2013
-'''
-
 from util import hook, http
 
 
@@ -53,4 +49,4 @@ def gex(inp):
                 query[0],
                 query[1],
                 query[2])
-        
+

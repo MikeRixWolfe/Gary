@@ -1,7 +1,3 @@
-"""
-disable.py: written by MikeFightsBears 2013
-"""
-
 import json
 from util import hook
 

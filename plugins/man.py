@@ -1,7 +1,3 @@
-"""
-man.py - written by MikeFigthtsBears 2014
-"""
-
 import re
 import os
 from util import hook, web, http, text

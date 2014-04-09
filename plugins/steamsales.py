@@ -1,7 +1,3 @@
-"""
-steam_sales.py - Written by MikeRixWolfe 2013
-"""
-
 import time
 import json
 import os

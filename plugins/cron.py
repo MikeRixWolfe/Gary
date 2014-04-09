@@ -1,7 +1,3 @@
-"""
-cron.py: written by MikeFightsBears
-"""
-
 import re
 import time
 import datetime

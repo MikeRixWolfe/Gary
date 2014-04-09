@@ -1,7 +1,3 @@
-"""
-log.py: written by MikeFightsBears 2014
-"""
-
 import time
 import re
 from datetime import datetime

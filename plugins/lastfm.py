@@ -1,7 +1,3 @@
-'''
-lastfm.py - rewritten by MikeFightsBears 2013
-'''
-
 from util import hook, http
 
 

@@ -1,7 +1,3 @@
-'''
-dns.py - written by MikeFightsBears 2013
-'''
-
 from util import hook
 import socket
 

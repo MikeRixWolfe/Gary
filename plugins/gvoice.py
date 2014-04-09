@@ -1,8 +1,3 @@
-"""
-sms.py written by MikeFightsBears September 2013
-requires pygooglevoice
-"""
-
 import re
 import sys
 import time

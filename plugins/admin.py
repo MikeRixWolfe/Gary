@@ -1,7 +1,3 @@
-"""
-admin.py - Written by MikeFightsBears 2013
-"""
-
 from util import hook
 import os
 import sys

@@ -1,7 +1,3 @@
-"""
-karma.py: written by MikeFightsBears 2013
-"""
-
 import re
 from util import hook
 

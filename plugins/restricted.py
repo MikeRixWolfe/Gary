@@ -1,7 +1,3 @@
-"""
-restrict.py: written by MikeFightsBears.com
-"""
-
 import json
 from util import hook
 

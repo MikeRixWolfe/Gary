@@ -1,7 +1,3 @@
-"""
-factoid.py: written by MikeFightsBears 2013
-"""
-
 import datetime
 from util import hook
 

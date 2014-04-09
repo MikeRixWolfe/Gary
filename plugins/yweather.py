@@ -1,7 +1,3 @@
-"""
-weather.py - written by MikeFightsBears 2013
-"""
-
 import json
 import urllib2
 import lxml.etree

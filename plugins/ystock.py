@@ -1,7 +1,3 @@
-'''
-ystock.py - rewritten by MikeFightsBears 2013
-'''
-
 import random
 from datetime import date, timedelta
 from util import hook, http, web

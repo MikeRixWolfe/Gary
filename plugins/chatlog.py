@@ -1,7 +1,3 @@
-"""
-chatlog.py: written by MikeFightsBears 2013
-"""
-
 import datetime
 import time
 from util import hook, timesince, text

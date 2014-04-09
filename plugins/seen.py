@@ -1,7 +1,3 @@
-"""
-seen.py - written by MikeFightsBears 2013
-"""
-
 import time, re
 from util import hook, timesince, text
 
