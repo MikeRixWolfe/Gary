@@ -185,7 +185,7 @@ class IRC(object):
         self.nick = nick
 
     def join(self, channel):
-        self.cmd("JOIN", [channel])
+        self.cmd("JOIN", channel.split())  # Channel, Password (optional)
 
     def msg(self, target, text):
         self.cmd("PRIVMSG", [target, text])
