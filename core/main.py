@@ -134,7 +134,7 @@ def dispatch(input, kind, func, args, autohelp=False):
             input.reply('error: missing api key')
             return
         input.api_key = key
-    
+
     if func._thread:
         bot.threads[func].put(input)
     else:
