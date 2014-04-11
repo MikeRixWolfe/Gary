@@ -78,7 +78,7 @@ def outputsms(voice, conn, bot, db):
             continue
         recip = recip[-10:]
         recip_nick = get_name(db, recip)
-        if recip_nick and recip not in blacklist and not check_smslog(db, message):
+        if recip_nick and recip not in blacklist and not check_smslog(db, message) and message not in messages:
             message['out'] = "<{}> {}".format(recip_nick, message['text'])
             messages.append(message)
     for message in messages:
