@@ -6,7 +6,6 @@ api = "https://api.woot.com/1/sales/current.rss/"
 sites = {"woot": "www.woot.com",
          "wine": "wine.woot.com",
          "sellout": "sellout.woot.com",
-         "shirt": "shirt.woot.com",
          "sport": "sport.woot.com",
          "tools": "tools.woot.com",
          "home": "home.woot.com",

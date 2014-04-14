@@ -37,7 +37,10 @@ def weather(inp):
     if len(parsed) != 1:
         return "Error parsing Yahoo Weather API, please try again later..."
 
-    doc = lxml.etree.parse(urllib2.urlopen(url)).getroot()
+    try:
+        doc = lxml.etree.parse(urllib2.urlopen(url)).getroot()
+    except:
+        return "Error accessing Yahoo Weather API, please try again later..."
 
     location = doc.xpath('*/yweather:location',
                          namespaces={'yweather': 'http://xml.weather.yahoo.com/ns/rss/1.0'})

@@ -14,4 +14,4 @@ def kitchensink(inp, nick='', say=None):
 
 @hook.regex(r'^bot roll call')
 def rollcall(inp, chan='', say=None):
-    say("Ehh shut up ya dirty shisno")
+    say("Knock knock, Church")

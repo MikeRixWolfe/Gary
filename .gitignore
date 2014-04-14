@@ -6,3 +6,4 @@ unused_plugins
 config
 *.db
 geekboy.py
+build
