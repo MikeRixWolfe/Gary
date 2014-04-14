@@ -57,43 +57,34 @@ def format_woot(w):
 
 
 @hook.singlethread
-@hook.command()
+@hook.command(autohelp=False)
 def woot(inp, chan='', say=''):
     ".woot <option> - Gets woots! Options: " \
-    "woot wine sellout shirt sport tools home tech accessories"
+    "woot wine sellout sport tools home tech accessories; " \
+    "Defaults to list of all items if no option specified"
     # Clean input data
-    inp = inp.lower().split(' ')[0]
+    inp = inp.lower().split(' ')[0]  # Remove index to allow multiple
     inp = {k: v for k, v in sites.items() if k in inp}
 
-    # Check for bad input
-    if not inp:
-        return woot.__doc__
-
     # Get data
-    woots = get_woots(inp)
+    if inp:
+        woots = get_woots(inp)
+    else:
+        woots = get_woots(sites)
+        out = []
 
     # If sales not returned
     if not woots:
-        return "Woot API error, please try again in a few minutes."
+        return "Woot API error, please try again in a few minutes..."
 
     # Output appiropriate data
     for k, v in woots.items():
-        say("\x02{}\x0F: {}".format(k, format_woot(v)))
-
-
-@hook.singlethread
-@hook.command(autohelp=False)
-def wootlist(inp, nick='', say=''):
-    # Get data
-    woots = get_woots(sites)
-    if not woots:
-        return "Error getting Woots, please try again in a few minutes.."
-
-    # Output appiropriate data
-    out = []
-    for k, v in woots.items():
-        out.append("\x02{}\x0F: {}".format(k, v["product"]))
-    say("; ".join(out))
+        if inp:
+            say("\x02{}\x0F: {}".format(k, format_woot(v)))
+        else:
+            out.append("\x02{}\x0F: {}".format(k, v["product"]))
+    if not inp:
+        say("; ".join(out))
 
 
 @hook.singlethread
