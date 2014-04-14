@@ -1,15 +1,5 @@
 # Installation #
 
-
-## Requirements ##
-
-* Python 2.6 or 2.7
-* Many of the plugins require [lxml](http://lxml.de/)
-* Many plugins require BeautifulSoup4.
-* GVoice plugin requires pygooglevoice, I reccomend [my fork](https://github.com/MikeRixWolfe/pygooglevoice).
-
-
-
 ## Download ##
 
 You can easily retrieve Gary's files using git. Browse to the directory in
@@ -17,6 +7,12 @@ which you wish to place the bot and run the following command:
 
     git clone git://github.com/MikeRixWolfe/Gary.git
 
+
+## Requirements ##
+
+Install all required plugins using the following command:
+
+    pip install -r requirements.txt
     
 ## First run ##
 
