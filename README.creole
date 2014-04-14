@@ -27,3 +27,8 @@
 
 ==License==
 This code and documentation is licensed under the [[https://github.com/MikeRixWolfe/Gary/blob/master/LICENSE|MIT License]].
+
+==Wiki==
+* [[https://github.com/MikeRixWolfe/Gary/wiki/Installation|Installation]]
+* [[https://github.com/MikeRixWolfe/Gary/wiki/Configuration|Configuration]]
+* [[https://github.com/MikeRixWolfe/Gary/wiki/Plugin-development|Plugin Development]]
