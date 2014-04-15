@@ -95,7 +95,7 @@ def get_sales(mask):
                 else:
                     # Midweek Madness, etc
                     if "url" in item.keys() and "id" not in item.keys():
-                        data[category]["name"] = item["name"]
+                        data[category]["name"] = item["name"] or data[category]["name"]
                         item["id"] = str(item["url"])[34:-1]
                     appdata = http.get_json("http://store.steampowered.com/api/"
                         "appdetails/?appids={}".format(item["id"]))[item["id"]]["data"]

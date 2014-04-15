@@ -26,5 +26,5 @@ def litecoin(inp, say=None):
 @hook.command(autohelp=False)
 def dogecoin(inp, say=None):
     ".dogecoin - Gets current exchange rate for dogecoins from DogeAPI"
-    data = http.get("https://www.dogeapi.com/wow/?a=get_current_price&convert_to=usd&amount_doge=1000")
+    data = http.get_json("https://www.dogeapi.com/wow/?a=get_current_price&convert_to=usd&amount_doge=1000").get("data", '').get("amount", '')
     say("Current: \x0307${!s}\x0f per 1000 DogeCoin".format(data))
