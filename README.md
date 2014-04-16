@@ -23,7 +23,12 @@
 * lxml
 * BeautifulSoup4
 * yql
-* [[https://github.com/MikeRixWolfe/pygooglevoice|PyGoogleVoice]]
+* [PyGoogleVoice](https://github.com/MikeRixWolfe/pygooglevoice)
+
+## Documentation
+* [Installation](https://github.com/MikeRixWolfe/Gary/wiki/Installation)
+* [Configuration](https://github.com/MikeRixWolfe/Gary/wiki/Configuration)
+* [Plugin Development](https://github.com/MikeRixWolfe/Gary/wiki/Plugin-development)
 
 ## License
 Gary is **licensed** under the **GPL v3** license. The terms are as follows:
@@ -43,8 +48,3 @@ Gary is **licensed** under the **GPL v3** license. The terms are as follows:
      
      You should have received a copy of the GNU General Public License
      along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-## Wiki
-* [[https://github.com/MikeRixWolfe/Gary/wiki/Installation|Installation]]
-* [[https://github.com/MikeRixWolfe/Gary/wiki/Configuration|Configuration]]
-* [[https://github.com/MikeRixWolfe/Gary/wiki/Plugin-development|Plugin Development]]
