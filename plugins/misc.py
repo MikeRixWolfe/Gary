@@ -112,7 +112,7 @@ def onconnect(paraml, conn=None):
     ident, rev = get_version()
 
 
-#@hook.regex(r'^\x01VERSION\x01$')
+@hook.regex(r'^\x01VERSION\x01$')
 def version(inp, notice=None):
     ident, rev = get_version()
     notice('\x01VERSION Gary %s r%d - http://github.com/MikeRixWolfe/'

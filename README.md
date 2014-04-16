@@ -20,9 +20,10 @@
 
 ## Requirements
 * Python 2.7.x
+* yql
 * lxml
 * BeautifulSoup4
-* yql
+* GitPython
 * [PyGoogleVoice](https://github.com/MikeRixWolfe/pygooglevoice)
 
 ## Documentation
