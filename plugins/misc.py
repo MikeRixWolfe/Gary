@@ -47,7 +47,7 @@ def user_tracking(paraml, nick=None, input=None, conn=None):
             if nick.lower() in conn.users.keys():
                 del conn.users[nick.lower()]
             if input.command == 'NICK':
-                conn.send("PRIVMSG %s :info %s" % (conn.conf.get('nickserv_name', 'nickserv'), nick))
+                conn.send("PRIVMSG %s :info %s" % (conn.conf.get('nickserv_name', 'nickserv'), paraml[0]))
 
 
 @hook.event('NOTICE')
