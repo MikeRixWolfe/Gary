@@ -15,9 +15,26 @@ def geoip(inp):
     except:
         return "I couldn't find %s" % inp
 
-    out = inp + " seems to be located in " + content["city"] + \
-        ", " + content["region_name"] + " " + \
-        content["zipcode"] + " in " + content["country_name"]
+    if content["city"] or content["region_name"] or content["country_name"]:
+        if content["country_name"] == 'Reserved':
+            out = inp + " is reserved."
+        else:
+            out = inp + " seems to be located "
+            if content["city"] and content["region_name"]:
+                out += "in %s, %s" % (content["city"], content["region_name"])
+            elif content["city"]:
+                out += "in %s" % content["city"]
+            elif content["region_name"]:
+                out += "in %s" % content["region_name"]
+            else:
+                out += "somewhere"
+            if content["country_name"]:
+                out += " in %s" % content["country_name"]
+            else:
+                out += ", somewhere in the world"
+    else:
+        out = "I couldn't find any geographical information on %s" % inp
+
     return out
 
 
