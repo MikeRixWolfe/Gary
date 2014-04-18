@@ -38,6 +38,7 @@ def help(inp, bot=None, say=None):
             say(commands[inp].__doc__)
 
 
+@hook.command('ahelp', autohelp=False, adminonly=True)
 @hook.command(autohelp=False, adminonly=True)
 def adminhelp(inp, bot=None, say=None):
     ".adminhelp [command] - gives a list of admin commands/help for a command"
