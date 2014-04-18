@@ -104,14 +104,14 @@ def rinfo(inp):
         commands = info['total_commands_processed']
         changes = info['rdb_changes_since_last_save']
         last_save = time.strftime('%H:%M %D', time.localtime(int(info['rdb_last_save_time'])))
-
         distr = {k: v for k, v in Counter(redis.scard(key) for key in redis.keys()).iteritems()}
+        sets = sum([k*v for k, v in distr.iteritems()])
+        distr_string = ', '.join(["%s:%s" % (k, v) for k, v in distr.iteritems()])
 
-        out = "I have %s keys (%s); " % (keys, mem)
+        out = "I have %s keys/%s associations (%s); " % (keys, sets, mem)
         out += "%s processed commands (%s hits/%s misses); " % (commands, hits, misses)
         out += "last save at %s (%s pending changes to write); " % (last_save, changes)
-        out += "set distribution by length: %s" % ', '.join(["%s:%s" % (k, v)
-            for k, v in distr.iteritems()])
+        out += "set distribution by length: %s" % distr_string
         return out
     except:
         return "I do not yet have enough data to generate Redis statistics"
