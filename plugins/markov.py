@@ -1,5 +1,6 @@
 import re
 import random
+import time
 import redis as redislib
 from collections import Counter
 from util import hook
@@ -92,8 +93,8 @@ def markov(inp, say=''):
 
 
 @hook.command(autohelp=False, adminonly=True)
-def redisinfo(inp):
-    ".redisinfo - Gets Redis DB info"
+def rinfo(inp):
+    ".rinfo - Gets Redis DB info"
     try:
         info = redis.info()
         keys = info['db0']['keys']
@@ -101,18 +102,26 @@ def redisinfo(inp):
         hits = info['keyspace_hits']
         misses = info['keyspace_misses']
         commands = info['total_commands_processed']
+        changes = info['changes_since_last_save']
+        bgsave_status = int(info['bgsave_in_progress'])
+        last_save = time.strftime('%D %H:%M', time.localtime(int(info['last_save_time'])))
+
         distr = {k: v for k, v in Counter(redis.scard(key) for key in redis.keys()).iteritems()}
 
-        return("I have %s keys (%s); %s processed commands (%s hits/%s misses); "
-            "set distribution by length: %s" % (keys, mem, commands, hits, misses,
-            ', '.join(["%s: %s" % (k, v) for k, v in distr.iteritems()])))
+        out = "I have %s keys (%s); " % (keys, mem)
+        out += "%s processed commands (%s hits/%s misses); " % (commands, hits, misses)
+        out += "save in progress; " if bgsave_status else \
+            "last save at %s (%s pending changes to write); " % (last_save, changes)
+        out += "set distribution by length: %s" % ', '.join(["%s:%s" % (k, v)
+            for k, v in distr.iteritems()])
+        return out
     except:
         return "I do not yet have enough data to generate Redis statistics"
 
 
-@hook.command(autohelp=False, adminonly=True)
-def redisflush(inp):
-    ".redisflush - Flushes Redis DB and resets statistics, use with care"
+#@hook.command(autohelp=False, adminonly=True)
+def rflush(inp):
+    ".rflush - Flushes Redis DB and resets statistics, use with care"
     redis.flushall()
     redis.config_resetstat()
     return "Redis database flushed."
