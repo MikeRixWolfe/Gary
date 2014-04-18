@@ -102,16 +102,14 @@ def rinfo(inp):
         hits = info['keyspace_hits']
         misses = info['keyspace_misses']
         commands = info['total_commands_processed']
-        changes = info['changes_since_last_save']
-        bgsave_status = int(info['bgsave_in_progress'])
-        last_save = time.strftime('%D %H:%M', time.localtime(int(info['last_save_time'])))
+        changes = info['rdb_changes_since_last_save']
+        last_save = time.strftime('%H:%M %D', time.localtime(int(info['rdb_last_save_time'])))
 
         distr = {k: v for k, v in Counter(redis.scard(key) for key in redis.keys()).iteritems()}
 
         out = "I have %s keys (%s); " % (keys, mem)
         out += "%s processed commands (%s hits/%s misses); " % (commands, hits, misses)
-        out += "save in progress; " if bgsave_status else \
-            "last save at %s (%s pending changes to write); " % (last_save, changes)
+        out += "last save at %s (%s pending changes to write); " % (last_save, changes)
         out += "set distribution by length: %s" % ', '.join(["%s:%s" % (k, v)
             for k, v in distr.iteritems()])
         return out
