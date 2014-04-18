@@ -52,8 +52,8 @@ def get_message(key):
 
 @hook.event('PRIVMSG')
 def log(paraml, nick='', input=None):
-    if input.msg[0] in ('.', '!') or nick == 'extrastout' or \
-            "<reply>" in input.msg.split():
+    if input.msg[0] in ('.', '!') or input.chan[0] != '#' or \
+            "<reply>" in input.msg.split() or nick == 'extrastout':
         return
 
     message = input.msg.lower()
@@ -74,35 +74,40 @@ def markov(inp, say=''):
             key = separator.join(seed[:-1])
             redis.sadd(key, seed[-1])
             message = get_message(key)
-
-            if message:
+            if message and len(message.split()) > chain_length:
                 messages.append(message)
     else:
         while len(messages) < messages_to_generate:
             message = get_message(redis.randomkey())
-
-            if message and len(message.split()) > chain_length:
+            if not message:
+                break
+            if len(message.split()) > chain_length:
                 messages.append(message)
 
     if len(messages):
         say(random.choice(messages))
         #say(max(messages, key=len))
+    else:
+        return "I do not have enough data to formulate a response"
 
 
 @hook.command(autohelp=False, adminonly=True)
 def redisinfo(inp):
     ".redisinfo - Gets Redis DB info"
-    info = redis.info()
-    keys = info['db0']['keys']
-    mem = info['used_memory_human']
-    hits = info['keyspace_hits']
-    misses = info['keyspace_misses']
-    commands = info['total_commands_processed']
-    distr = {k: v for k, v in Counter(redis.scard(key) for key in redis.keys()).iteritems()}
+    try:
+        info = redis.info()
+        keys = info['db0']['keys']
+        mem = info['used_memory_human']
+        hits = info['keyspace_hits']
+        misses = info['keyspace_misses']
+        commands = info['total_commands_processed']
+        distr = {k: v for k, v in Counter(redis.scard(key) for key in redis.keys()).iteritems()}
 
-    return("I have %s keys (%s); %s processed commands (%s hits/%s misses); "
-        "set distribution by length: %s" % (keys, mem, commands, hits, misses,
-        ', '.join(["%s: %s" % (k, v) for k, v in distr.iteritems()])))
+        return("I have %s keys (%s); %s processed commands (%s hits/%s misses); "
+            "set distribution by length: %s" % (keys, mem, commands, hits, misses,
+            ', '.join(["%s: %s" % (k, v) for k, v in distr.iteritems()])))
+    except:
+        return "I do not yet have enough data to generate Redis statistics"
 
 
 @hook.command(autohelp=False, adminonly=True)
