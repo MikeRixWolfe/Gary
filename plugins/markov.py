@@ -31,12 +31,11 @@ def generate_chain(key):
         gen_words.append(words[0])
         next_word = redis.srandmember(key)
         if not next_word: # or next_word == stop_word:
-            gen_words.append(words[1])
             break
 
         key = separator.join(words[1:] + [next_word])
 
-    return (' '.join(gen_words)).replace(' <stop>', '.')
+    return ' '.join(gen_words)
 
 
 def get_message(key):
@@ -53,7 +52,8 @@ def get_message(key):
 
 @hook.event('PRIVMSG')
 def log(paraml, nick='', input=None):
-    if input.msg[0] == '.' or nick == 'extrastout':
+    if input.msg[0] in ('.', '!') or nick == 'extrastout' or \
+            "<reply>" in input.msg.split():
         return
 
     message = input.msg.lower()
@@ -63,8 +63,8 @@ def log(paraml, nick='', input=None):
         redis.sadd(key, words[-1])
 
 
-@hook.command(autohelp=False)
-def markov(inp):
+@hook.command(autohelp=False, adminonly=True)
+def markov(inp, say=''):
     ".markov [phrase] - Generate a Markov chain randomly or " \
         "based on a phrase; optional phrase must be > 3 words"
     messages = []
@@ -78,14 +78,15 @@ def markov(inp):
             if message:
                 messages.append(message)
     else:
-        for i in range(messages_to_generate):
+        while len(messages) < messages_to_generate:
             message = get_message(redis.randomkey())
 
-            if message:
+            if message and len(message.split()) > chain_length:
                 messages.append(message)
 
     if len(messages):
-        return random.choice(messages)
+        say(random.choice(messages))
+        #say(max(messages, key=len))
 
 
 @hook.command(autohelp=False, adminonly=True)
