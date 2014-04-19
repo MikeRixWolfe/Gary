@@ -64,7 +64,7 @@ def log(paraml, nick='', input=None):
         redis.sadd(key, words[-1])
 
 
-@hook.command(autohelp=False, adminonly=True)
+@hook.command(autohelp=False)
 def markov(inp, say=''):
     ".markov [phrase] - Generate a Markov chain randomly or " \
         "based on a phrase; optional phrase must be > 3 words"
@@ -92,7 +92,7 @@ def markov(inp, say=''):
         return "I do not have enough data to formulate a response"
 
 
-@hook.command(autohelp=False, adminonly=True)
+@hook.command(autohelp=False)
 def rinfo(inp):
     ".rinfo - Gets Redis DB info"
     try:
