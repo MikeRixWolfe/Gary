@@ -31,7 +31,7 @@ def generate_chain(key):
         words = key.split(separator)
         gen_words.append(words[0])
         next_word = redis.srandmember(key)
-        if not next_word: # or next_word == stop_word:
+        if not next_word:
             break
 
         key = separator.join(words[1:] + [next_word])
@@ -66,11 +66,20 @@ def log(paraml, nick='', input=None):
 
 @hook.command(autohelp=False)
 def markov(inp, say=''):
-    ".markov [phrase] - Generate a Markov chain randomly or " \
-        "based on a phrase; optional phrase must be > 3 words"
+    ".markov [phrase] - Generate a Markov chain randomly or based on a phrase"
     messages = []
 
-    if len(inp.split()) > chain_length:
+    if inp and len(inp.split()) <= chain_length:
+        for i in range(messages_to_generate):
+            try:
+                message = get_message(random.choice(redis.keys('*' +
+                    '<space>'.join(inp.lower().split()) + '*')))
+            except:
+                return "I do not have enough data to " \
+                    "formulate a response for that phrase"
+            if message and len(message.split()) > chain_length:
+                messages.append(message)
+    elif len(inp.split()) > chain_length:
         for seed in get_seeds(inp.lower()):
             key = separator.join(seed[:-1])
             redis.sadd(key, seed[-1])
@@ -87,7 +96,6 @@ def markov(inp, say=''):
 
     if len(messages):
         say(random.choice(messages))
-        #say(max(messages, key=len))
     else:
         return "I do not have enough data to formulate a response"
 
@@ -106,15 +114,28 @@ def rinfo(inp):
         last_save = time.strftime('%H:%M %D', time.localtime(int(info['rdb_last_save_time'])))
         distr = {k: v for k, v in Counter(redis.scard(key) for key in redis.keys()).iteritems()}
         sets = sum([k*v for k, v in distr.iteritems()])
-        distr_string = ', '.join(["%s:%s" % (k, v) for k, v in distr.iteritems()])
 
         out = "I have %s keys/%s associations (%s); " % (keys, sets, mem)
         out += "%s processed commands (%s hits/%s misses); " % (commands, hits, misses)
         out += "last save at %s (%s pending changes to write); " % (last_save, changes)
-        out += "set distribution by length: %s" % distr_string
         return out
     except:
         return "I do not yet have enough data to generate Redis statistics"
+
+
+@hook.command(adminonly=True)
+def rdelete(inp):
+    ".rdelete <key> - Deletes a specified key from the Redis DB"
+    try:
+        for key in redis.keys('*' + inp.lower() + '*'):
+            redis.delete(key)
+        for key in redis.keys():
+            for member in redis.smembers():
+                if inp.lower() in member:
+                    redis.srem(key, member)
+        return "Keys matching '%s' deleted" % inp
+    except:
+        return "Keys matching '%s' deleted" % inp
 
 
 #@hook.command(autohelp=False, adminonly=True)
