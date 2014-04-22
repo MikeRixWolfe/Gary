@@ -28,6 +28,7 @@ def parse_html(document):
     return output
 
 
+@hook.command('rb')
 @hook.command
 def ruby(inp, say=None):
     '''.rb / .ruby <code> - Executes Ruby code.'''

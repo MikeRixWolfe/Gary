@@ -87,7 +87,7 @@ def markov(inp, say=''):
             if message and len(message.split()) > chain_length:
                 messages.append(message)
     else:
-        while len(messages) < messages_to_generate:
+        for i in range(messages_to_generate):
             message = get_message(redis.randomkey())
             if not message:
                 break

@@ -15,7 +15,7 @@ def python(inp):
         return (re_lineends.split(res[0])[0] if res[0] != 'Traceback (most recent call last):' else res[-1])
 
 
-@hook.command(adminonly=True)
+#@hook.command(adminonly=True)
 def py(inp, bot=None, input=None, nick=None, db=None, chan=None):
     ".py <prog> - execute local python"
     arguments = inp.split(" ")
