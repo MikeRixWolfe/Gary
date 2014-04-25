@@ -143,10 +143,10 @@ def sms(inp, nick='', chan='', db=None, bot=None):
     db_init(db)
     voice = Voice()
     blacklist = bot.config["gvoice"]["private"]
-    operands = inp.strip().encode('ascii', 'ignore').lower().split(' ', 1)
+    operands = inp.strip().encode('ascii', 'ignore').split(' ', 1)
     if len(operands) < 2:
         return "Please check your input and try again."
-    recip = operands[0].strip()
+    recip = operands[0].strip().lower()
     text = "<" + nick + "> " + operands[1]
     recip_number, private = get_phonenumber(db, recip)
 
