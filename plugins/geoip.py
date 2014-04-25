@@ -41,7 +41,7 @@ def geoip(inp):
 @hook.command
 def whereis(inp):
     ".whereis <user> - gets the ip and location of a system user"
-    cmd = "w -hs | awk '{print $1 \" \" $3}' | grep \"%s\" | tail -n 1 | awk '{print $2}'" % inp.strip()
+    cmd = "w -hs | awk '{print $1 \" \" $3}' | grep \"%s\" | tail -n 1 | awk '{print $2}'" % inp.strip().split()[0]
     ip = os.popen(cmd).read().strip()
     if ip:
         if not ip[0].isdigit():
