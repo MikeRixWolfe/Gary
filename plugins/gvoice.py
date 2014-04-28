@@ -68,24 +68,40 @@ def extractsms(htmlsms):
 
 def outputsms(voice, conn, bot, db):
     blacklist = bot.config["gvoice"]["private"]
-    if not voice.special:
-        voice.login()
-    voice.sms()
     messages = []
+
+    if not voice.special:  # Not logged in
+        voice.login()
+    voice.sms()  # Init sms object
+
     for message in extractsms(voice.sms.html):
-        recip = message['from'].strip('+: ')
-        if not recip or not recip.isdigit():
+        sender = message['from'].strip('+: ')
+        if not sender or not sender.isdigit():  # GV errors, warnings
             continue
-        recip = recip[-10:]
-        recip_nick = get_name(db, recip)
-        if recip_nick and recip not in blacklist and not check_smslog(db, message) and message not in messages:
-            message['out'] = "<{}> {}".format(recip_nick, message['text'])
+        sender = sender[-10:]  # Force number to fit our model
+        sender_nick = get_name(db, sender)
+        if sender_nick and sender not in blacklist and not check_smslog(db, message) and message not in messages:
+            message['out'] = "<{}> {}".format(sender_nick, message['text'])
             messages.append(message)
-    for message in messages:
-        for chan in conn.channels:
-            conn.send("PRIVMSG {} :{}".format(chan, message['out']))
-        mark_as_read(db, message)
+    for message in messages:  # Redirect or output messages
+        if not redirect(message, voice, db):
+            for chan in conn.channels:
+                conn.send("PRIVMSG {} :{}".format(chan, message['out']))
+        mark_as_read(db, message)  # Mark all as read
     return voice, len(messages)
+
+
+def redirect(message, voice, db):
+    try:  # See if someone is trying to sms someone else thru bot, not to channel
+        recip_nick, text = re.match(r'\.?(?:SMS|Sms|sms) ([^\ ]+) (.+)', message['text']).groups()
+        recip, private = get_phonenumber(db, recip_nick)
+        sender_nick = get_name(db, message['from'].strip('+: ')[-10:])
+        text = "<" + sender_nick + "> " + text
+        voice.send_sms(recip, text)
+        print(">>> u'SMS sent from %s to %s'" % (sender_nick, recip_nick))
+        return True
+    except:
+        return False
 
 
 @hook.command(adminonly=False, autohelp=False)
