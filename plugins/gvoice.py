@@ -84,23 +84,50 @@ def outputsms(voice, conn, bot, db):
             message['out'] = "<{}> {}".format(sender_nick, message['text'])
             messages.append(message)
     for message in messages:  # Redirect or output messages
-        if not redirect(message, voice, db):
+        if not redirect(message, voice, bot, db):
             for chan in conn.channels:
                 conn.send("PRIVMSG {} :{}".format(chan, message['out']))
         mark_as_read(db, message)  # Mark all as read
     return voice, len(messages)
 
 
-def redirect(message, voice, db):
-    try:  # See if someone is trying to sms someone else thru bot, not to channel
-        recip_nick, text = re.match(r'\.?(?:SMS|Sms|sms) ([^\ ]+) (.+)', message['text']).groups()
-        recip, private = get_phonenumber(db, recip_nick)
-        sender_nick = get_name(db, message['from'].strip('+: ')[-10:])
-        text = "<" + sender_nick + "> " + text
-        voice.send_sms(recip, text)
-        print(">>> u'SMS sent from %s to %s'" % (sender_nick, recip_nick))
+def redirect(message, voice, bot, db):  # Ugly function
+    # Circumvent channel and sms others directly or get phone numbers
+    sms_cmd = re.match(r'\.?(?:SMS|Sms|sms) ([^\ ]+) (.+)', message['text'])
+    pb_cmd = re.match(r'\.?(?:Phonebook|phonebook) ([^\ ]+)', message['text'])
+    blacklist = bot.config["gvoice"]["private"]
+    sender_number = message['from'].strip('+: ')[-10:]
+    sender = get_name(db, sender_number)
+
+    if sms_cmd:
+        recip, text = sms_cmd.groups()
+        recip_number, private = get_phonenumber(db, recip)
+        if recip_number:
+            text = "<" + sender + "> " + text
+        else:
+            text = "Sorry, I don't have that user in my phonebook."
+        if recip_number in blacklist or recip in blacklist:
+            voice.send_sms(sender_number, "I'm sorry %s, I'm afraid I can't do that." % sender)
+            print(">>> u'SMS sent to %s for blacklist warning'" % sender)
+        else:
+            voice.send_sms(recip_number, text)
+            print(">>> u'SMS sent from %s to %s'" % (sender, recip))
         return True
-    except:
+    elif pb_cmd:
+        who = pb_cmd.group(1)
+        who_number, private = get_phonenumber(db, who)
+        if who_number:
+            text = "%s's number is %s" % (who, who_number)
+        else:
+            text = "User does not have a registered phone number."
+        if private:
+            voice.send_sms(sender_number, "%s's number is set to private." % who)
+            print(">>> u'SMS sent to %s for private contact warning'" % sender)
+        else:
+            voice.send_sms(sender_number, text)
+            print(">>> u'SMS sent to %s for phonebook query'" % sender)
+        return True
+    else:
         return False
 
 
@@ -110,18 +137,19 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
     db_init(db)
     voice = Voice()
     say("Checking for unread SMS...")
-    try:
+    #try:
+    if 1==1:
         voice, sms_count = outputsms(voice, conn, bot, db)
         if sms_count:
             say("Outputting {} message(s) complete.".format(sms_count))
         else:
             say("No new SMS found.")
-    except googlevoice.util.LoginError:
-        say("Error logging in to Google Voice; please try again in a few minutes.")
-    except googlevoice.util.ParsingError:
-        say("Error parsing data from Google Voice; please try again in a few minutes.")
-    except:
-        say("Ouch! I've encountered an unexpected error (and it hurt).")
+    #except googlevoice.util.LoginError:
+    #    say("Error logging in to Google Voice; please try again in a few minutes.")
+    #except googlevoice.util.ParsingError:
+    #    say("Error parsing data from Google Voice; please try again in a few minutes.")
+    #except:
+    #    say("Ouch! I've encountered an unexpected error (and it hurt).")
 
 
 @hook.singlethread
