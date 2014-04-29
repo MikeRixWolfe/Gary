@@ -140,7 +140,7 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
     try:
         voice, sms_count = outputsms(voice, conn, bot, db)
         if sms_count:
-            say("Outputting {} message(s) complete.".format(sms_count))
+            say("Processing {} message(s) complete.".format(sms_count))
         else:
             say("No new SMS found.")
     except googlevoice.util.LoginError:
@@ -167,7 +167,7 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
                 voice = Voice()
             voice, sms_count = outputsms(voice, conn, bot, db)
             if sms_count:
-                print(">>> u'Outputting {} message(s) complete :{}'".format(sms_count, server))
+                print(">>> u'Processing {} message(s) complete :{}'".format(sms_count, server))
         except googlevoice.util.LoginError:
             print(">>> u'Google Voice login error :{}'".format(server))
             voice = None
