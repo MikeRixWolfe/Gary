@@ -101,31 +101,31 @@ def redirect(message, voice, bot, db):  # Ugly function
 
     if sms_cmd:
         recip, text = sms_cmd.groups()
-        recip_number, private = get_phonenumber(db, recip)
+        recip_number, private = get_phonenumber(db, recip.lower())
         if recip_number:
-            text = "<" + sender + "> " + text
+            if recip_number in blacklist or recip.lower() in blacklist:
+                text = "I'm sorry %s, I'm afraid I can't do that." % sender
+            else:
+                voice.send_sms(recip_number, "<%s> %s" % (sender, text))
+                print(">>> u'SMS sent from %s to %s'" % (sender, recip))
+                return True
         else:
             text = "Sorry, I don't have that user in my phonebook."
-        if recip_number in blacklist or recip in blacklist:
-            voice.send_sms(sender_number, "I'm sorry %s, I'm afraid I can't do that." % sender)
-            print(">>> u'SMS sent to %s for blacklist warning'" % sender)
-        else:
-            voice.send_sms(recip_number, text)
-            print(">>> u'SMS sent from %s to %s'" % (sender, recip))
+        voice.send_sms(sender_number, text)
+        print(">>> u'SMS relay error returned to %s'" % sender)
         return True
     elif pb_cmd:
         who = pb_cmd.group(1)
-        who_number, private = get_phonenumber(db, who)
+        who_number, private = get_phonenumber(db, who.lower())
         if who_number:
-            text = "%s's number is %s" % (who, who_number)
+            if private:
+                text = "%s's number is set to private." % who
+            else:
+                text = "%s's number is %s" % (who, who_number)
         else:
             text = "User does not have a registered phone number."
-        if private:
-            voice.send_sms(sender_number, "%s's number is set to private." % who)
-            print(">>> u'SMS sent to %s for private contact warning'" % sender)
-        else:
-            voice.send_sms(sender_number, text)
-            print(">>> u'SMS sent to %s for phonebook query'" % sender)
+        voice.send_sms(sender_number, text)
+        print(">>> u'SMS relay phonebook query returned to %s'" % sender)
         return True
     else:
         return False
