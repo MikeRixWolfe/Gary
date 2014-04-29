@@ -137,19 +137,18 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
     db_init(db)
     voice = Voice()
     say("Checking for unread SMS...")
-    #try:
-    if 1==1:
+    try:
         voice, sms_count = outputsms(voice, conn, bot, db)
         if sms_count:
             say("Outputting {} message(s) complete.".format(sms_count))
         else:
             say("No new SMS found.")
-    #except googlevoice.util.LoginError:
-    #    say("Error logging in to Google Voice; please try again in a few minutes.")
-    #except googlevoice.util.ParsingError:
-    #    say("Error parsing data from Google Voice; please try again in a few minutes.")
-    #except:
-    #    say("Ouch! I've encountered an unexpected error (and it hurt).")
+    except googlevoice.util.LoginError:
+        say("Error logging in to Google Voice; please try again in a few minutes.")
+    except googlevoice.util.ParsingError:
+        say("Error parsing data from Google Voice; please try again in a few minutes.")
+    except:
+        say("Ouch! I've encountered an unexpected error (and it hurt).")
 
 
 @hook.singlethread
