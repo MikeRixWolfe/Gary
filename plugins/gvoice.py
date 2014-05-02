@@ -106,7 +106,7 @@ def redirect(message, voice, bot, db):  # Ugly function
             if recip_number in blacklist or recip.lower() in blacklist:
                 text = "I'm sorry %s, I'm afraid I can't do that." % sender
             else:
-                voice.send_sms(recip_number, "<%s> %s" % (sender, text))
+                voice.send_sms(recip_number, "<%s-mobile> %s" % (sender, text))
                 print(">>> u'SMS sent from %s to %s'" % (sender, recip))
                 return True
         else:
@@ -161,7 +161,7 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
     voice = Voice()
     print(">>> u'Beginning SMS parse loop for %s'" % server)
     while True:
-        time.sleep(90)
+        time.sleep(1)
         try:
             if not voice:
                 voice = Voice()
