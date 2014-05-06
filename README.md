@@ -16,7 +16,7 @@
 * Multithreaded dispatch and the ability to connect to multiple networks at a time.
 * Easy plugin development with automatic reloading and a simple hooking API.
 * NickServ-based user authentication and per-function permissions with the ability to manage access to functions/plugins/the bot from in channel.
-* The ability to send/receive SMS messages and call other users from channel via PyGoogleVoice.
+* The ability to send/receive SMS messages and call other users from channel via GoogleVoice.
 
 ## Requirements
 * Python 2.7.x
@@ -24,7 +24,6 @@
 * lxml
 * BeautifulSoup4
 * GitPython
-* [PyGoogleVoice](https://github.com/MikeRixWolfe/pygooglevoice)
 
 ## Documentation
 * [Installation](https://github.com/MikeRixWolfe/Gary/wiki/Installation)

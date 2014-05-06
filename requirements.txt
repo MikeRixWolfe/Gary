@@ -2,4 +2,3 @@ BeautifulSoup4
 yql
 lxml
 GitPython
-git+git://github.com/MikeRixWolfe/pygooglevoice.git

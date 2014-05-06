@@ -1,11 +1,9 @@
 import re
-import sys
 import time
 import json
 import BeautifulSoup
-import googlevoice.util
-from util import hook, text
-from googlevoice import Voice
+from util import hook
+from util.googlevoice import Voice
 
 
 def db_init(db):
@@ -83,11 +81,13 @@ def outputsms(voice, conn, bot, db):
         if sender_nick and sender not in blacklist and not check_smslog(db, message) and message not in messages:
             message['out'] = "<{}> {}".format(sender_nick, message['text'])
             messages.append(message)
+
     for message in messages:  # Redirect or output messages
         if not redirect(message, voice, bot, db):
             for chan in conn.channels:
                 conn.send("PRIVMSG {} :{}".format(chan, message['out']))
         mark_as_read(db, message)  # Mark all as read
+
     return voice, len(messages)
 
 
@@ -143,9 +143,9 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
             say("Processing {} message(s) complete.".format(sms_count))
         else:
             say("No new SMS found.")
-    except googlevoice.util.LoginError:
+    except voice.util.LoginError:
         say("Error logging in to Google Voice; please try again in a few minutes.")
-    except googlevoice.util.ParsingError:
+    except voice.util.ParsingError:
         say("Error parsing data from Google Voice; please try again in a few minutes.")
     except:
         say("Ouch! I've encountered an unexpected error (and it hurt).")
@@ -161,21 +161,24 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
     voice = Voice()
     print(">>> u'Beginning SMS parse loop for %s'" % server)
     while True:
-        time.sleep(1)
+        time.sleep(3)
         try:
             if not voice:
                 voice = Voice()
             voice, sms_count = outputsms(voice, conn, bot, db)
             if sms_count:
                 print(">>> u'Processing {} message(s) complete :{}'".format(sms_count, server))
-        except googlevoice.util.LoginError:
+        except voice.util.LoginError:
             print(">>> u'Google Voice login error :{}'".format(server))
             voice = None
-        except googlevoice.util.ParsingError:
+            time.sleep(90)
+        except voice.util.ParsingError:
             print(">>> u'Google Voice parse error :{}'".format(server))
             voice = None
+            time.sleep(90)
         except Exception as e:
             print(">>> u'Google Voice error: {} :{}'".format(e, server))
+            time.sleep(90)
 
 
 @hook.command()
