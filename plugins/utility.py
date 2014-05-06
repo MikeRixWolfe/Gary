@@ -250,5 +250,6 @@ def usa(inp, say=None):
 
 @hook.command
 def shorten(inp):
+    ".shorten <url> - Shortens a URL with is.gd"
     url = web.try_isgd(inp)
     return url

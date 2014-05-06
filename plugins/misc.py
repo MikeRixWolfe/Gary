@@ -23,9 +23,8 @@ def get_version():
     return shorthash, revnumber
 
 
-@hook.command(autohelp=False)
+@hook.command
 def auth(inp, nick='', conn=None):
-    ".auth - Forces update of a user's NickServ ident status."
     if conn.nick.lower() not in conn.users.keys():
         return("I am currently not identified with NickServ and am unable to "
             "authenticate nicks; as such, user class based functions are "
