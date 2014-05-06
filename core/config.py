@@ -72,9 +72,14 @@ if not os.path.exists('config'):
             "gibberish"
           ],
           "gvoice": {
+            "email": "",
+            "forwardingNumber": "",
+            "password": "",
+            "phoneType": 2,
             "private": [
               "Gary"
-            ]
+            ],
+            "smsKey": ""
           },
           "ignored": [],
           "muted": [],
