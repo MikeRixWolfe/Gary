@@ -123,7 +123,7 @@ def redirect(message, voice, bot, db):  # Ugly function
             else:
                 text = "%s's number is %s" % (who, who_number)
         else:
-            text = "User does not have a registered phone number."
+            text = "'%s' does not have a registered phone number." % who
         voice.send_sms(sender_number, text)
         print(">>> u'SMS relay phonebook query returned to %s'" % sender)
         return True

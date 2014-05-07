@@ -59,22 +59,18 @@ def karma(inp, chan='', say=None, db=None, input=None):
         say("%s has neutral karma" % word)
 
 
-@hook.singlethread
-@hook.regex(r'^(.+)(?: has an all-time net karma of )(-)?(\d+)(?:\ .+)?')
-def setkarma(inp, nick='', chan='', db=None):
+@hook.command(adminonly=True)
+def setkarma(inp, chan='', db=None):
+    ".setkarma <word> <value> - Sets karma value."
     db_init(db)
 
-    word = inp.group(1)
-    karma = int(inp.group(3))
-    if inp.group(2) is not None:
-        karma = -karma
+    try:
+        word, karma = inp.split()
+    except:
+        return setkarma.__doc__
 
-    if nick != "extrastout":
-        return  # "Please don't impersonate others."
-
-    if abs(get_karma(db, chan, word)) < abs(karma):
-        set_karma(db, chan, word, karma)
-        print ">>> u'Karma of %s set to %s :%s'" % (word, karma, chan)
+    set_karma(db, chan, word, karma)
+    return "Karma of %s set to %s" % (word, karma)
 
 
 @hook.command(autohelp=False)
