@@ -1,4 +1,4 @@
-import re
+import re, sys
 from util import hook, http
 
 re_lineends = re.compile(r'[\r\n]*')
@@ -16,7 +16,12 @@ def python(inp):
 
 
 #@hook.command(adminonly=True)
-def py(inp, bot=None, input=None, nick=None, db=None, chan=None):
-    ".py <prog> - execute local python"
-    arguments = inp.split(" ")
-    exec(" ".join(arguments[1:]))
+def ply(inp, bot=None, input=None, nick=None, db=None, chan=None):
+    "execute local python - only admins can use this"
+    from cStringIO import StringIO
+    old_stdout = sys.stdout
+    redirected_output = sys.stdout = StringIO()
+    exec(inp)
+    sys.stdout = old_stdout
+
+    return redirected_output.getvalue()
