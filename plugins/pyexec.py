@@ -15,13 +15,16 @@ def python(inp):
         return (re_lineends.split(res[0])[0] if res[0] != 'Traceback (most recent call last):' else res[-1])
 
 
-#@hook.command(adminonly=True)
+@hook.command(adminonly=True)
 def ply(inp, bot=None, input=None, nick=None, db=None, chan=None):
-    "execute local python - only admins can use this"
-    from cStringIO import StringIO
-    old_stdout = sys.stdout
-    redirected_output = sys.stdout = StringIO()
-    exec(inp)
-    sys.stdout = old_stdout
+    ".ply <prog> - Execute local python."
+    try:
+        from cStringIO import StringIO
+        old_stdout = sys.stdout
+        redirected_output = sys.stdout = StringIO()
+        exec(inp)
+        sys.stdout = old_stdout
 
-    return redirected_output.getvalue()
+        return redirected_output.getvalue()
+    except Exception as e:
+        return "Python execution error: %" % e
