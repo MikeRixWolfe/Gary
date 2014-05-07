@@ -3,7 +3,7 @@ import time
 import json
 import BeautifulSoup
 from util import hook
-from util.googlevoice import Voice
+from util.googlevoice import Voice, LoginError, ParsingError
 
 
 def db_init(db):
@@ -143,9 +143,9 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
             say("Processing {} message(s) complete.".format(sms_count))
         else:
             say("No new SMS found.")
-    except voice.util.LoginError:
+    except LoginError:
         say("Error logging in to Google Voice; please try again in a few minutes.")
-    except voice.util.ParsingError:
+    except ParsingError:
         say("Error parsing data from Google Voice; please try again in a few minutes.")
     except:
         say("Ouch! I've encountered an unexpected error (and it hurt).")
@@ -168,11 +168,11 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
             voice, sms_count = outputsms(voice, conn, bot, db)
             if sms_count:
                 print(">>> u'Processing {} message(s) complete :{}'".format(sms_count, server))
-        except voice.util.LoginError:
+        except LoginError:
             print(">>> u'Google Voice login error :{}'".format(server))
             voice = None
             time.sleep(90)
-        except voice.util.ParsingError:
+        except ParsingError:
             print(">>> u'Google Voice parse error :{}'".format(server))
             voice = None
             time.sleep(90)
