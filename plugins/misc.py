@@ -14,44 +14,48 @@ def get_version():
     p.wait()
 
     revnumber = len(stdout.splitlines())
-
     shorthash = stdout.split(None, 1)[0]
-
     http.ua_gary = 'Gary/r%d %s (http://github.com/MikeRixWolfe/gary)' \
         % (revnumber, shorthash)
 
     return shorthash, revnumber
 
 
-@hook.command
+@hook.command(autohelp=False)
 def auth(inp, nick='', conn=None):
-    if conn.nick.lower() not in conn.users.keys():
-        return("I am currently not identified with NickServ and am unable to "
-            "authenticate nicks; as such, user class based functions are "
-            "now disabled. Please notify one of my admin's to this.")
-    conn.send("PRIVMSG %s :info %s" % (conn.conf.get('nickserv_name', 'nickserv'), nick))
-    return "NickServ ident status updated."
+    ".auth - Tries to update your NickServ ident status."
+    if not conn.users.get(conn.nick.lower(), False):
+        return("I cannot identify with NickServ; priviledged functions disabled.")
+    else:
+        conn.msg(conn.conf.get('nickserv_name', 'nickserv'),
+            conn.conf.get('nickserv_ident_command', 'INFO %s') % nick)
+        return "NickServ ident status updated."
 
 
 @hook.event('*')
 def user_tracking(paraml, nick=None, input=None, conn=None):
-    if input.command in ('QUIT', 'NICK', 'JOIN', 'PART', 'PRIVMSG'):
+    if input.command in ('QUIT', 'NICK', 'JOIN', 'PART', 'PRIVMSG') and \
+            conn.users.get(conn.nick.lower(), False):
+        nick = nick.lower()
+        nickserv_name = conn.conf.get('nickserv_name', 'nickserv')
+        nickserv_ident = conn.conf.get('nickserv_ident_command', 'INFO %s')
         if input.command == 'JOIN':
-            if not conn.users.get(nick.lower(), False):
-                conn.send("PRIVMSG %s :info %s" % (conn.conf.get('nickserv_name', 'nickserv'), nick))
+            if not conn.users.get(nick, False):
+                conn.msg(nickserv_name, nickserv_ident % nick)
         if input.command == 'PRIVMSG':
-            if nick.lower() not in conn.users.keys():
-                conn.send("PRIVMSG %s :info %s" % (conn.conf.get('nickserv_name', 'nickserv'), nick))
+            if nick not in conn.users.keys():
+                 conn.msg(nickserv_name, nickserv_ident % nick)
         elif input.command in ('QUIT', 'PART', 'NICK'):
-            if nick.lower() in conn.users.keys():
-                del conn.users[nick.lower()]
+            if nick in conn.users.keys():
+                del conn.users[nick]
             if input.command == 'NICK':
-                conn.send("PRIVMSG %s :info %s" % (conn.conf.get('nickserv_name', 'nickserv'), paraml[0]))
+                conn.msg(nickserv_name, nickserv_ident % nick)
 
 
 @hook.event('NOTICE')
-def noticed(paraml, input=None, conn=None):
-    if paraml[0] == input.conn.nick and input.chan.lower() == conn.conf.get('nickserv_name', 'nickserv'):
+def noticed(paraml, chan='', conn=None):
+    if paraml[0] == conn.nick and \
+            chan.lower() == conn.conf.get('nickserv_name', 'nickserv'):
         if "Nickname:" in paraml[1]:
             if "ONLINE" in paraml[1]:
                 conn.users[str(paraml[1].split()[1]).lower()] = True
@@ -93,8 +97,11 @@ def onconnect(paraml, conn=None):
     nickserv_password = conn.conf.get('nickserv_password', '')
     nickserv_name = conn.conf.get('nickserv_name', 'nickserv')
     nickserv_command = conn.conf.get('nickserv_command', 'IDENTIFY %s')
+    nickserv_ident = conn.conf.get('nickserv_ident_command', 'INFO %s')
     if nickserv_password:
         conn.msg(nickserv_name, nickserv_command % nickserv_password)
+        time.sleep(1)
+        conn.msg(nickserv_name, nickserv_ident % conn.nick)
         time.sleep(1)
 
     # set mode on self
