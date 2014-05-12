@@ -138,7 +138,6 @@ def dispatch(input, kind, func, args, autohelp=False):
     if func._thread:
         bot.threads[func].put(input)
     else:
-        #print func.__name__
         thread.start_new_thread(run, (func, input))
 
 
