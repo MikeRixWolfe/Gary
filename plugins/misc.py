@@ -49,7 +49,7 @@ def user_tracking(paraml, nick=None, input=None, conn=None):
             if nick in conn.users.keys():
                 del conn.users[nick]
             if input.command == 'NICK':
-                conn.msg(nickserv_name, nickserv_ident % nick)
+                conn.msg(nickserv_name, nickserv_ident % paraml[0])
 
 
 @hook.event('NOTICE')
@@ -68,13 +68,13 @@ def noticed(paraml, chan='', conn=None):
 @hook.event('JOIN')
 def onjoin(paraml, nick=None, conn=None):
     if nick == conn.nick and paraml[0] not in conn.channels:
-            conn.channels.append(paraml[0])
+        conn.channels.append(paraml[0])
 
 
 @hook.event('PART')
 def onpart(paraml, nick=None, conn=None):
     if nick == conn.nick and paraml[0] in conn.channels:
-            conn.channels.remove(paraml[0])
+        conn.channels.remove(paraml[0])
 
 
 @hook.event('KICK')
