@@ -25,6 +25,6 @@ def ply(inp, bot=None, input=None, nick=None, db=None, chan=None):
         exec(inp)
         sys.stdout = old_stdout
 
-        return redirected_output.getvalue()
+        return redirected_output.getvalue().strip() or "No output."
     except Exception as e:
         return "Python execution error: %" % e

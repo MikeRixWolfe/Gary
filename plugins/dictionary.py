@@ -124,8 +124,10 @@ ed_url = "http://encyclopediadramatica.es/"
 @hook.command
 def drama(inp):
     '''.drama <phrase> - gets first paragraph of Encyclopedia Dramatica article on <phrase>; Note, use proper calitalization e.g. "Ron Paul"'''
-
-    j = http.get_json(api_url, search=inp)
+    try:
+        j = http.get_json(api_url, search=inp)
+    except:
+        return "Error parsing Encyclopedia Dramatica API, please try again in a few minutes"
     if not j[1]:
         return 'no results found'
     article_name = j[1][0].replace(' ', '_').encode('utf8')
