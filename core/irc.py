@@ -125,13 +125,13 @@ irc_param_ref = re.compile(r'(?:^|(?<= ))(:.*|[^ ]+)').findall
 class IRC(object):
     "handles the IRC protocol"
     #see the docs/ folder for more information on the protocol
-    def __init__(self, server, nick, port=6667, channels=[], conf={}, users={}):
+    def __init__(self, server, nick, port=6667, channels=[], conf={}):
         self.channels = channels
         self.conf = conf
         self.server = server
         self.port = port
         self.nick = nick
-        self.users = users
+        self.users = {}
 
         self.out = Queue.Queue()  # responses from the server are placed here
         # format: [rawline, prefix, command, params,
@@ -203,9 +203,9 @@ class IRC(object):
 
 class SSLIRC(IRC):
     def __init__(self, server, nick, port=6667, channels=[], conf={},
-                 users={}, ignore_certificate_errors=True):
+                 ignore_certificate_errors=True):
         self.ignore_cert_errors = ignore_certificate_errors
-        IRC.__init__(self, server, nick, port, channels, conf, users)
+        IRC.__init__(self, server, nick, port, channels, conf)
 
     def create_connection(self):
         return crlf_ssl_tcp(self.server, self.port, self.ignore_cert_errors)
