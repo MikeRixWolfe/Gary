@@ -28,7 +28,7 @@ def auth(inp, nick='', conn=None):
         return("I cannot identify with NickServ; priviledged functions disabled.")
     else:
         conn.msg(conn.conf.get('nickserv_name', 'nickserv'),
-            conn.conf.get('nickserv_ident_command', 'INFO %s') % nick)
+            conn.conf.get('nickserv_ident_command', 'INFO %s') % nick.lower())
         return "NickServ ident status updated."
 
 
