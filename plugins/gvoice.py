@@ -133,7 +133,7 @@ def redirect(message, voice, bot, db):  # Ugly function
 
 @hook.command(adminonly=False, autohelp=False)
 def parsesms(inp, say='', conn=None, bot=None, db=None):
-    ".parsesms - force an sms check from Google Voice"
+    ".parsesms - Force an sms check from Google Voice."
     db_init(db)
     voice = Voice()
     say("Checking for unread SMS...")
@@ -183,7 +183,9 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
 
 @hook.command()
 def sms(inp, nick='', chan='', db=None, bot=None):
-    ".sms <nick> <message> - sends a text message to specified <nick> from .phonebook via Google Voice"
+    ".sms <nick> <message> - Sends a text message to specified <nick> from " \
+    "phonebook via Google Voice; users may send 'sms <nick> <message>' or "\
+    "'phonebook <nick>' via mobile to use functions while circumventing channel."
     if chan[0] != '#':
         return "Can only SMS from public channels to control abuse."
     db_init(db)
@@ -211,7 +213,7 @@ def sms(inp, nick='', chan='', db=None, bot=None):
 
 @hook.command()
 def call(inp, say='', nick='', db=None, bot=None):
-    ".call <nick> - calls specified <nick> and connects the call to your number from .phonebook via Google Voice"
+    ".call <nick> - Calls specified <nick> and connects the call to your number from phonebook via Google Voice."
     db_init(db)
     forwardingNumber, forwardingPrivate = get_phonenumber(db, nick)
     if not forwardingNumber:
