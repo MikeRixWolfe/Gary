@@ -29,7 +29,7 @@ def censor(text):
 class crlf_tcp(object):
     "Handles tcp connections that consist of utf-8 lines ending with crlf"
 
-    def __init__(self, host, port, timeout=500):
+    def __init__(self, host, port, timeout=300):
         self.ibuffer = ""
         self.obuffer = ""
         self.oqueue = Queue.Queue()  # lines to be sent out
@@ -156,7 +156,13 @@ class IRC(object):
             msg = self.conn.iqueue.get()
 
             if msg == StopIteration:
-                self.connect()
+                try:
+                    self.connect()
+                except socket.error as e:
+                    print ">>> u'%s :%r:%r'" % (e, self.server, self.port)
+                    self.conn.iqueue.put(StopIteration)
+                    self.conn.socket.close()
+                    time.sleep(self.conn.timeout)
                 continue
 
             if msg.startswith(":"):  # has a prefix
