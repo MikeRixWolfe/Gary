@@ -69,7 +69,7 @@ def oper(inp, say=None, bot=None):
         opers.append(target)
         opers.sort()
         json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
-        say("%s +bo" % format(target))
+        say("%s +o" % format(target))
     return
 
 
@@ -84,7 +84,7 @@ def deoper(inp, say=None, bot=None):
         opers.remove(target)
         opers.sort()
         json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
-        say("%s -bo" % format(target))
+        say("%s -o" % format(target))
     else:
         if target in admins:
             return "You can not remove bot admins as bot operators."
@@ -126,7 +126,7 @@ def voicer(inp, say=None, bot=None):
     json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
     if len(newvoicers) == 0:
         return "%s already has bot voice." % format(", ".join(skips))
-    say("%s +bv" % format(", ".join(newvoicers)))
+    say("%s +v" % format(", ".join(newvoicers)))
 
 
 @hook.command(adminonly=True)
@@ -153,5 +153,5 @@ def devoicer(inp, say=None, bot=None):
             return "You can not remove bot admins or opers as bot voicers."
         return "%s does not have bot voice." % format(", ".join(skips))
     else:
-        say("%s -bv" % format(", ".join(oldvoicers)))
+        say("%s -v" % format(", ".join(oldvoicers)))
     return
