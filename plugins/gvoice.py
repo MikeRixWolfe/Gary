@@ -5,6 +5,8 @@ import BeautifulSoup
 from util import hook
 from util.googlevoice import Voice, LoginError, ParsingError
 
+default_privacy = 0  # 0 or 1 for not private/private
+
 
 def db_init(db):
     db.execute("create table if not exists phonebook(name, phonenumber, private,"
@@ -175,10 +177,10 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
         except ParsingError:
             print(">>> u'Google Voice parse error :{}'".format(server))
             voice = None
-            time.sleep(90)
+            time.sleep(3)
         except Exception as e:
             print(">>> u'Google Voice error: {} :{}'".format(e, server))
-            time.sleep(90)
+            time.sleep(3)
 
 
 @hook.command()
@@ -248,7 +250,7 @@ def phonebook(inp, nick='', input=None, db=None, bot=None):
         if len(recip) < 10:
             return "Please check your input and try again."
         db.execute("insert or replace into phonebook(name, phonenumber, private)"
-                   "values(?, ?, 0)", (nick.lower(), recip[-10:]))
+                   "values(?, ?, ?)", (nick.lower(), recip[-10:], default_privacy))
         db.commit()
         return "Number saved!"
     elif recip == 'delete':
