@@ -121,18 +121,16 @@ def similar(inp, nick='', say=None, api_key=None):
                              api_key=api_key, artist=inp.strip(), limit=5, autocorrect=1)
 
     if 'error' in response:
-        if inp:  # specified a user name
-            return "error: %s" % response["message"]
-        else:
-            return "I couldn't find that artist."
+        return "Error parsing the LastFM API, please try again later."
 
-    if not "artist" in response["similarartists"] or len(response["similarartists"]["artist"]) == 0:
-        return "no recent tracks for user \x02%s\x0F found" % user
+    if not "artist" in response["similarartists"] or \
+            not isinstance(response["similarartists"]["artist"], list) or \
+            len(response["similarartists"]["artist"]) == 0:
+        return "I couldn't find that artist."
 
     artists = response["similarartists"]["artist"]
 
     ret = "Artists similar to \"\x02" + inp.strip() + "\x0f\": "
     for artist in artists:
         ret = ret + "\"\x02" + artist["name"] + "\x0f\", "
-
     say(ret.strip(', '))
