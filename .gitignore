@@ -7,3 +7,5 @@ config
 *.db
 geekboy.py
 build
+markov.py
+
