@@ -4,9 +4,10 @@ import http
 import urlnorm
 import json
 import urllib
+import urllib2
 import yql
 
-short_url = "http://is.gd/create.php"
+short_url = "https://www.googleapis.com/urlshortener/v1/url"
 paste_url = "http://hastebin.com"
 yql_env = "http://datatables.org/alltables.env"
 
@@ -22,22 +23,28 @@ class ShortenError(Exception):
         return self.text
 
 
-def isgd(url):
-    """ shortens a URL with the is.gd API """
-    url = urlnorm.normalize(url.encode('utf-8'), assume_scheme='http')
-    params = urllib.urlencode({'format': 'json', 'url': url})
-    request = http.get_json("http://is.gd/create.php?%s" % params)
+def googl(url):
+    """ shortens a URL with the goo.gl API """
+    postdata = {'longUrl':url}
+    headers = {'Content-Type':'application/json'}
+    req = urllib2.Request(
+        short_url,
+        json.dumps(postdata),
+        headers
+    )
+    ret = urllib2.urlopen(req).read()
+    request = json.loads(ret)['id']
 
-    if "errorcode" in request:
-        raise ShortenError(request["errorcode"], request["errormessage"])
+    if not request.strip():
+        raise ShortenError("Error", "None returned")
     else:
-        return request["shorturl"]
+        return request
 
 
-def try_isgd(url):
+def try_googl(url):
     try:
-        out = isgd(url)
-    except (ShortenError, http.HTTPError):
+        out = googl(url)
+    except:
         out = url
     return out
 

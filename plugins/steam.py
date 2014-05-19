@@ -40,7 +40,7 @@ def steam(inp):
     result = soup.find('a', {'class': 'search_result_row'})
     try:
         return (get_steam_info(result['href']) +
-            " - " + web.isgd(result['href']))
+            " - " + web.try_googl(result['href']))
     except Exception as e:
         print "Steam search error: {}".format(e)
         return "Steam API error, please try again later."

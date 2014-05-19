@@ -20,7 +20,7 @@ youtube_re = (r'(?:youtube.*?(?:v=|/v/)|youtu\.be/|yooouuutuuube.*?id=)'
 def youtube_url(match, bot=None, say=None):
     # if "autoreply" in bot.config and not bot.config["autoreply"]:
     #    return
-    url = web.try_isgd(video_url % match)
+    url = web.try_googl(video_url % match)
     say(url + " - " + get_video_description(match.group(1)))
 
 

@@ -17,7 +17,7 @@ def gis(inp, api_key=None):
     parsed = api_get(inp, api_key, is_image=True, num=10)
     if 'items' not in parsed:
         return 'no images found'
-    return web.try_isgd(random.choice(parsed['items'])['link'])
+    return web.try_googl(random.choice(parsed['items'])['link'])
 
 
 @hook.api_key('google')
@@ -30,7 +30,7 @@ def google(inp, api_key=None):
     if 'items' not in parsed:
         return 'no results found'
 
-    link = web.try_isgd(parsed['items'][0]['link'])
+    link = web.try_googl(parsed['items'][0]['link'])
     title = parsed['items'][0]['title']
 
     out = u'{} - \x02{}\x02'.format(link, title)

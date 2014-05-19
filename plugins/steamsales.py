@@ -90,7 +90,7 @@ def get_sales(mask):
                 if set(["id", "url"]).issubset(set(item.keys())):
                     if not item["final_price"] and not item["discounted"]:
                         item["name"] = item["name"].encode("ascii", "ignore")
-                        item["final_price"] = web.try_isgd(item["url"])
+                        item["final_price"] = web.try_googl(item["url"])
                         item["discounted"] = True
                 else:
                     # Midweek Madness, etc

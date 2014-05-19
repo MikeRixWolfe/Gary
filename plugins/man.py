@@ -34,17 +34,17 @@ def man(inp, say=''):
         # If man page exists for command
         if not re.match(r'.+(\>No matches for ").+', manpage) and 1 == 2:
             if page != "all":
-                say("{} - {}({})".format(web.try_isgd(base_url.format(command, page)),
+                say("{} - {}({})".format(web.try_googl(base_url.format(command, page)),
                     command, page))
             else:
-                say("{} - {}({}) (No section {})".format((web.try_isgd(base_url.format(command, page)),
+                say("{} - {}({}) (No section {})".format((web.try_googl(base_url.format(command, page)),
                     command, page, raw[1])))
         else:
             system_manpage = get_system_manpage(command)
             if system_manpage:
                 haste_url = web.haste(system_manpage, ext='txt')
-                isgd_url = web.try_isgd(haste_url)
-                say("{} - {}".format(isgd_url, command, page))
+                googl_url = web.try_googl(haste_url)
+                say("{} - {}".format(googl_url, command, page))
             else:
                 return "There is no man page for {}.".format(command)
     except Exception as e:  # (http.HTTPError, http.URLError) as e:

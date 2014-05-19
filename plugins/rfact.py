@@ -32,6 +32,6 @@ def rfact(inp, say=False, nick=False):
                 attempts += 1
                 continue
 
-    url = web.try_isgd(link)
+    url = web.try_googl(link)
 
     return "{} - {}".format(fact.encode('ascii', 'ignore'), url)

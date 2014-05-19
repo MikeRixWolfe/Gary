@@ -95,8 +95,8 @@ def outputsms(voice, conn, bot, db):
 
 def redirect(message, voice, bot, db):  # Ugly function
     # Circumvent channel and sms others directly or get phone numbers
-    sms_cmd = re.match(r'\.?(?:SMS|Sms|sms) ([^\ ]+) (.+)', message['text'])
-    pb_cmd = re.match(r'\.?(?:Phonebook|phonebook) ([^\ ]+)', message['text'])
+    sms_cmd = re.match(r'[\.|!]?(?:SMS|Sms|sms) ([^\ ]+) (.+)', message['text'])
+    pb_cmd = re.match(r'[\.|!]?(?:Phonebook|phonebook) ([^\ ]+)', message['text'])
     blacklist = bot.config["gvoice"]["private"]
     sender_number = message['from'].strip('+: ')[-10:]
     sender = get_name(db, sender_number)

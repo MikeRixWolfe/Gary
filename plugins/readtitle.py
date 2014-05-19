@@ -8,7 +8,7 @@ v0.4    cant write regex to save my life so used split to break match at whitesp
         in case someone posts a URL and also says something about it afterwards
 v0.5    if any(): return used to handle the keywords to not match urls against
 v0.6    changed regex again!
-v0.7    inserted isgd link to beginning of each title
+v0.7    inserted googl link to beginning of each title
 '''
 import re
 import time
@@ -50,7 +50,7 @@ def readtitle(match, say=None, nick=None):
     except IndexError:
         titleuni = ""
 
-    shorturl = web.try_isgd(parsed_url)
+    shorturl = web.try_googl(parsed_url)
 
     say(shorturl + titleuni)
 
