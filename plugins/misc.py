@@ -61,7 +61,7 @@ def noticed(paraml, chan='', conn=None):
                 conn.users[str(paraml[1].split()[1]).lower()] = True
             else:
                 conn.users[str(paraml[1].split()[1]).lower()] = False
-        elif "not registered" in paraml[1]:
+        elif "not registered" in paraml[1] or "is private" in paraml[1]:
             conn.users[str(paraml[1].split()[2]).lower()[2:-2]] = False
 
 
