@@ -81,7 +81,7 @@ def outputsms(voice, conn, bot, db):
         sender = sender[-10:]  # Force number to fit our model
         sender_nick = get_name(db, sender)
         if sender_nick and sender not in blacklist and not check_smslog(db, message) and message not in messages:
-            message['out'] = "<{}> {}".format(sender_nick, message['text'])
+            message['out'] = "<{}> {}".format(sender_nick, message['text'].encode('ascii', 'replace'))
             messages.append(message)
 
     for message in messages:  # Redirect or output messages
