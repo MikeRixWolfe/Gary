@@ -99,51 +99,50 @@ def redirect(message, voice, bot, db):  # Ugly function
     pb_cmd = re.match(r'[\.|!]?(?:Phonebook|phonebook) ([^\ ]+)', message['text'])
     call_cmd = re.match(r'[\.|!]?(?:Call|call) ([^\ ]+)', message['text'])
     blacklist = bot.config["gvoice"]["private"]
-    sender_number = message['from'].strip('+: ')[-10:]
-    sender = get_name(db, sender_number)
+    senderNumber = message['from'].strip('+: ')[-10:]
+    sender = get_name(db, senderNumber)
 
     if sms_cmd:
         recip, text = sms_cmd.groups()
-        recip_number, private = get_phonenumber(db, recip.lower())
-        if recip_number:
-            if recip_number in blacklist or recip.lower() in blacklist:
+        recipNumber, private = get_phonenumber(db, recip.lower())
+        if recipNumber:
+            if recipNumber in blacklist or recip.lower() in blacklist:
                 text = "I'm sorry %s, I'm afraid I can't do that." % sender
             else:
-                voice.send_sms(recip_number, "<%s-mobile> %s" % (sender, text))
+                voice.send_sms(recipNumber, "<%s-mobile> %s" % (sender, text))
                 print(">>> u'SMS sent from %s to %s'" % (sender, recip))
                 return True
         else:
             text = "Sorry, I don't have that user in my phonebook."
-        voice.send_sms(sender_number, text)
+        voice.send_sms(senderNumber, text)
         print(">>> u'SMS relay error returned to %s'" % sender)
         return True
     elif pb_cmd:
-        who = pb_cmd.group(1)
-        who_number, private = get_phonenumber(db, who.lower())
-        if who_number:
+        recip = pb_cmd.group(1)
+        recipNumber, private = get_phonenumber(db, recip.lower())
+        if recipNumber:
             if private:
-                text = "%s's number is set to private." % who
+                text = "%s's number is set to private." % recip
             else:
-                text = "%s's number is %s" % (who, who_number)
+                text = "%s's number is %s" % (recip, recipNumber)
         else:
-            text = "'%s' does not have a registered phone number." % who
-        voice.send_sms(sender_number, text)
+            text = "'%s' does not have a registered phone number." % recip
+        voice.send_sms(senderNumber, text)
         print(">>> u'SMS relay phonebook query returned to %s'" % sender)
         return True
     elif call_cmd:
-        who = call_cmd.group(1)
-        who_number, private = get_phonenumber(db, who.lower())
-        if who_number:
-            if who_number in blacklist or who.lower() in blacklist:
+        recip = call_cmd.group(1)
+        recipNumber, private = get_phonenumber(db, recip.lower())
+        if recipNumber:
+            if recipNumber in blacklist or recip.lower() in blacklist or recipNumber = senderNumber:
                 text = "I'm sorry %s, I'm afraid I can't do that." % sender
-                voice.send_sms(sender_number, text)
             else:
-                voice.call(who_number, sender_number)
-                print ">>> u'SMS relay call command sent from  %s to %s'" % (sender, who)
+                voice.call(recipNumber, senderNumber)
+                print ">>> u'SMS relay call command sent from  %s to %s'" % (sender, recip)
                 return True
         else:
-            text = "'%s' does not have a registered phone number." % who
-            voice.send_sms(sender_number, text)
+            text = "'%s' does not have a registered phone number." % recip
+        voice.send_sms(senderNumber, text)
         print(">>> u'SMS relay call returned to %s'" % sender)
         return True
     else:
