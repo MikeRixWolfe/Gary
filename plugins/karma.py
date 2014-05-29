@@ -20,7 +20,6 @@ def set_karma(db, chan, word, karma):
     db.commit()
 
 
-@hook.singlethread
 @hook.regex(r'((?:\().*(?:\))|\S+)(\+\+|--)')
 def karma_edit(inp, chan='', nick='', say=None, db=None):
     db_init(db)
@@ -41,7 +40,6 @@ def karma_edit(inp, chan='', nick='', say=None, db=None):
     set_karma(db, chan, word, karma)
 
 
-@hook.singlethread
 @hook.command
 def karma(inp, chan='', say=None, db=None, input=None):
     ".karma <word> - Returns karma of <word>; <word>(++|--) increments or decrements karma of <word>"

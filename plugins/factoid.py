@@ -16,9 +16,7 @@ def get_factoid(db, chan, word):
 
 
 # @hook.regex(r'^(no\ )?(?:G|g)ary(?:\:\ |\,\ |\ )([^\.][\S]+|.*)\ (?:is)\ (also\ )?\<(reply|rreply|exec)\>(.+)') #m2 style
-@hook.singlethread
-# Geekboy Style
-@hook.regex(r'^(no\ )?(?:G|g)ary(?:\:\ |\,\ |\ )([^\(].*?[^\)]|\(.*\))\ (?:is)\ (also\ )?(.+)')
+@hook.regex(r'^(no\ )?(?:G|g)ary(?:\:\ |\,\ |\ )([^\(].*?[^\)]|\(.*\))\ (?:is)\ (also\ )?(.+)')  # Geekboy style
 def set_factoid(inp, nick='', chan='', say=None, db=None):
     # Backup documentation for m2 style factoids
     "Gary: [word|phrase] is <reply> [data] - sets [word|phrase] to [data]; \

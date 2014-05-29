@@ -33,6 +33,7 @@ def system(inp):
 @hook.command(autohelp=False)
 def memory(inp):
     """.memory - Displays the bot's current memory usage."""
+    time.sleep(1)
     if os.name == "posix":
         # get process info
         sfile = open('/proc/self/status')

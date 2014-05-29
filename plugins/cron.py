@@ -53,6 +53,7 @@ def clean_db(db, time, chan):
     db.commit()
 
 
+@hook.singlethread
 @hook.event('JOIN')
 def cron(paraml, nick='', conn=None, db=None):
     global running_cron_loops
