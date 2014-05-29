@@ -134,7 +134,7 @@ def redirect(message, voice, bot, db):  # Ugly function
         recip = call_cmd.group(1)
         recipNumber, private = get_phonenumber(db, recip.lower())
         if recipNumber:
-            if recipNumber in blacklist or recip.lower() in blacklist or recipNumber = senderNumber:
+            if recipNumber in blacklist or recip.lower() in blacklist or recipNumber == senderNumber:
                 text = "I'm sorry %s, I'm afraid I can't do that." % sender
             else:
                 voice.call(recipNumber, senderNumber)
