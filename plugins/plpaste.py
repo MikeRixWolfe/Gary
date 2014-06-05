@@ -11,8 +11,8 @@ def plpaste(inp, say='', bot=None):
         try:
             if inp[-3:] == '.py':
                 inp = inp[:-3]
-            plugin = open('plugins/%s.py' % inp)
-            say(web.haste(plugin.read(), 'py'))
+            with open('plugins/%s.py' % inp) as f:
+                say(web.haste(f.read(), 'py'))
             return
         except:
             pass
