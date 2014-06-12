@@ -51,7 +51,7 @@ def karma(inp, chan='', say=None, db=None, input=None):
 
     karma = get_karma(db, chan, inp.strip())
 
-    if karma:
+    if karma and karma != '0':
         say("%s has %s karma" % (word, karma))
     else:
         say("%s has neutral karma" % word)
@@ -63,7 +63,7 @@ def setkarma(inp, chan='', db=None):
     db_init(db)
 
     try:
-        word, karma = inp.split()
+        word, karma = inp.rsplit(' ',1)
     except:
         return setkarma.__doc__
 
