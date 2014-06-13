@@ -43,9 +43,15 @@ class crlf_tcp(object):
         return socket.socket(socket.AF_INET, socket.TCP_NODELAY)
 
     def run(self):
-        self.socket.connect((self.host, self.port))
-        thread.start_new_thread(self.recv_loop, ())
-        thread.start_new_thread(self.send_loop, ())
+        try:
+            self.socket.connect((self.host, self.port))
+            thread.start_new_thread(self.recv_loop, ())
+            thread.start_new_thread(self.send_loop, ())
+        except socket.error as e:
+            print ">>> u'%s :%r:%r'" % (e, self.host, self.port)
+            self.iqueue.put(StopIteration)
+            self.socket.close()
+            time.sleep(self.timeout)
 
     def recv_from_socket(self, nbytes):
         return self.socket.recv(nbytes)
@@ -144,18 +150,12 @@ class IRC(object):
         return crlf_tcp(self.server, self.port)
 
     def connect(self):
-        try:
-            self.conn = self.create_connection()
-            thread.start_new_thread(self.conn.run, ())
-            self.set_pass(self.conf.get('server_password'))
-            self.set_nick(self.nick)
-            self.cmd("USER", [conf.get('user', 'Gary'), "3",
-                "*", conf.get('realname','Gary')])
-        except socket.error as e:
-            print ">>> u'%s :%r:%r'" % (e, self.server, self.port)
-            self.conn.iqueue.put(StopIteration)
-            self.conn.socket.close()
-            time.sleep(self.conn.timeout)
+        self.conn = self.create_connection()
+        thread.start_new_thread(self.conn.run, ())
+        self.set_pass(self.conf.get('server_password'))
+        self.set_nick(self.nick)
+        self.cmd("USER", [conf.get('user', 'Gary'), "3",
+            "*", conf.get('realname','Gary')])
 
 
     def parse_loop(self):
