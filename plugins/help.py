@@ -32,7 +32,7 @@ def help(inp, bot=None, say=None):
             say(' '.join(sorted(overflowlist)))
         else:
             say('Available commands: ' + ' '.join(sorted(commands)))
-        say('Tip: .help <command> - Gets more info on that command')
+        say('Tip: .help <command> - Gets more info on that command; arguements in <angle brackets> are required and arguements in [square brackets] are optional for any command')
     else:
         if inp in commands:
             say(commands[inp].__doc__)

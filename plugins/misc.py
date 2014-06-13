@@ -23,7 +23,7 @@ def get_version():
 
 @hook.command(autohelp=False)
 def auth(inp, nick='', conn=None):
-    ".auth - Tries to update your NickServ ident status."
+    #".auth - Tries to update your NickServ ident status."
     if not conn.users.get(conn.nick.lower(), False):
         return("I cannot identify with NickServ; priviledged functions disabled.")
     else:
