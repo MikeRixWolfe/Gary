@@ -9,7 +9,7 @@ def choose(inp):
     c = re.findall(r'([^,]+)', inp)
     if len(c) == 1:
         c = re.findall(r'(\S+)', inp)
-    c = [x.strip() for x in c]
-    if len(set(c)) == 1:
+    c = set(x.strip() for x in c)  # prevent weighting, normalize
+    if len(c) == 1:
         return "Looks like you've already made that decision."
-    return random.choice(c).strip()
+    return random.choice(list(c))
