@@ -67,7 +67,7 @@ def formatdata(info):
 @hook.api_key('rdio')
 @hook.command
 def rdio(inp, api_key=None, bot=None):
-    """.rdio [-track|-artist|-album] <search term> - Search for specified or any media Rdio."""
+    """.rdio [-track|-artist|-album] <search term> - Search for specified or any media via Rdio."""
     if not isinstance(api_key, dict) or any(key not in api_key for key in
             ('consumer', 'consumer_secret')):
         return "error: No api key set"
@@ -87,4 +87,4 @@ def rdio(inp, api_key=None, bot=None):
     except IndexError:
         return "No results."
 
-    return formatdata(info) or "Error reading data."
+    return formatdata(info)

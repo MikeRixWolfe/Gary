@@ -16,11 +16,9 @@ def nowplaying(inp, nick='', say=None, api_key=None):
             api_key=api_key, user=user, limit=1)
     except:
         "LastFM API Error, please try again in a few minutes"
-
     if 'error' in response:
         return "error: %s" % response["message"] if inp \
             else "Your nick is not a Last.fm account. Try '.lastfm username'."
-
     if not "track" in response["recenttracks"] or len(response["recenttracks"]["track"]) == 0:
         return "No recent tracks found for \x02%s\x0F." % user
 
@@ -75,10 +73,7 @@ def toptrack(inp, nick='', say=None, api_key=None):
         if inp:  # specified a user name
             return "Error: %s" % response["message"]
         else:
-            return (
-                "Your nick is not a Last.fm account. try '.lastfm username'."
-            )
-
+            return "Your nick is not a Last.fm account. try '.lastfm username'."
     if not "track" in response["toptracks"] or len(response["toptracks"]["track"]) == 0:
         if period == "1month":
             return "The 1month flag is currently broken in the LastFM API; a bug report has been filed."

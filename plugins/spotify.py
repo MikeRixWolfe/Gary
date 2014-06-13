@@ -31,9 +31,8 @@ def sptfy(inp, sptfy=False):
         return web.try_googl(inp)
 
 
-@hook.command('sptrack')
 @hook.command
-def spotify(inp):
+def sptrack(inp):
     """spotify <song> -- Search Spotify for <song>"""
     try:
         data = http.get_json("http://ws.spotify.com/search/1/track.json", q=inp.strip())
