@@ -87,7 +87,8 @@ def outputsms(voice, conn, bot, db):
     for message in messages:  # Redirect or output messages
         if not redirect(message, voice, bot, db):
             for chan in conn.channels:
-                conn.send("PRIVMSG {} :{}".format(chan, message['out']))
+                if chan == '#geekboy':
+                    conn.send("PRIVMSG {} :{}".format(chan, message['out']))
         mark_as_read(db, message)  # Mark all as read
 
     return voice, len(messages)
