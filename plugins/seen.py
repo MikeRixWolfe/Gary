@@ -30,7 +30,7 @@ def around(inp, nick='', chan='', say='', db=None, input=None):
     if inp == 'today':
         today = datetime.today()
         period = float(datetime(today.year, today.month, today.day).strftime('%s'))
-        out = "Users around today: ".format(minutes)
+        out = "Users around today: "
 
     rows = db.execute("select distinct nick from seen where uts >= ? and "
         "server = lower(?) and chan = lower(?) order by nick", (period,
@@ -41,7 +41,7 @@ def around(inp, nick='', chan='', say='', db=None, input=None):
         out += ', '.join(rows)
         if len(out) >= length:
             truncstr = prefix[:length].rsplit(' ', 1)[0]
-            out = truncstr + " and %s others" % len(out[len(truncstr):].split())
+            out = truncstr + " and {} others".format(len(out[len(truncstr):].split()))
         say(out)
     else:
         say("No one!")
