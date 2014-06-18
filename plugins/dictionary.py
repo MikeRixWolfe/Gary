@@ -7,11 +7,13 @@ from util import hook, http
 @hook.command
 def urban(inp):
     '''.ud/.urban <phrase> - looks up <phrase> on urbandictionary.com'''
-
     url = 'http://www.urbandictionary.com/iphone/search/define'
-    page = http.get_json(
-        url, term=inp, headers={'Referer': 'http://m.urbandictionary.com'})
-    defs = page['list']
+    referer = 'http://m.urbandictionary.com'
+    try:
+        page = http.get_json(url, term=inp, headers={'Referer': referer})
+        defs = page['list']
+    except:
+        return "Error reading the Urban Dictionary API; please try again later.."
 
     if page['result_type'] == 'no_results':
         return 'not found.'
