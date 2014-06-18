@@ -1,4 +1,6 @@
-import time, re
+import re
+from time import time
+from datetime import datetime
 from util import hook, timesince, text
 
 formats = {
@@ -17,9 +19,18 @@ formats = {
 def around(inp, nick='', chan='', say='', db=None, input=None):
     ".around [minutes] - Lists what nicks have been active in the last [minutes] minutes, defaults to 15"
     minutes = 15
+    length = 430
+
     if inp.isdigit():
         minutes = int(inp)
-    period = time.time() - (minutes * 60)
+
+    period = time() - (minutes * 60)
+    prefix = "Users around in the last {} minutes: ".format(minutes)
+
+    if inp == 'today':
+        today = datetime.today()
+        period = float(datetime(today.year, today.month, today.day).strftime('%s'))
+        prefix = "Users around today: ".format(minutes)
 
     rows = db.execute("select distinct nick from seen where uts >= ? and "
         "server = lower(?) and chan = lower(?) order by nick", (period,
@@ -27,16 +38,11 @@ def around(inp, nick='', chan='', say='', db=None, input=None):
     rows = ([row[0] for row in rows] if rows else None)
 
     if rows:
-        out = "Users around in the last {} minutes: ".format(minutes)
-        out2 = "{} others"
-        while rows:
-            if len(out) + len(rows[0]) + len(out2) + len(str(len(rows))) < 450:
-                out += rows.pop(0) + ", "
-            else:
-                break
-        if rows:
-            out += out2.format(len(rows))
-        say(text.rreplace(out.strip(', '), ', ', ', and ', 1))
+        prefix += ', '.join(rows)
+        if len(prefix) >= length:
+            out = prefix[:length].rsplit(' ', 1)[0]
+            out += " and %s others" % len(prefix[len(out):].split())
+        say(out)
     else:
         say("No one!")
 
