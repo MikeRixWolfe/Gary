@@ -65,7 +65,7 @@ def seen(inp, say='', nick='', db=None, input=None):
             row['who'] = row['msg'].split(' ')[:1][0]
             row['msg'] = ' '.join(row['msg'].split(' ')[1:]).strip('[]')
             if inp.lower() != row['who'].lower():
-                inp['action'] = 'KICKEE'
+                row['action'] = 'KICKEE'
 
         format = formats.get(row['action'])
 
