@@ -226,6 +226,8 @@ def sms(inp, nick='', chan='', db=None, bot=None):
         voice.login()
         voice.send_sms(recip_number, text)
         return "SMS sent"
+    except LoginError:
+        return "Unable to login to Google Voice, please try again in a few minutes."
     except:
         return "Google Voice API error, please try again in a few minutes."
 
@@ -234,6 +236,10 @@ def sms(inp, nick='', chan='', db=None, bot=None):
 def call(inp, say='', nick='', db=None, bot=None):
     ".call <nick> - Calls specified <nick> and connects the call to your number from phonebook via Google Voice."
     db_init(db)
+
+    if inp.lower() == nick.lower():
+        return "You don't want to talk to yourself, I don't even want to talk to you!"
+
     forwardingNumber, forwardingPrivate = get_phonenumber(db, nick)
     if not forwardingNumber:
         return "Your number needs to be in my phonebook to use this function."
@@ -251,8 +257,11 @@ def call(inp, say='', nick='', db=None, bot=None):
         voice.login()
         voice.call(outgoingNumber, forwardingNumber)
         say("Calling %s from %s's phone..." % (recip, nick))
+    except LoginError:
+        return "Unable to login to Google Voice, please try again in a few minutes."
     except:
-        return "Google Voice API error, please try again in a few minutes."
+        #return "Google Voice API error, please try again in a few minutes."
+        return "Unable to place call, please check the numbers and try again."
 
 
 @hook.command
