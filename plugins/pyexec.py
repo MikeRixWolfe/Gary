@@ -1,4 +1,4 @@
-import re, sys
+import re, sys, time
 from util import hook, http
 
 re_lineends = re.compile(r'[\r\n]*')
@@ -19,12 +19,14 @@ def python(inp):
 def ply(inp, bot=None, input=None, nick=None, db=None, chan=None):
     ".ply <prog> - Execute local python."
     try:
+        time.sleep(.1)
         from cStringIO import StringIO
-        old_stdout = sys.stdout
-        redirected_output = sys.stdout = StringIO()
-        exec(inp)
-        sys.stdout = old_stdout
 
-        return redirected_output.getvalue().strip() or "No output."
+        buffer = StringIO()
+        sys.stdout = buffer
+        exec(inp)
+        sys.stdout = sys.__stdout__
+
+        return buffer.getvalue().strip() or "No output"
     except Exception as e:
         return "Python execution error: %" % e
