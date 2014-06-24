@@ -7,7 +7,7 @@ html_re = r'https?://[^\s<>"]+|www\.[^\s<>"]+'
 
 @hook.command(autohelp=False)
 def linkdump(inp, chan="", say="", db=None):
-    ".linkdump - Get's today's links dumped in channel"
+    ".linkdump - Gets today's links dumped in channel"
     today = datetime.today()
     period = float(datetime(today.year, today.month, today.day).strftime('%s'))
     rows = db.execute("select nick, msg, time from log where uts >= ? and chan = ? and " \
@@ -19,4 +19,5 @@ def linkdump(inp, chan="", say="", db=None):
     links = ["via %s [%s]: %s" % (row[0], re.search(r'(\d+\:\d+:\d+)', row[2]).group(0),
         re.search(html_re, row[1]).group(0)) for row in rows]
     say("Today's link dump: " + web.haste('\n'.join(links), 'txt'))
+
 
