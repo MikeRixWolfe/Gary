@@ -40,7 +40,7 @@ def around(inp, nick='', chan='', say='', db=None, input=None):
     if rows:
         out += ', '.join(rows)
         if len(out) >= length:
-            truncstr = prefix[:length].rsplit(' ', 1)[0]
+            truncstr = out[:length].rsplit(' ', 1)[0]
             out = truncstr + " and {} others".format(len(out[len(truncstr):].split()))
         say(out)
     else:
