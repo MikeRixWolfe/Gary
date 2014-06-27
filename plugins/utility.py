@@ -1,33 +1,5 @@
 from util import hook, text, web
 import hashlib
-import collections
-import re
-import random
-
-# variables
-
-colors = collections.OrderedDict([
-    ('red', '\x0304'),
-    ('ornage', '\x0307'),
-    ('yellow', '\x0308'),
-    ('green', '\x0309'),
-    ('cyan', '\x0303'),
-    ('ltblue', '\x0310'),
-    ('rylblue', '\x0312'),
-    ('blue', '\x0302'),
-    ('magenta', '\x0306'),
-    ('pink', '\x0313'),
-    ('maroon', '\x0305')
-])
-
-# helper functions
-
-strip_re = re.compile(
-    "(\x03|\x02|\x1f)(?:,?\d{1,2}(?:,\d{1,2})?)?", re.UNICODE)
-
-
-def strip(text):
-    return strip_re.sub('', text)
 
 # basic text tools
 
@@ -168,88 +140,13 @@ def munge(inp):
 
 # colors - based on code by Reece Selwood - <https://github.com/hitzler/homero>
 
-
-@hook.command
-def rpenis(inp, say=None):
-#    ".rainbow <phrase> - rainbow all the way!"
-    inp = inp.strip()
-    if inp.isdigit():
-        if int(inp) > 110:
-            inp = 110
-        shaft = "8"
-        i = 0
-        while i < int(inp):
-            shaft += "="
-            i = i + 1
-        shaft = shaft + "D"
-        col = colors.items()
-        out = ""
-        for i, t in enumerate(shaft):
-            if t == " ":
-                out += t
-            else:
-                out += random.choice(col)[1] + t
-        say(out)
-    else:
-        say("Not a valid length")
-
-
-@hook.command
-def rainbow(inp, say=None):
-#    ".rainbow <phrase> - rainbow all the way!"
-    inp = unicode(inp)
-    inp = strip(inp)
-    col = colors.items()
-    out = ""
-    l = len(colors)
-    for i, t in enumerate(inp):
-        if t == " ":
-            out += t
-        else:
-            out += col[i % l][1] + t
-    say(out)
-
-
 @hook.command(autohelp=False)
 def spam(inp, say=None):
-    inp = unicode("~SPAM~")
-    col = colors.items()
-    out = ""
-    for i, t in enumerate(inp):
-        if t == " ":
-            out += t
-        else:
-            out += random.choice(col)[1] + t
-    say(out)
-
-
-@hook.command
-def wrainbow(inp, say=None):
-#    ".wrainbow <phrase> - rainbow with words"
-    inp = unicode(inp)
-    col = colors.items()
-    inp = strip(inp).split(' ')
-    out = []
-    l = len(colors)
-    for i, t in enumerate(inp):
-        out.append(col[i % l][1] + t)
-    say(' '.join(out))
-
-
-@hook.command
-def usa(inp, say=None):
-#    ".usa <phrase> - get patriotic!"
-    inp = strip(inp)
-    c = [colors['red'], '\x0300', colors['blue']]
-    l = len(c)
-    out = ''
-    for i, t in enumerate(inp):
-        out += c[i % l] + t
-    say(out)
+    say(text.rainbow("~SPAM~"))
 
 
 @hook.command
 def shorten(inp):
-    ".shorten <url> - Shortens a URL with is.gd"
+    #".shorten <url> - Shortens a URL with goo.gl"
     url = web.try_googl(inp)
     return url

@@ -4,7 +4,8 @@
 """
 
 import re
-
+import random
+import collections
 from HTMLParser import HTMLParser
 import htmlentitydefs
 
@@ -152,6 +153,54 @@ def truncate_str(content, length=100, suffix='...'):
 def rreplace(s, old, new, occurrence):
     li = s.rsplit(old, occurrence)
     return new.join(li)
+
+
+colors = collections.OrderedDict([
+    ('red', '\x0304'),
+    ('ornage', '\x0307'),
+    ('yellow', '\x0308'),
+    ('green', '\x0309'),
+    ('cyan', '\x0303'),
+    ('ltblue', '\x0310'),
+    ('rylblue', '\x0312'),
+    ('blue', '\x0302'),
+    ('magenta', '\x0306'),
+    ('pink', '\x0313'),
+    ('maroon', '\x0305')
+])
+
+
+strip_re = re.compile(
+    "(\x03|\x02|\x1f)(?:,?\d{1,2}(?:,\d{1,2})?)?", re.UNICODE)
+
+
+def strip(text):
+    return strip_re.sub('', text)
+
+
+def rainbow(content):
+    content = unicode(content)
+    content = strip(content)
+    col = colors.items()
+    out = ""
+    l = len(colors)
+    for i, t in enumerate(content):
+        if t == " ":
+            out += t
+        else:
+            out += col[i % l][1] + t
+    return out
+
+
+def wrainbow(content):
+    content = unicode(content)
+    col = colors.items()
+    content = strip(content).split(' ')
+    out = []
+    l = len(colors)
+    for i, t in enumerate(content):
+        out.append(col[i % l][1] + t)
+    return ' '.join(out)
 
 
 # ALL CODE BELOW THIS LINE IS COVERED BY THE FOLLOWING AGREEMENT:

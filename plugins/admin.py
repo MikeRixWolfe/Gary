@@ -1,4 +1,4 @@
-from util import hook
+from util import hook, text
 import os
 import sys
 import re
@@ -258,6 +258,20 @@ def say(inp, conn=None, chan=None):
 
 
 @hook.command(adminonly=True)
+def rsay(inp, conn=None, chan=None):
+    """.say [channel] <message> - Makes the bot say <message> in [channel]. If [channel] is blank the bot will
+    the command was used in."""
+    split = inp.split(" ")
+    if split[0][0] == "#":
+        message = text.rainbow(" ".join(split[1:]))
+        out = "PRIVMSG {} :{}".format(split[0], message)
+    else:
+        message = text.rainbow(" ".join(split[0:]))
+        out = "PRIVMSG {} :{}".format(chan, message)
+    conn.send(out)
+
+
+hook.command(adminonly=True)
 def action(inp, conn=None, chan=None):
     """.action [channel] <action> - Makes the bot do <action> in [channel]. If [channel] is blank the bot will say the <action> in the channel the command was used in."""
     inp = inp.split(" ")

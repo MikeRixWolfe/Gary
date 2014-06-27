@@ -1,5 +1,5 @@
 import time
-from util import hook, timesince
+from util import hook, timesince, text
 
 
 def db_init(db):
@@ -36,6 +36,7 @@ def showtells(inp, say='', nick='', chan='', db=None):
     db.commit()
 
 
+@hook.command('rmsg')
 @hook.command('msg')
 @hook.command
 def message(inp, nick='', chan='', db=None, input=None):
@@ -49,6 +50,9 @@ def message(inp, nick='', chan='', db=None, input=None):
     user_to = query[0].lower()
     message = query[1].strip()
     user_from = nick
+
+    if input.trigger == 'rmsg':
+        message = text.rainbow(message)
 
     if chan.lower() == user_from.lower():
         chan = 'a pm'
