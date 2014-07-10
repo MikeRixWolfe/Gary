@@ -25,7 +25,7 @@ def first(inp, chan='', input=None, db=None, say=None):
         (('%' + inp.strip() + '%'), chan)).fetchone()
     if row:
         xtime, xnick, xmsg, xuts = row
-        say("%s last said \"%s\" on %s (%s ago)" %
+        say("%s first said \"%s\" on %s (%s ago)" %
             (xnick, xmsg, xtime[:-7], timesince.timesince(xuts)))
     else:
         say("Never!")

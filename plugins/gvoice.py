@@ -259,9 +259,9 @@ def call(inp, say='', nick='', db=None, bot=None):
         say("Calling %s from %s's phone..." % (recip, nick))
     except LoginError:
         return "Unable to login to Google Voice, please try again in a few minutes."
-    except:
+    except Exception as e:
         #return "Google Voice API error, please try again in a few minutes."
-        return "Unable to place call, please check the numbers and try again."
+        return "Unable to place call (%s)" % e
 
 
 @hook.command
