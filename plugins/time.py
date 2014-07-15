@@ -1,5 +1,5 @@
-from util import hook, http, text
 import time
+from util import hook, http, text
 
 api_url = 'http://api.wolframalpha.com/v2/query?format=plaintext'
 
@@ -18,7 +18,7 @@ def cap_first(line):
 
 @hook.command("time")
 def time_command(inp, bot=None):
-    """time <area> - Gets the time in <area>"""
+    """.time <area> - Gets the time in <area>."""
 
     if inp.lower() == "butts":
         return "It's always time for butts."
@@ -49,7 +49,7 @@ def time_command(inp, bot=None):
 
 @hook.command(autohelp=False)
 def beats(inp):
-    """beats [what|guide]- Gets the current time in .beats (Swatch Internet Time). Optional switches for what and guide for description and conversion. """
+    """.beats [what|guide]- Gets the current time in .beats (Swatch Internet Time). Optional switches for what and guide for description and conversion."""
 
     if inp.lower() == "what":
         return "Instead of hours and minutes, the mean solar day is divided " \

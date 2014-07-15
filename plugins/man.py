@@ -2,7 +2,6 @@ import re
 import os
 from util import hook, web, http, text
 
-
 base_url = "http://man.he.net/?topic={}&section={}"
 
 
@@ -16,7 +15,7 @@ def get_system_manpage(command):
 
 @hook.command
 def man(inp, say=''):
-    '''.man <command> [section] - Returns man page for specified command, section defaults to 1 if not specified.'''
+    """.man <command> [section] - Returns man page for specified command, section defaults to 1 if not specified."""
     raw = inp.split()
 
     command = raw[0]

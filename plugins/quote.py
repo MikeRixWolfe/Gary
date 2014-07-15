@@ -13,14 +13,13 @@ def db_init(db):
 
 def add_quote(db, chan, nick, add_nick, msg):
     db.execute(
-        '''insert into quote (chan, nick, add_nick, msg, time) values(?,?,?,?,?)''',
+        "insert into quote (chan, nick, add_nick, msg, time) values(?,?,?,?,?)",
         (chan, nick, add_nick, msg, time.time()))
     db.commit()
 
 
 def del_quote(key):
-    db.execute('''delete from quote where key=?''',
-               (key,))
+    db.execute("delete from quote where key=?", (key,))
     db.commit()
 
 
@@ -49,7 +48,7 @@ def format_quote(q):
 
 @hook.command(autohelp=False)
 def randomquote(inp, nick='', chan='', db=None, input=None):
-    ".randomquote [nick] - gets random quote by <nick> or from the current channel"
+    """.randomquote [nick] - Gets random quote by <nick> or from the current channel."""
     db_init(db)
     if inp == "":
         quotes = get_quotes_by_chan(db, chan)
@@ -68,7 +67,7 @@ def randomquote(inp, nick='', chan='', db=None, input=None):
 
 @hook.command
 def getquote(inp, nick='', chan='', db=None):
-    ".getquote <#n> - gets <#n>th quote by [nick] or from channel if no nick specified"
+    """.getquote <n> - gets <n>th quote."""
     db_init(db)
     if inp.strip().isdigit():
         num = int(inp.strip())
@@ -83,7 +82,7 @@ def getquote(inp, nick='', chan='', db=None):
 
 @hook.command
 def quote(inp, nick='', chan='', db=None):
-    ".quote <nick> <msg> - gets adds quote"
+    """.quote <nick> <msg> - Adds quote."""
     db_init(db)
     quoted_nick = inp.split(' ', 1)[0].strip('<> ')
     msg = inp.split(' ', 1)[1].strip(' ')

@@ -42,7 +42,7 @@ def karma_edit(inp, chan='', nick='', say=None, db=None):
 
 @hook.command
 def karma(inp, chan='', say=None, db=None, input=None):
-    ".karma <word> - Returns karma of <word>; <word>(++|--) increments or decrements karma of <word>"
+    """.karma <word> - Returns karma of <word>; <word>(++|--) increments or decrements karma of <word>."""
     db_init(db)
 
     word = inp.strip()
@@ -59,7 +59,7 @@ def karma(inp, chan='', say=None, db=None, input=None):
 
 @hook.command(adminonly=True)
 def setkarma(inp, chan='', db=None):
-    ".setkarma <word> <value> - Sets karma value."
+    """.setkarma <word> <value> - Sets karma value."""
     db_init(db)
 
     try:
@@ -73,7 +73,7 @@ def setkarma(inp, chan='', db=None):
 
 @hook.command(autohelp=False)
 def topkarma(inp, chan='', say=None, db=None):
-    ".topkarma - returns 3 top karma'd items"
+    """.topkarma - Returns 3 highest karma'd items."""
     db_init(db)
     items = db.execute("select word, karma from karma where chan=? " \
         "order by karma desc limit 3", (chan,)).fetchall()
@@ -85,7 +85,7 @@ def topkarma(inp, chan='', say=None, db=None):
 
 @hook.command(autohelp=False)
 def botkarma(inp, chan='', say=None, db=None):
-    ".botkarma - returns 3 lowest karma'd items"
+    """.botkarma - Returns 3 lowest karma'd items."""
     db_init(db)
     items = db.execute(
         "select word, karma from karma where chan=? order by karma limit 3",

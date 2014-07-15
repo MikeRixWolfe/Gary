@@ -152,7 +152,7 @@ def redirect(message, voice, bot, db):  # Ugly function
 
 @hook.command(adminonly=False, autohelp=False)
 def parsesms(inp, say='', conn=None, bot=None, db=None):
-    ".parsesms - Force an sms check from Google Voice."
+    """.parsesms - Force an SMS check from Google Voice."""
     db_init(db)
     voice = Voice()
     say("Checking for unread SMS...")
@@ -203,7 +203,7 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
 @hook.command()
 def sms(inp, nick='', chan='', db=None, bot=None):
     ".sms <nick> <message> - Sends a text message to specified <nick> from " \
-    "phonebook via Google Voice; users may send 'sms <nick> <message>' or "\
+    "phonebook via Google Voice; users may send 'sms <nick> <message>' or " \
     "'phonebook <nick>' via mobile to use functions while circumventing channel."
     if chan[0] != '#':
         return "Can only SMS from public channels to control abuse."
@@ -234,7 +234,7 @@ def sms(inp, nick='', chan='', db=None, bot=None):
 
 @hook.command()
 def call(inp, say='', nick='', db=None, bot=None):
-    ".call <nick> - Calls specified <nick> and connects the call to your number from phonebook via Google Voice."
+    """.call <nick> - Calls specified <nick> and connects the call to your number from phonebook via Google Voice."""
     db_init(db)
 
     if inp.lower() == nick.lower():
@@ -266,7 +266,7 @@ def call(inp, say='', nick='', db=None, bot=None):
 
 @hook.command
 def phonebook(inp, nick='', input=None, db=None, bot=None):
-    ".phonebook <nick|number|delete|private> - Gets a users phone number, or sets/deletes your phone number, or toggles private status."
+    """.phonebook <nick|number|delete|private> - Gets a users phone number, or sets/deletes your phone number, or toggles private status."""
     db_init(db)
     blacklist = bot.config["gvoice"]["private"]
     recip = inp.strip().encode('ascii', 'ignore')
@@ -311,7 +311,7 @@ def phonebook(inp, nick='', input=None, db=None, bot=None):
 
 @hook.command(adminonly=True)
 def blacklist(inp, nick='', conn=None, bot=None, say=None):
-    ".blacklist <list|add|del> [contact|number] - Displays blacklist or adds/dels contacts/numbers to/from blacklist."
+    """.blacklist <list|add|del> [contact|number] - Displays blacklist or adds/dels contacts/numbers to/from blacklist."""
     private = bot.config["gvoice"]["private"]
     inp = inp.split()
     if len(inp) == 1 and inp[0] == 'list':

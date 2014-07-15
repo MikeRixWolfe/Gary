@@ -4,7 +4,7 @@ import re
 
 @hook.command(autohelp=False)
 def kernel(inp, reply=None):
-    ".kernel - displays recent kernel versions"
+    """.kernel - Displays recent kernel versions."""
     contents = http.get("https://www.kernel.org/finger_banner")
     contents = re.sub(r'The latest(\s*)', '', contents)
     contents = re.sub(r'version of the Linux kernel is:(\s*)', '- ', contents)

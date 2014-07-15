@@ -33,7 +33,7 @@ def sptfy(inp, sptfy=False):
 
 @hook.command
 def sptrack(inp):
-    """spotify <song> -- Search Spotify for <song>"""
+    """.spotify <song> - Search Spotify for <song>."""
     try:
         data = http.get_json("http://ws.spotify.com/search/1/track.json", q=inp.strip())
     except Exception as e:
@@ -50,7 +50,7 @@ def sptrack(inp):
 
 @hook.command
 def spalbum(inp):
-    """spalbum <album> -- Search Spotify for <album>"""
+    """.spalbum <album> - Search Spotify for <album>."""
     try:
         data = http.get_json("http://ws.spotify.com/search/1/album.json", q=inp.strip())
     except Exception as e:
@@ -67,7 +67,7 @@ def spalbum(inp):
 
 @hook.command
 def spartist(inp):
-    """spartist <artist> -- Search Spotify for <artist>"""
+    """.spartist <artist> - Search Spotify for <artist>."""
     try:
         data = http.get_json("http://ws.spotify.com/search/1/artist.json", q=inp.strip())
     except Exception as e:

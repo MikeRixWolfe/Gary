@@ -9,8 +9,7 @@ from util import hook, http
 @hook.api_key('twitter')
 @hook.command
 def twitter(inp, say='', api_key=None):
-    ".twitter <user>/<user> <n>/<id>/#<search>/#<search> <n> - " \
-        "get <user>'s last/<n>th tweet/get tweet <id>/do <search>/get <n>th <search> result"
+    """.twitter <user>/<user> <n>/<id>/#<search>/#<search> <n> - Get <user>'s last/<n>th tweet/get tweet <id>/do <search>/get <n>th <search> result."""
 
     if not isinstance(api_key, dict) or any(key not in api_key for key in
                                             ('consumer', 'consumer_secret', 'access', 'access_secret')):

@@ -3,7 +3,7 @@ from util import hook, http
 
 @hook.command
 def domainr(inp, say=''):
-    ".domainr <domain> - Use domai.nr's API to search for a domain, and similar domains."
+    """.domainr <domain> - Use domai.nr's API to search for a domain, and similar domains."""
     try:
         data = http.get_json('http://domai.nr/api/json/search?q=' + inp)
     except (http.URLError, http.HTTPError) as e:

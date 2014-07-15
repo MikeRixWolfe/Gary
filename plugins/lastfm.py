@@ -1,6 +1,5 @@
 from util import hook, http
 
-
 api_url = "http://ws.audioscrobbler.com/2.0/?format=json"
 
 
@@ -8,7 +7,7 @@ api_url = "http://ws.audioscrobbler.com/2.0/?format=json"
 @hook.command('np', autohelp=False)
 @hook.command(autohelp=False)
 def nowplaying(inp, nick='', say=None, api_key=None):
-    ".np/.nowplaying <user> - gets a lastfm user's last played track"
+    """.np/.nowplaying <user> - Gets a LastFM user's last played track."""
     user = inp or nick
 
     try:
@@ -53,7 +52,7 @@ def nowplaying(inp, nick='', say=None, api_key=None):
 @hook.api_key('lastfm')
 @hook.command  # (autohelp=False)
 def toptrack(inp, nick='', say=None, api_key=None):
-    ".toptrack [overall|7day|1month|3month|6month|12month] <user> - gets a LastFM user's most played track, specify time period or default to overall"
+    """.toptrack [overall|7day|1month|3month|6month|12month] <user> - gets a LastFM user's most played track, specify time period or default to overall."""
     inp = inp.strip("").split(" ")
 
     if len(inp) == 2:
@@ -110,7 +109,7 @@ def toptrack(inp, nick='', say=None, api_key=None):
 @hook.api_key('lastfm')
 @hook.command
 def similar(inp, nick='', say=None, api_key=None):
-    ".similar <artist> - gets similar artists via lastfm"
+    """.similar <artist> - Gets similar artists via LastFM."""
 
     response = http.get_json(api_url, method="artist.getsimilar",
                              api_key=api_key, artist=inp.strip(), limit=5, autocorrect=1)

@@ -31,7 +31,7 @@ cards = {
 @hook.command
 @hook.command('w')
 def weather(inp):
-    ".w[eather] <zip code> - Gets the current weather conditions for a given zipcode"
+    """.w[eather] <zip code> - Gets the current weather conditions for a given zipcode."""
     url = wurl % inp + '&u=f'
     parsed = http.get_xml(url)
     if len(parsed) != 1:
@@ -84,7 +84,7 @@ def weather(inp):
 @hook.command('f')
 @hook.command
 def forecast(inp):
-    ".f[orecast] <zip code> - gets the current weather conditions for a given zipcode"
+    """.f[orecast] <zip code> - Gets the current weather conditions for a given zipcode."""
     url = wurl % inp + '&u=f'
     parsed = http.get_xml(url)
 

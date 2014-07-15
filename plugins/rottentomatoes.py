@@ -8,7 +8,7 @@ movie_reviews_url = api_root + 'movies/%s/reviews.json'
 @hook.api_key('rottentomatoes')
 @hook.command
 def rt(inp, api_key=None):
-    '.rt <title> - gets ratings for <title> from Rotten Tomatoes'
+    """.rt <title> - Gets ratings for <title> from Rotten Tomatoes."""
 
     results = http.get_json(movie_search_url, q=inp, apikey=api_key)
     if results['total'] == 0:

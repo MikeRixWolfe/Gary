@@ -1,12 +1,11 @@
 import re
-
 from util import hook, http
 
 
 @hook.command('ud')
 @hook.command
 def urban(inp):
-    '''.ud/.urban <phrase> - looks up <phrase> on urbandictionary.com'''
+    """.ud/.urban <phrase> - Looks up <phrase> on urbandictionary.com."""
     url = 'http://www.urbandictionary.com/iphone/search/define'
     referer = 'http://m.urbandictionary.com'
     try:
@@ -25,14 +24,11 @@ def urban(inp):
 
     return out
 
-# define plugin by GhettoWizard & Scaevolus
-
 
 @hook.command('dict')
 @hook.command
 def define(inp):
-    ".define/.dict <word> - fetches definition of <word>"
-
+    """.define/.dict <word> - fetches definition of <word>."""
     url = 'http://ninjawords.com/'
 
     try:
@@ -94,28 +90,21 @@ def define(inp):
 @hook.command('e')
 @hook.command
 def etymology(inp):
-    ".e/.etymology <word> - Retrieves the etymology of chosen word"
-
+    """.e/.etymology <word> - Retrieves the etymology of chosen word."""
     url = 'http://www.etymonline.com/index.php'
-
     h = http.get_html(url, term=inp)
-
     etym = h.xpath('//dl')
 
     if not etym:
         return 'No etymology found for ' + inp
 
     etym = etym[0].text_content()
-
     etym = ' '.join(etym.split())
 
     if len(etym) > 400:
         etym = etym[:etym.rfind(' ', 0, 400)] + ' ...'
 
     return etym
-
-'''Searches Encyclopedia Dramatica and returns the first paragraph of the
-article'''
 
 
 api_url = "http://encyclopediadramatica.es/api.php?action=opensearch"
@@ -125,7 +114,7 @@ ed_url = "http://encyclopediadramatica.es/"
 @hook.command('ed')
 @hook.command
 def drama(inp):
-    '''.drama <phrase> - gets first paragraph of Encyclopedia Dramatica article on <phrase>; Note, use proper calitalization e.g. "Ron Paul"'''
+    """.drama <phrase> - gets first paragraph of Encyclopedia Dramatica article on <phrase>; Note, use proper calitalization e.g. 'Ron Paul'."""
     try:
         j = http.get_json(api_url, search=inp)
     except:
@@ -144,4 +133,4 @@ def drama(inp):
                 summary = summary[:summary.rfind(' ', 0, 300)] + "..."
             return '%s :: \x02%s\x02' % (summary, url)
 
-    return "error"
+    return "Error"

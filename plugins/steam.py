@@ -35,7 +35,7 @@ def get_steam_info(url):
 
 @hook.command
 def steam(inp):
-    """steam [search] - Search for specified game/trailer/DLC"""
+    """.steam [search] - Search for specified game/trailer/DLC."""
     soup = http.get_soup("http://store.steampowered.com/search/?term={}".format(inp))
     result = soup.find('a', {'class': 'search_result_row'})
     try:

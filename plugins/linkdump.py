@@ -7,7 +7,7 @@ html_re = r'https?://[^\s<>"]+|www\.[^\s<>"]+'
 
 @hook.command(autohelp=False)
 def linkdump(inp, chan="", say="", db=None):
-    ".linkdump - Gets today's links dumped in channel"
+    """.linkdump - Gets today's links dumped in channel."""
     today = datetime.today()
     period = float(datetime(today.year, today.month, today.day).strftime('%s'))
     rows = db.execute("select nick, msg, time from log where uts >= ? and chan = ? and " \

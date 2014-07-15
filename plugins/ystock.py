@@ -42,7 +42,7 @@ def get_stock_console(inp, q="SELECT * FROM yahoo.finance.quotes WHERE symbol=@s
 
 @hook.command
 def stock(inp, say=''):
-    '''.stock <symbol> - Gets stock information from Yahoo.'''
+    """.stock <symbol> - Gets stock information from Yahoo."""
     quote = get_stock_console(inp) or get_stock_rest(inp) or get_stock_download(inp)
 
     if not quote:
@@ -63,7 +63,7 @@ def stock(inp, say=''):
 
 @hook.command
 def stockhistory(inp, say=''):
-    '''.stockhisory <symbol> - gets stock history information from Yahoo.'''
+    """.stockhisory <symbol> - Gets stock history information from Yahoo."""
     quote = get_stock_console(inp) or get_stock_rest(inp,
         'SELECT * FROM yahoo.finance.quotes WHERE symbol in ("%s")')
 

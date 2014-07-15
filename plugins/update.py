@@ -3,10 +3,11 @@
 from git import Repo
 from util import hook, web
 
+
 @hook.command("pull", adminonly=True, autohelp=False)
 @hook.command(adminonly=True, autohelp=False)
 def update(inp, bot=None):
-    ".update - Pull latest changes from Git repo (restart may be required)"
+    """.update - Pull latest changes from Git repo (restart may be required)."""
     repo = Repo()
     git = repo.git
     try:
@@ -21,7 +22,7 @@ def update(inp, bot=None):
 
 @hook.command(autohelp=False)
 def version(inp, bot=None):
-    ".version - Gets version information for local and remote Git repo's"
+    """.version - Gets version information for local and remote Git repos."""
     repo = Repo()
 
     # get origin and fetch it

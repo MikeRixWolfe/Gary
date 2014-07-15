@@ -15,13 +15,8 @@ def get_factoid(db, chan, word):
     return (row[0] if row else None)
 
 
-# @hook.regex(r'^(no\ )?(?:G|g)ary(?:\:\ |\,\ |\ )([^\.][\S]+|.*)\ (?:is)\ (also\ )?\<(reply|rreply|exec)\>(.+)') #m2 style
-@hook.regex(r'^(no\ )?(?:G|g)ary(?:\:\ |\,\ |\ )([^\(].*?[^\)]|\(.*\))\ (?:is)\ (also\ )?(.+)')  # Geekboy style
+@hook.regex(r'^(no\ )?(?:G|g)ary(?:\:\ |\,\ |\ )([^\(].*?[^\)]|\(.*\))\ (?:is)\ (also\ )?(.+)')
 def set_factoid(inp, nick='', chan='', say=None, db=None):
-    # Backup documentation for m2 style factoids
-    "Gary: [word|phrase] is <reply> [data] - sets [word|phrase] to [data]; \
-    no Gary, [word|phrase] is <reply> [new data] - resets [word|phrase] to [new data]; \
-    Gary: [word|phrase] is also <reply> [additional data] - adds [additional data] to [word]"
     db_init(db)
 
     replace = inp.group(1)
@@ -58,7 +53,7 @@ def set_factoid(inp, nick='', chan='', say=None, db=None):
 
 @hook.command
 def forget(inp, chan='', say=None, db=None):
-    ".forget <word|phrase> - forgets factoid"
+    """.forget <word|phrase> - Forgets factoid."""
     db_init(db)
     word = inp.strip()
     data = get_factoid(db, chan, word)
@@ -74,9 +69,9 @@ def forget(inp, chan='', say=None, db=None):
 @hook.command
 @hook.regex(r'^(.+)\?$')
 def factoid(inp, chan='', say=None, db=None):
-    "Gary: <word|(multi word)> is <data> - sets <word|(multi word)> to <data>; \
-    no Gary, <word|(multi word)> is <new data> - resets <word|(multi word)> to <new data>; \
-    Gary: <word|(multi word)> is also <additional data> - adds <additional data> to <word|(multi word)>"
+    "Gary: <word|(multi word)> is <data> - Sets <word|(multi word)> to <data>; \
+    no Gary, <word|(multi word)> is <new data> - Resets <word|(multi word)> to <new data>; \
+    Gary: <word|(multi word)> is also <additional data> - Adds <additional data> to <word|(multi word)>."
     db_init(db)
     word = inp.group(1).strip()
     data = get_factoid(db, chan, word)

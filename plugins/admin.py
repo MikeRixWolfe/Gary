@@ -90,7 +90,7 @@ def raw(inp, conn=None, notice=None):
 
 
 def mode_cmd(mode, text, inp, chan, conn, notice):
-    """ generic mode setting function """
+    """.mode [channel] <target> <mode> - Generic mode setting function."""
     split = inp.split(" ")
     if split[0].startswith("#"):
         channel = split[0]
@@ -105,7 +105,7 @@ def mode_cmd(mode, text, inp, chan, conn, notice):
 
 
 def mode_cmd_no_target(mode, text, inp, chan, conn, notice):
-    """ generic mode setting function without a target"""
+    """.mode [channel] <mode> - Generic mode setting function without a target."""
     split = inp.split(" ")
     if split[0].startswith("#"):
         channel = split[0]

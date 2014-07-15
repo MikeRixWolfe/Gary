@@ -1,16 +1,9 @@
-"""
-TV information, written by Lurchington 2010
-modified by rmmh 2010
-"""
-
 import datetime
 from urllib2 import URLError
 from zipfile import ZipFile
 from cStringIO import StringIO
-
 from lxml import etree
 from util import hook, http
-
 
 base_url = "http://thetvdb.com/api/"
 api_key = "469B73127CA0C411"
@@ -85,7 +78,7 @@ def get_episode_info(episode):
 @hook.command
 @hook.command('tv')
 def tvnext(inp):
-    ".tvnext <series> - get the next episode of <series>"
+    """.tvnext <series> - Get the next episode of <series>."""
     episodes = get_episodes_for_series(inp)
 
     if episodes["error"]:
@@ -131,7 +124,7 @@ def tvnext(inp):
 @hook.command
 @hook.command('tvprev')
 def tvlast(inp):
-    ".tvlast <series> - gets the most recently aired episode of <series>"
+    """.tvlast <series> - Gets the most recently aired episode of <series>."""
     episodes = get_episodes_for_series(inp)
 
     if episodes["error"]:

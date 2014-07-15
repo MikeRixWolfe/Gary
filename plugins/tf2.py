@@ -1,15 +1,12 @@
-"""
-tf.py: written by MikeFightsBears 2013, inspired by ipsum
-"""
-
 from util import hook, http
 
 steam_key = '5519ACA4E3711C3A52AA7CEC7169C6E6'
 
+
 #@hook.api_key('steam_key')
 @hook.command
 def hats(inp):
-    ".hats <Steam Vanity URL|Numeric Steam ID> - Shows backpack information for TF2."
+    """.hats <Steam Vanity URL|Numeric Steam ID> - Shows backpack information for TF2."""
 
     # Get SteamID
     if inp.isdigit():

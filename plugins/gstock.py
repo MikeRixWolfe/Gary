@@ -19,5 +19,5 @@ def get_stock(symbol):
 
 @hook.command()
 def gstock(inp, say=None):
-    '''.gstock <symbol> - Gets stock information from Google.'''
+    """.gstock <symbol> - Gets stock information from Google."""
     say(get_stock(inp) or "Google Finance API error, please try again in a few minutes.")

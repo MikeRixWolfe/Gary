@@ -6,7 +6,7 @@ re_lineends = re.compile(r'[\r\n]*')
 
 @hook.command
 def python(inp):
-    ".python <prog> - executes python code <prog>"
+    """.python <prog> - Executes Python code <prog>."""
     try:
         res = http.get("http://eval.appspot.com/eval", statement=inp).splitlines()
     except Exception as e:
@@ -17,7 +17,7 @@ def python(inp):
 
 @hook.command(adminonly=True)
 def ply(inp, bot=None, input=None, nick=None, db=None, chan=None):
-    ".ply <prog> - Execute local python."
+    """.ply <prog> - Execute local Python."""
     try:
         time.sleep(.1)
         from cStringIO import StringIO

@@ -1,6 +1,7 @@
 from util import hook
 import random
 import re
+
 r = "\x02\x0305"  # red
 g = "\x02\x0303"  # green
 y = "\x02\x0308"  # yellow
@@ -30,7 +31,7 @@ nextresponsenumber = -1
 @hook.command
 @hook.command("8ball")
 def eightball(inp, nick='', say=None):
-    '''.8ball <question> - ask the 8ball a question'''
+    """.8ball <question> - Ask the 8ball a question."""
     global nextresponsenumber
     inp = inp.strip()
     if re.match("[a-zA-Z0-9]", inp[-1]):
@@ -42,10 +43,11 @@ def eightball(inp, nick='', say=None):
         return inp + " " + random.choice(answers)
 
 
-@hook.command("8next")
+@hook.command("8next", adminonly=True)
 def eightballnext(inp, nick='', input=None, say=None):
-    if nick in input.bot.config["admins"]:
-        global nextresponsenumber
-        nextresponsenumber = int(inp.strip())
-        say("next response will be #%d - %s" %
-            (nextresponsenumber, answers[nextresponsenumber]))
+    if not inp.isdigit() or (int(inp) < 0  or int(inp) > 19):
+        return "Please specify 0-19"
+    global nextresponsenumber
+    nextresponsenumber = int(inp.strip())
+    say("next response will be #%d - %s" %
+        (nextresponsenumber, answers[nextresponsenumber]))

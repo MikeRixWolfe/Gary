@@ -5,8 +5,7 @@ from util import hook, http, web
 
 @hook.command
 def geoip(inp):
-    ".geoip <host/ip> - Gets the location of <host/ip>"
-
+    """.geoip <host/IP> - Gets the location of <host/IP>."""
     url = "http://freegeoip.net/json/%s" % \
           (http.quote(inp.encode('utf8'), safe=''))
 
@@ -40,7 +39,7 @@ def geoip(inp):
 
 @hook.command
 def whereis(inp):
-    ".whereis <user> - gets the ip and location of a system user"
+    """.whereis <user> - Gets the IP and location of a system user."""
     cmd = "w -hs | awk '{print $1 \" \" $3}' | grep \"%s\" | tail -n 1 | awk '{print $2}'" % inp.strip().split()[0]
     ip = os.popen(cmd).read().strip()
     if ip:
@@ -68,6 +67,6 @@ def whereis(inp):
 
 @hook.command
 def map(inp):
-    ".map <place>|<origin> to <destination> - Gets a Map of place or route from Google Maps"
+    """.map <place>|<origin to destination> - Gets a Map of place or route from Google Maps."""
     return web.try_googl('https://www.google.com/maps/?q=' +
         '+'.join(inp.split(' ')))

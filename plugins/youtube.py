@@ -43,7 +43,7 @@ def get_video_description(vid_id):
 @hook.command('y')
 @hook.command
 def youtube(inp, say=None):
-    '.youtube <query> - returns the first YouTube search result for <query>'
+    """.youtube <query> - Returns the first YouTube search result for <query>."""
 
     j = http.get_json(search_api_url, q=inp)
 

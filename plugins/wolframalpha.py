@@ -7,7 +7,7 @@ from util import hook, http, text
 @hook.command('calc')
 @hook.command
 def wa(inp, api_key=None):
-    ".wa/.calc <query> - computes <query> using Wolfram Alpha"
+    """.wa/.calc <query> - Computes <query> using Wolfram Alpha."""
 
     url = 'http://api.wolframalpha.com/v2/query?format=plaintext'
 

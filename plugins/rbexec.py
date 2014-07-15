@@ -31,7 +31,7 @@ def parse_html(document):
 @hook.command('rb')
 @hook.command
 def ruby(inp, say=None):
-    '''.rb / .ruby <code> - Executes Ruby code.'''
+    """.rb / .ruby <code> - Executes Ruby code."""
 
     code = inp.split(" ")[0:]
     code = " ".join(code)

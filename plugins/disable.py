@@ -4,7 +4,7 @@ from util import hook
 
 @hook.command(autohelp=False)
 def disabled(inp, notice=None, bot=None, say=None):
-    """.disabled - Lists disabled commands/plugins"""
+    """.disabled - Lists disabled commands/plugins."""
 
     disabled = bot.config["disabled"]
 

@@ -80,7 +80,7 @@ def cron(paraml, nick='', conn=None, db=None):
 
 @hook.command()
 def remindme(inp, nick='', chan='', db=None):
-    ".remindme YYYY-MM-DD HH:MM <message> - Queues <message> to be output at specified date and time."
+    """.remindme YYYY-MM-DD HH:MM <message> - Queues <message> to be output at specified date and time."""
     db_init(db)
     new_event = re.match(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2})\ (.+)', inp)
     if new_event and new_event.group(1) > str(datetime.datetime.now(EST()))[:16]:

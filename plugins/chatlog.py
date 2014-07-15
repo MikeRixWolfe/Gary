@@ -5,7 +5,7 @@ from util import hook, timesince, text
 
 @hook.command
 def last(inp, nick='', chan='', input=None, db=None, say=None):
-    ".last <phrase> - finds the last occurence of a phrase"
+    """.last <phrase> - Finds the last occurence of a phrase."""
     row = db.execute("select time, nick, msg, uts from log where msg like ? "
         "and uts < ? and chan = ? order by uts desc limit 1",
         (('%' + inp.strip() + '%'), (time.time() - 1), chan)).fetchone()
@@ -19,7 +19,7 @@ def last(inp, nick='', chan='', input=None, db=None, say=None):
 
 @hook.command
 def first(inp, chan='', input=None, db=None, say=None):
-    ".first <phrase> - finds the first occurence of a phrase"
+    """.first <phrase> - Finds the first occurence of a phrase."""
     row = db.execute("select time, nick, msg, uts from log where msg like ? "
         "and chan = ? order by uts asc limit 1",
         (('%' + inp.strip() + '%'), chan)).fetchone()
@@ -33,7 +33,7 @@ def first(inp, chan='', input=None, db=None, say=None):
 
 @hook.command(autohelp=False)
 def king(inp, input=None, db=None, say=None, bot=None):
-    ".king - gets the user with the most used commands"
+    """.king - Gets the user with the most used commands."""
     query_string = "select nick, count(nick) as nick_occ from log where ("
     for command in bot.commands.keys():
         query_string += "msg like '." + command + "%' or "
@@ -55,7 +55,7 @@ def king(inp, input=None, db=None, say=None, bot=None):
 
 @hook.command
 def said(inp, chan='', input=None, db=None, say=None):
-    ".said <phrase> - finds users who has said a phrase."
+    """.said <phrase> - Finds users who has said a phrase."""
     rows = db.execute(
         "select distinct nick from log where msg like ? and chan = ? order by nick",
         ('%' + inp.strip() + '%', chan)).fetchall()
@@ -76,12 +76,12 @@ def said(inp, chan='', input=None, db=None, say=None):
         say("No one!")
 
 
-# def userstats():
+#def userstats():
 
-# def dailylines():
+#def dailylines():
 
 #def chanstats():
 
-# def dailystats():
+#def dailystats():
 
 # def lines():

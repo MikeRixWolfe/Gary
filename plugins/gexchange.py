@@ -11,8 +11,7 @@ def isfloat(string):
 
 @hook.command
 def gex(inp):
-    '''.gex <amount> <from currency> <to currency> - Returns Google Exchange result; <amount> and <to currency> default to 1 and USD respectively'''
-
+    """.gex <amount> <from currency> <to currency> - Returns Google Exchange result; <amount> and <to currency> default to 1 and USD respectively."""
     # Veryfiy and format input
     query = inp.decode('utf-8').upper().split(' ', 2)
     if len(query) == 1:

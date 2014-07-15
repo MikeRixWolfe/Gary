@@ -19,7 +19,7 @@ def restrict(inp, input=None, say=None, bot=None):
 
 @hook.command(adminonly=True, autohelp=False)
 def unrestrict(inp, input=None, say=None, bot=None):
-    """.unrestrict - Removes current channel from restricted mode"""
+    """.unrestrict - Removes current channel from restricted mode."""
     target = input.chan
     chans = bot.config["restrictedmode"]
     if target in chans:
@@ -58,7 +58,7 @@ def opers(inp, bot=None, say=None):
 
 @hook.command(adminonly=True)
 def oper(inp, say=None, bot=None):
-    """.oper user - Adds user to opers."""
+    """.oper <user> - Adds <user> to opers."""
     target = inp.lower()
     opers = bot.config["opers"]
     admins = bot.config["admins"]
@@ -75,7 +75,7 @@ def oper(inp, say=None, bot=None):
 
 @hook.command(adminonly=True)
 def deoper(inp, say=None, bot=None):
-    """.deoper <user> - Removes user from opers."""
+    """.deoper <user> - Removes <user> from opers."""
     target = inp.lower()
     opers = bot.config["opers"]
     admins = bot.config["admins"]
@@ -108,7 +108,7 @@ def voicers(inp, bot=None, say=None):
 
 @hook.command(adminonly=True)
 def voicer(inp, say=None, bot=None):
-    """.voicer user - Adds user to voicers."""
+    """.voicer <user> - Adds <user> to voicers."""
     targets = inp.lower().split()
     voicers = bot.config["voice"]
     opers = bot.config["opers"]
@@ -131,7 +131,7 @@ def voicer(inp, say=None, bot=None):
 
 @hook.command(adminonly=True)
 def devoicer(inp, say=None, bot=None):
-    """.devoicer <user> - Removes user from voicers."""
+    """.devoicer <user> - Removes <user> from voicers."""
     targets = inp.lower().split()
     voicers = bot.config["voice"]
     opers = bot.config["opers"]

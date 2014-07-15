@@ -1,10 +1,7 @@
-"dotnetpad.py: by sklnd, because gobiner wouldn't shut up"
-
 import urllib
 import httplib
 import socket
 import json
-
 from util import hook
 
 
@@ -45,14 +42,14 @@ def dotnetpad(lang, code, timeout=30):
 
 @hook.command
 def fs(inp):
-    ".fs - post a F# code snippet to dotnetpad.net and print the results"
+    """.fs <code> - post a F# code snippet to dotnetpad.net and print the results."""
 
     return dotnetpad('fsharp', inp)
 
 
 @hook.command
 def cs(snippet):
-    ".cs - post a C# code snippet to dotnetpad.net and print the results"
+    """.cs <code> - post a C# code snippet to dotnetpad.net and print the results."""
 
     file_template = ('using System; '
                      'using System.Linq; '

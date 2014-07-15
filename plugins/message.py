@@ -40,7 +40,7 @@ def showtells(inp, say='', nick='', chan='', db=None):
 @hook.command('msg')
 @hook.command
 def message(inp, nick='', chan='', db=None, input=None):
-    ".msg/.message <nick> <message> - relay <message> to <nick> when <nick> is around"
+    """.msg/.message <nick> <message> - Relay <message> to <nick> when <nick> is around."""
 
     query = inp.split(' ', 1)
 

@@ -5,7 +5,7 @@ from util import hook
 
 @hook.command(autohelp=False)
 def help(inp, bot=None, say=None):
-    ".help [command] - gives a list of commands/help for a command"
+    """.help [command] - Gives a list of commands or help for a command."""
 
     funcs = {}
     disabled = bot.config.get('disabled', [])
@@ -41,7 +41,7 @@ def help(inp, bot=None, say=None):
 @hook.command('ahelp', autohelp=False, adminonly=True)
 @hook.command(autohelp=False, adminonly=True)
 def adminhelp(inp, bot=None, say=None):
-    ".adminhelp [command] - gives a list of admin commands/help for a command"
+    """.adminhelp [command] - Gives a list of admin commands or help for a command."""
 
     funcs = {}
     disabled = bot.config.get('disabled', [])

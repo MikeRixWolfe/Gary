@@ -12,7 +12,7 @@ def api_get(query, key, is_image=None, num=1):
 @hook.api_key('google')
 @hook.command
 def gis(inp, api_key=None):
-    '''.gis <term> - finds an image using google images (safesearch off)'''
+    """.gis <term> - Finds an image using Google images (safesearch off)."""
 
     parsed = api_get(inp, api_key, is_image=True, num=10)
     if 'items' not in parsed:
@@ -24,7 +24,7 @@ def gis(inp, api_key=None):
 @hook.command('g')
 @hook.command
 def google(inp, api_key=None):
-    '''.g/.google <query> - returns first google search result'''
+    """.g/.google <query> - Returns first Google search result."""
 
     parsed = api_get(inp, api_key)
     if 'items' not in parsed:
