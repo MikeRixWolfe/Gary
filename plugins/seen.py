@@ -11,7 +11,7 @@ formats = {
     'KICKEE': 'being kicked from %(chan)s by %(nick)s with reason: %(msg)s',
     'TOPIC': 'in %(chan)s changing the topic to: %(msg)s',
     'QUIT': 'quitting IRC with reason: %(msg)s',
-    'NICK': 'in changing nick to %(msg)s'
+    'NICK': 'changing nick to %(msg)s'
 }
 
 
