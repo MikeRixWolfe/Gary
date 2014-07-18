@@ -118,7 +118,7 @@ def log(paraml, input=None, bot=None, db=None):
 
         log_chat(db, input.server, input.chan, input.nick,
             input.user, input.host, input.command, input.msg)
-        if input.command not in ('MODE', 'TOPIC', 'NICK'):
+        if input.command not in ('MODE'):
             log_seen(db, input.server, input.chan, input.nick,
                 input.user, input.host, input.command, input.msg)
 

@@ -1,16 +1,15 @@
 import random
 import re
+import time
 from time import strptime, strftime
 from urllib import quote
-
 from util import hook, http
 
 
 @hook.api_key('twitter')
 @hook.command
-def twitter(inp, say='', api_key=None):
+def twitter(inp, api_key=None):
     """.twitter <user>/<user> <n>/<id>/#<search>/#<search> <n> - Get <user>'s last/<n>th tweet/get tweet <id>/do <search>/get <n>th <search> result."""
-
     if not isinstance(api_key, dict) or any(key not in api_key for key in
                                             ('consumer', 'consumer_secret', 'access', 'access_secret')):
         return "error: api keys not set"
@@ -78,4 +77,31 @@ def twitter(inp, say='', api_key=None):
     time = strftime('%Y-%m-%d %H:%M:%S',
                     strptime(time, '%a %b %d %H:%M:%S +0000 %Y'))
 
-    say("%s: %s [%s]" % (screen_name, text, time))
+    return "%s: %s [%s]" % (screen_name, text, time)
+
+
+@hook.singlethread
+@hook.api_key('twitter')
+@hook.event('JOIN')
+@hook.command
+def twitterloop(paraml, nick='', conn=None, bot=None, api_key=None):
+    server = "%s:%s" % (conn.server, conn.port)
+    if server != "localhost:7666" or paraml[0] != "#vidya" or nick != conn.nick:
+        return
+    api_key = bot.config.get('api_keys', None).get('twitter', None)
+    if not isinstance(api_key, dict) or any(key not in api_key for key in
+        ('consumer', 'consumer_secret', 'access', 'access_secret')):
+            print "Twitter RSS Loop Error: API keys not set."
+            return
+
+    accounts = ["igndeals", "cheapsharkdeals"]
+    prev_tweets = {}
+    print(">>> u'Beginning Twitter RSS loop for %s'" % server)
+    while True:
+        for account in accounts:
+            tweet = twitter(account, api_key)
+            if prev_tweets.get(account, None) != tweet and \
+                    tweet is not None and tweet[:5] != "error":
+                prev_tweets[account] = tweet
+                conn.send("PRIVMSG {} :{}".format(paraml[0], tweet))
+        time.sleep(60)
