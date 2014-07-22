@@ -81,10 +81,10 @@ def twitter(inp, api_key=None):
 
 
 @hook.singlethread
-@hook.api_key('twitter')
 @hook.event('JOIN')
 @hook.command
 def twitterloop(paraml, nick='', conn=None, bot=None, api_key=None):
+    """twitter rss checking loop"""
     server = "%s:%s" % (conn.server, conn.port)
     if server != "localhost:7666" or paraml[0] != "#vidya" or nick != conn.nick:
         return
@@ -100,8 +100,12 @@ def twitterloop(paraml, nick='', conn=None, bot=None, api_key=None):
     while True:
         for account in accounts:
             tweet = twitter(account, api_key)
+            # if not unchanged, empty, error, or @ reply
             if prev_tweets.get(account, None) != tweet and \
-                    tweet is not None and tweet[:5] != "error":
+                    tweet is not None and tweet[:5] != "error" \
+                    and "@" not in tweet.split(":", 1)[1].strip()[:2]:
+                # handle restarts
+                if prev_tweets.get(account, None) is not None:
+                    conn.send("PRIVMSG {} :{}".format(paraml[0], tweet))
                 prev_tweets[account] = tweet
-                conn.send("PRIVMSG {} :{}".format(paraml[0], tweet))
         time.sleep(60)

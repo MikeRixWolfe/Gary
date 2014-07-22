@@ -4,8 +4,9 @@ import lxml.etree
 from util import hook, http
 
 wurl = 'http://xml.weather.yahoo.com/forecastrss?p=%s'
-
+wurl2 = 'http://xml.weather.yahoo.com/forecastrss?w=%s'
 wser = 'http://xml.weather.yahoo.com/ns/rss/1.0'
+wgeo = "http://where.yahooapis.com/v1/places.q('%s')?appid=%s&format=json"
 
 cards = {
     0: "N",
@@ -28,11 +29,32 @@ cards = {
 }
 
 
+def get_woeid(inp, api_key):
+    url = wgeo % (http.quote_plus(inp), api_key['consumer'])
+    try:
+        parsed = http.get_json(url)
+        return parsed.get('places', None).get('place', None)[0].get('woeid', None)
+    except:
+        return None
+
+
+@hook.api_key('yahoo')
 @hook.command
 @hook.command('w')
-def weather(inp):
+def weather(inp, api_key=None):
     """.w[eather] <zip code> - Gets the current weather conditions for a given zipcode."""
-    url = wurl % inp + '&u=f'
+    if not isinstance(api_key, dict) or any(key not in api_key for key in
+            ('consumer', 'consumer_secret')):
+        return "Error: API keys not set."
+
+    if inp.isdigit():
+        url = wurl % inp + '&u=f'
+    else:
+        woeid = get_woeid(inp, api_key)
+        if woeid is None:
+            return "Error: unable to lookup weather ID for location"
+        url = wurl2 % woeid + '&u=f'
+
     parsed = http.get_xml(url)
     if len(parsed) != 1:
         return "Error parsing Yahoo Weather API, please try again later..."
@@ -81,13 +103,24 @@ def weather(inp):
         #"(delta " + atmosphere[0].items()[3][1] + ")"
 
 
+@hook.api_key('yahoo')
 @hook.command('f')
 @hook.command
-def forecast(inp):
+def forecast(inp, api_key=None):
     """.f[orecast] <zip code> - Gets the current weather conditions for a given zipcode."""
-    url = wurl % inp + '&u=f'
-    parsed = http.get_xml(url)
+    if not isinstance(api_key, dict) or any(key not in api_key for key in
+            ('consumer', 'consumer_secret')):
+        return "Error: API keys not set."
 
+    if inp.isdigit():
+        url = wurl % inp + '&u=f'
+    else:
+        woeid = get_woeid(inp, api_key)
+        if woeid is None:
+            return "Error: unable to lookup weather ID for location"
+        url = wurl2 % woeid + '&u=f'
+
+    parsed = http.get_xml(url)
     if len(parsed) != 1:
         return "Error parsing Yahoo Weather API, please try again later..."
     doc = lxml.etree.parse(urllib2.urlopen(url)).getroot()
