@@ -69,4 +69,4 @@ def whereis(inp):
 def map(inp):
     """.map <place>|<origin to destination> - Gets a Map of place or route from Google Maps."""
     return web.try_googl('https://www.google.com/maps/?q=' +
-        '+'.join(inp.split(' ')))
+        http.quote_plus(inp))

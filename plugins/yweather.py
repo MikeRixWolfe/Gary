@@ -42,7 +42,7 @@ def get_woeid(inp, api_key):
 @hook.command
 @hook.command('w')
 def weather(inp, api_key=None):
-    """.w[eather] <zip code> - Gets the current weather conditions for a given zipcode."""
+    """.w[eather] <zip code|location> - Gets the current weather conditions."""
     if not isinstance(api_key, dict) or any(key not in api_key for key in
             ('consumer', 'consumer_secret')):
         return "Error: API keys not set."
@@ -52,7 +52,7 @@ def weather(inp, api_key=None):
     else:
         woeid = get_woeid(inp, api_key)
         if woeid is None:
-            return "Error: unable to lookup weather ID for location"
+            return "Error: unable to lookup weather ID for location."
         url = wurl2 % woeid + '&u=f'
 
     parsed = http.get_xml(url)
@@ -78,7 +78,7 @@ def weather(inp, api_key=None):
     try:
         condition = conditions[0]
     except IndexError:
-        return "City not found"
+        return "City not found."
     # there HAS to be a way to clean this crap up
     return "\x02" + location[0].items()[0][1] + \
         ", " + \
@@ -107,7 +107,7 @@ def weather(inp, api_key=None):
 @hook.command('f')
 @hook.command
 def forecast(inp, api_key=None):
-    """.f[orecast] <zip code> - Gets the current weather conditions for a given zipcode."""
+    """.f[orecast] <zip code|location> - Gets the current weather conditions."""
     if not isinstance(api_key, dict) or any(key not in api_key for key in
             ('consumer', 'consumer_secret')):
         return "Error: API keys not set."
@@ -117,7 +117,7 @@ def forecast(inp, api_key=None):
     else:
         woeid = get_woeid(inp, api_key)
         if woeid is None:
-            return "Error: unable to lookup weather ID for location"
+            return "Error: unable to lookup weather ID for location."
         url = wurl2 % woeid + '&u=f'
 
     parsed = http.get_xml(url)
@@ -132,7 +132,7 @@ def forecast(inp, api_key=None):
     try:
         fc = forecast[0]
     except IndexError:
-        return "City not found"
+        return "City not found."
 
     # again, there MUST be a better way!
     forecast_string = "Forecast for \x02" + \

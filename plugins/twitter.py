@@ -82,7 +82,6 @@ def twitter(inp, api_key=None):
 
 @hook.singlethread
 @hook.event('JOIN')
-@hook.command
 def twitterloop(paraml, nick='', conn=None, bot=None, api_key=None):
     """twitter rss checking loop"""
     server = "%s:%s" % (conn.server, conn.port)
