@@ -1,26 +1,33 @@
 import re
-from util import hook, http
+import random
+from util import hook, http, text
 
 
 @hook.command('ud')
 @hook.command
 def urban(inp):
     """.ud/.urban <phrase> - Looks up <phrase> on urbandictionary.com."""
-    url = 'http://www.urbandictionary.com/iphone/search/define'
-    referer = 'http://m.urbandictionary.com'
+    base_url = 'http://api.urbandictionary.com/v0'
+    define_url = base_url + "/define"
+
+    # fetch the definitions
     try:
-        page = http.get_json(url, term=inp, headers={'Referer': referer})
-        defs = page['list']
+        page = http.get_json(define_url, term=inp, referer="http://m.urbandictionary.com")
     except:
         return "Error reading the Urban Dictionary API; please try again later.."
 
     if page['result_type'] == 'no_results':
-        return 'not found.'
+        return 'Not found.'
 
-    out = defs[0]['word'] + ': ' + defs[0]['definition'].replace('\r\n', ' ')
+    definitions = page['list']
+    definition = random.choice(definitions)
 
-    if len(out) > 400:
-        out = out[:out.rfind(' ', 0, 400)] + '...'
+    def_text = " ".join(definition['definition'].split())  # remove excess spaces
+    def_text = text.truncate_str(def_text, 200)
+
+    name = definition['word']
+    url = definition['permalink']
+    out = u"\x02{}\x02: {}".format(name, def_text)
 
     return out
 
