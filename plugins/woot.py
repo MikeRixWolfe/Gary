@@ -56,7 +56,6 @@ def format_woot(w):
     return "\x02{}\x0F - {} [{}]".format(w['product'], price, w['url'])
 
 
-@hook.singlethread
 @hook.command(autohelp=False)
 def woot(inp, chan='', say=''):
     ".woot <option> - Gets woots! Options: " \

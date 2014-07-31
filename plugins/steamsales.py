@@ -141,7 +141,6 @@ def format_sale_item(item):
             item["discount_percent"])
 
 
-@hook.singlethread
 @hook.command()
 def steamsales(inp, say='', chan=''):
     ".steamsales <space seperated options> - Check Steam for specified sales; " \
