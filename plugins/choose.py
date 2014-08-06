@@ -12,4 +12,7 @@ def choose(inp):
     c = set(x.strip() for x in c)  # prevent weighting, normalize
     if len(c) == 1:
         return "Looks like you've already made that decision."
-    return random.choice(list(c))
+    x = random.choice(list(c))
+    if x == '4':
+        return 'http://imgs.xkcd.com/comics/random_number.png'  # heh
+    return x
