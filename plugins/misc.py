@@ -93,6 +93,9 @@ def oninvite(paraml, conn=None):
 
 @hook.event('004')
 def onconnect(paraml, conn=None):
+    # wipe user list (useful for server restarts)
+    conn.users = {}
+
     # identify to services
     nickserv_password = conn.conf.get('nickserv_password', '')
     nickserv_name = conn.conf.get('nickserv_name', 'nickserv')
