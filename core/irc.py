@@ -51,7 +51,6 @@ class crlf_tcp(object):
             print ">>> u'%s :%r:%r'" % (e, self.host, self.port)
             self.iqueue.put(StopIteration)
             self.socket.close()
-            time.sleep(self.timeout)
 
     def recv_from_socket(self, nbytes):
         return self.socket.recv(nbytes)
