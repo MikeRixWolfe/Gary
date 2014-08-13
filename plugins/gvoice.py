@@ -2,7 +2,7 @@ import re
 import time
 import json
 import BeautifulSoup
-from util import hook
+from util import hook, text
 from util.googlevoice import Voice, LoginError, ParsingError
 
 default_privacy = 0  # 0 or 1 for not private/private
@@ -62,6 +62,7 @@ def extractsms(htmlsms):
                 cl = span["class"].replace('gc-message-sms-', '')
                 # put text in dict
                 msgitem[cl] = (" ".join(span.findAll(text=True))).strip()
+            msgitem['text'] = text.strip_html(msgitem['text'])  # convert html
             msgitems.append(msgitem)  # add msg dictionary to list
     return msgitems
 
