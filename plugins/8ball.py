@@ -40,7 +40,7 @@ def eightball(inp, nick='', say=None):
         say("%s: %s %s" % (nick, inp, answers[nextresponsenumber]))
         nextresponsenumber = -1
     else:
-        return inp + " " + random.choice(answers)
+        return random.choice(answers)
 
 
 @hook.command("8next", adminonly=True)
