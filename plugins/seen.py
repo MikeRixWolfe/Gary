@@ -24,7 +24,12 @@ def around(inp, nick='', chan='', say='', db=None, input=None):
     if inp.isdigit():
         minutes = int(inp)
 
-    period = time() - (minutes * 60)
+    try:
+        period = time() - (minutes * 60)
+    except:
+        minutes = 15
+        period = time() - (minutes * 60)
+
     out = "Users around in the last {} minutes: ".format(minutes)
 
     if inp == 'today':
