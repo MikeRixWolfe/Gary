@@ -43,14 +43,9 @@ class crlf_tcp(object):
         return socket.socket(socket.AF_INET, socket.TCP_NODELAY)
 
     def run(self):
-        try:
-            self.socket.connect((self.host, self.port))
-            thread.start_new_thread(self.recv_loop, ())
-            thread.start_new_thread(self.send_loop, ())
-        except socket.error as e:
-            print ">>> u'%s :%r:%r'" % (e, self.host, self.port)
-            self.iqueue.put(StopIteration)
-            self.socket.close()
+        self.socket.connect((self.host, self.port))
+        thread.start_new_thread(self.recv_loop, ())
+        thread.start_new_thread(self.send_loop, ())
 
     def recv_from_socket(self, nbytes):
         return self.socket.recv(nbytes)
@@ -156,19 +151,12 @@ class IRC(object):
         self.cmd("USER", [conf.get('user', 'Gary'), "3",
             "*", conf.get('realname','Gary')])
 
-
     def parse_loop(self):
         while True:
             msg = self.conn.iqueue.get()
 
             if msg == StopIteration:
-                try:
-                    self.connect()
-                except socket.error as e:
-                    print ">>> u'%s :%r:%r'" % (e, self.server, self.port)
-                    self.conn.iqueue.put(StopIteration)
-                    self.conn.socket.close()
-                    time.sleep(self.conn.timeout)
+                self.connect()
                 continue
 
             if msg.startswith(":"):  # has a prefix
