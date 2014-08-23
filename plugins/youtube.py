@@ -2,7 +2,7 @@ import locale
 import re
 import time
 
-from util import hook, http
+from util import hook, http, web
 from random import choice
 
 locale.setlocale(locale.LC_ALL, '')

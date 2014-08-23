@@ -12,38 +12,56 @@ def disabled(inp, notice=None, bot=None, say=None):
         say("Disabled commands/plugins are: %s" % format(", ".join(disabled)))
     else:
         say("No commands/plugins are currently disabled.")
-    return
 
 
 @hook.command(adminonly=True)
 def disable(inp, say=None, notice=None, bot=None, config=None):
     """.disable <command/plugin> - Disables <command/plugin>."""
-    target = inp.lower()
+    targets = inp.lower().split()
 
     disabled = bot.config["disabled"]
+    skips = []
+    new = []
+    out = ""
 
-    if target in disabled:
-        say("%s is already disabled." % format(target))
-    else:
-        say("%s has been disabled." % format(target))
-        disabled.append(target)
-        disabled.sort()
-        json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
-    return
+    for target in targets:
+        if not target in disabled:
+            new.append(target)
+            disabled.append(target)
+        else:
+            skips.append(target)
+
+    if new:
+        out = "%s has been disabled. " % format(', '.join(new))
+    if skips:
+        out += "%s is not enabled." % format(', '.join(skips))
+
+    disabled.sort()
+    json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
+    say(out)
 
 
 @hook.command(adminonly=True)
 def enable(inp, say=None, notice=None, bot=None, config=None):
     """.enable <command> - Enables <commmand/plugin>."""
-    target = inp.lower()
+    targets = inp.lower().split()
 
     disabled = bot.config["disabled"]
+    skips = []
+    new = []
+    out = ""
 
-    if target in disabled:
-        say("%s has been enabled." % format(target))
-        disabled.remove(target)
-        disabled.sort()
-        json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
-    else:
-        say("%s is not disabled." % format(target))
-    return
+    for target in targets:
+        if target in disabled:
+            new.append(target)
+            disabled.remove(target)
+        else:
+            skips.append(target)
+
+    if new:
+        out = "%s has been enabled. " % format(', '.join(new))
+    if skips:
+        out += "%s is not disabled." % format(', '.join(skips))
+
+    json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
+    say(out)
