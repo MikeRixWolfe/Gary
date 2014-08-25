@@ -1,109 +1,62 @@
-from util import hook, http, text
-import csv
-import StringIO
+import json
+from util import hook, http, web
 
-gauge_url = "http://www.mysteamgauge.com/search?username={}"
-api_url = "http://mysteamgauge.com/user/{}.csv"
-steam_api_url = "http://steamcommunity.com/id/{}/?xml=1"
-
-
-def refresh_data(name):
-    http.get(gauge_url.format(name), timeout=25, get_method='HEAD')
+user_url = "http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=%s&vanityurl=%s"
+profile_url = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s"
+account_url = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=%s&steamid=%s&format=json"
+games_url = "http://store.steampowered.com/api/appdetails/?appids=%s"
 
 
-def get_data(name):
-    return http.get(api_url.format(name))
-
-
-def is_number(s):
+@hook.singlethread
+@hook.api_key('steam_key')
+@hook.command(autohelp=True)
+def steamcalc(inp, say='', api_key=None):
+    """.steamcalc <Steam Vanity URL ID> - Gets Steam account value for a given Vanity ID. Uses steamcommunity.com/id/<nickname>."""
+    # Get SteamID
     try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-
-
-def unicode_dictreader(utf8_data, **kwargs):
-    csv_reader = csv.DictReader(utf8_data, **kwargs)
-    for row in csv_reader:
-        yield dict([(key.lower(), unicode(value, 'utf-8')) for key, value in row.iteritems()])
-
-
-@hook.command('sc')
-@hook.command
-def steamcalc(inp, reply=None):
-    """.steamcalc <vanity id> [currency] - Gets value of steam account and total hours played. Uses steamcommunity.com/id/<nickname>."""
-
-    name = inp.strip()
-
-    try:
-        request = get_data(name)
-        do_refresh = True
+        steamid = http.get_json(user_url % (api_key, http.quote(inp.encode('utf8'), safe='')))['response']['steamid']
     except:
+        return "'%s' does not appear to be a valid Vanity ID. Uses steamcommunity.com/id/<VanityID>." % inp
+
+    # Get Steam profile info
+    try:
+        profile = http.get_json(profile_url % (api_key, steamid))['response']['players'][0]
+        persona = profile['personaname']
+    except:
+        return "Error looking up %s's Steam profile." % inp
+
+    # Get Steam account games for User
+    try:
+        account = http.get_json(account_url % (api_key, steamid))['response']['games']
+        games = [str(item['appid']) for item in account]
+    except:
+        return "Error looking up %s's Steam inventory." % inp
+
+    # Get info for games
+    say("Collecting data for %s, please wait..." % inp)
+    games_info = {}
+    try:
+        while games:
+            games_temp, games = games[:20], games[20:]
+            gurl = games_url % ','.join(games_temp)
+            games_info  = dict(games_info.items() + http.get_json(gurl).items())
+    except:
+        return "Error looking up game data, please try again later."
+
+    # Aggregate Steam data
+    prices = []
+    scores = []
+    for game in games_info:
         try:
-            reply("Collecting data, this may take a while.")
-            refresh_data(name)
-            request = get_data(name)
-            do_refresh = False
-        except (http.HTTPError, http.URLError):
-            return "Could not get data for this user."
+            prices.append(games_info[game]['data']['price_overview']['final'])
+            scores.append(games_info[game]['data']['metacritic']['score'])
+        except:
+            pass #print games_info[game]
 
-    # we use StringIO because CSV can't read a string
-    csv_data = StringIO.StringIO(request)
-    reader = unicode_dictreader(csv_data)
+    prices = [int(price) / 100. for price in prices]
+    scores = [float(score) for score in scores]
 
-    # put the games in a list
-    games = []
-    for row in reader:
-        games.append(row)
+    total_price = "{0:.2f}".format(sum(prices))
+    avg_score = "{0:.1f}".format(sum(scores) / len(scores))
 
-    data = {}
-
-    # basic information
-    try:
-        steam_profile = http.get_xml(steam_api_url.format(name))
-        data["name"] = steam_profile.find('steamID').text
-        online_state = steam_profile.find('stateMessage').text
-    except AttributeError:
-        return "Could not get data for this user."
-
-    # will make this pretty later
-    online_state = online_state.replace("<br/>", ": ")
-    data["state"] = text.strip_html(online_state)
-
-    # work out the average metascore for all games
-    ms = [float(game["metascore"])
-          for game in games if is_number(game["metascore"])]
-    metascore = float(sum(ms)) / len(ms) if len(ms) > 0 else float('nan')
-    data["average_metascore"] = "{0:.1f}".format(metascore)
-
-    # work out the totals
-    data["games"] = len(games)
-
-    total_value = sum([float(game["value"])
-                      for game in games if is_number(game["value"])])
-    data["value"] = str(int(round(total_value)))
-
-    # work out the total size
-    total_size = 0.0
-
-    for game in games:
-        if not is_number(game["size"]):
-            continue
-
-        if game["unit"] == "GB":
-            total_size += float(game["size"])
-        else:
-            total_size += float(game["size"]) / 1024
-
-    data["size"] = "{0:.1f}".format(total_size)
-
-    try:
-        reply("{name} ({state}) has {games} games with a total value of ${value}"
-              " and a total size of {size}GB! The average metascore for these"
-              " games is {average_metascore}.".format(**data))
-    except:
-        return "The return string contains characters I can't output, get mulched."
-
-    if do_refresh:
-        refresh_data(name)
+    say("{} has {} games with a total value of ${} and an average metascore of {}".format(persona, len(games_info), total_price, avg_score))

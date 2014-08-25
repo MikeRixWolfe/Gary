@@ -1,11 +1,9 @@
 from util import hook, http
 
-steam_key = '5519ACA4E3711C3A52AA7CEC7169C6E6'
 
-
-#@hook.api_key('steam_key')
-@hook.command
-def hats(inp):
+@hook.api_key('steam_key')
+@hook.command(autohelp=True)
+def hats(inp, api_key=None):
     """.hats <Steam Vanity URL|Numeric Steam ID> - Shows backpack information for TF2."""
 
     # Get SteamID
@@ -14,7 +12,7 @@ def hats(inp):
     else:
         try:
             id_url = 'http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=%s&vanityurl=%s' % \
-                (steam_key, http.quote(inp.encode('utf8'), safe=''))
+                (api_key, http.quote(inp.encode('utf8'), safe=''))
             steamid64 = http.get_json(id_url)['response']['steamid']
         except:
             return "Error getting numeric Steam ID, please try format '.hats <Numeric Steam ID>'"
@@ -22,7 +20,7 @@ def hats(inp):
     # Get Steam User's TF2 Inventory/Check for User
     try:
         inv_url = 'http://api.steampowered.com/IEconItems_440/GetPlayerItems/v0001/?SteamID=%s&key=%s' % \
-            (steamid64, steam_key)
+            (steamid64, api_key)
         inv = http.get_json(inv_url)
     except:
         return "Sorry, I couldn't find '%s''s Steam inventory." % inp
@@ -47,10 +45,9 @@ def hats(inp):
 
     # Get Market Price for Backpack
     try:
-        backpack_url = 'http://backpack.tf/api/IGetUsers/v3/?steamids=%s&format=json' % \
-            (steamid64)
+        backpack_url = 'http://backpack.tf/api/IGetUsers/v3/?steamids=%s' % steamid64
         backpack = http.get_json(backpack_url)
-        ref = backpack['response']['players'][0]['backpack_value']['440']
+        ref = backpack['response']['players'][steamid64]['backpack_value']['440']
     except:
         ref = '???'
 
