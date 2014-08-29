@@ -1,5 +1,5 @@
 import json
-from util import hook, http, web
+from util import hook, http
 
 user_url = "http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=%s&vanityurl=%s"
 profile_url = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s"
