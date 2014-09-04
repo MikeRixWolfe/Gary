@@ -5,12 +5,12 @@ from util import hook, timesince, text
 
 formats = {
     'PRIVMSG': 'in %(chan)s saying "%(msg)s"',
-    'PART': 'leaving %(chan)s with reason: %(msg)s',
+    'PART': 'leaving %(chan)s with reason "%(msg)s"',
     'JOIN': 'joining %(chan)s',
-    'KICK': 'kicking %(who)s from %(chan)s with reason: %(msg)s',
-    'KICKEE': 'being kicked from %(chan)s by %(nick)s with reason: %(msg)s',
-    'TOPIC': 'in %(chan)s changing the topic to: %(msg)s',
-    'QUIT': 'quitting IRC with reason: %(msg)s',
+    'KICK': 'kicking %(who)s from %(chan)s with reason "%(msg)s"',
+    'KICKEE': 'being kicked from %(chan)s by %(nick)s with reason "%(msg)s"',
+    'TOPIC': 'in %(chan)s changing the topic to "%(msg)s"',
+    'QUIT': 'quitting IRC with reason "%(msg)s"',
     'NICK': 'changing nick to %(msg)s'
 }
 
@@ -24,7 +24,7 @@ def around(inp, nick='', chan='', say='', db=None, input=None):
     if inp.isdigit():
         minutes = int(inp)
 
-    try:
+    try:  # prevent int overflow
         period = time() - (minutes * 60)
     except:
         minutes = 15
