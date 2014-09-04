@@ -42,7 +42,7 @@ if not os.path.exists('config'):
             "nigger"
           ],
           "connections": {
-            "bearsircd": {
+            "local": {
               "channels": [
                 "#test"
               ],
@@ -52,21 +52,20 @@ if not os.path.exists('config'):
               "server": "localhost",
               "user": "Gary"
             },
-            "dot": {
+            "freenode": {
               "channels": [
-                "#geekboy"
+                "#test"
               ],
               "nick": "Gary",
               "nickserv_password": "xxxx",
-              "port": 7666,
+              "port": 8001,
               "realname": "Gary",
-              "server": "localhost",
+              "server": "irc.freenode.net",
               "user": "Gary"
             }
           },
         "disabled": [
             "beats",
-            "cron.py",
             "cypher",
             "decypher",
             "gibberish"
