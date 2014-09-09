@@ -201,6 +201,7 @@ def parseloop(paraml, nick='', conn=None, bot=None, db=None):
             time.sleep(3)
 
 
+@hook.singlethread
 @hook.command()
 def sms(inp, nick='', chan='', db=None, bot=None):
     ".sms <nick> <message> - Sends a text message to specified <nick> from " \
