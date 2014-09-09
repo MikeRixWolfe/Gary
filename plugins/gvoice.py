@@ -271,7 +271,7 @@ def phonebook(inp, nick='', input=None, db=None, bot=None):
     db_init(db)
     blacklist = bot.config["gvoice"]["private"]
     recip = inp.strip().encode('ascii', 'ignore')
-    if recip in blacklist:
+    if recip in blacklist or nick.lower() in blacklist:
         return "Nope."
     if recip.isdigit():
         if len(recip) < 10:
