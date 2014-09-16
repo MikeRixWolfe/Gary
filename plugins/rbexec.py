@@ -43,4 +43,7 @@ def ruby(inp, say=None):
     except Exception as e:
         return e
 
+    if output == []:
+        return "No output"
+
     return output[-1].encode("ascii", "ignore")

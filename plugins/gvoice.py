@@ -233,7 +233,7 @@ def sms(inp, nick='', chan='', db=None, bot=None):
     except:
         return "Google Voice API error, please try again in a few minutes."
 
-
+@hook.singlethread
 @hook.command()
 def call(inp, say='', nick='', db=None, bot=None):
     """.call <nick> - Calls specified <nick> and connects the call to your number from phonebook via Google Voice."""

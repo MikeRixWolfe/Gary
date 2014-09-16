@@ -7,6 +7,7 @@ re_lineends = re.compile(r'[\r\n]*')
 @hook.command
 def python(inp):
     """.python <prog> - Executes Python code <prog>."""
+    inp = inp.encode('ascii', 'ignore')
     try:
         res = http.get("http://eval.appspot.com/eval", statement=inp).splitlines()
     except Exception as e:
@@ -29,4 +30,4 @@ def ply(inp, bot=None, input=None, nick=None, db=None, chan=None):
 
         return buffer.getvalue().strip() or "No output"
     except Exception as e:
-        return "Python execution error: %" % e
+        return "Python execution error: %s" % e
