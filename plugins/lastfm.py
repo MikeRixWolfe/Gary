@@ -38,7 +38,7 @@ def nowplaying(inp, nick='', say=None, api_key=None):
     album = track["album"]["#text"]
     artist = track["artist"]["#text"]
 
-    ret = "\x02%s\x0F's %s - \x02%s\x0f" % (user, status, title)
+    ret = "\x02%s\x0f's %s - \x02%s\x0f" % (user, status, title)
     if artist:
         ret += " by \x02%s\x0f" % artist
     if album:
@@ -115,16 +115,31 @@ def similar(inp, nick='', say=None, api_key=None):
                              api_key=api_key, artist=inp.strip(), limit=5, autocorrect=1)
 
     if 'error' in response:
-        return "Error parsing the LastFM API, please try again later."
+        return response["message"]
 
     if not "artist" in response["similarartists"] or \
             not isinstance(response["similarartists"]["artist"], list) or \
             len(response["similarartists"]["artist"]) == 0:
         return "I couldn't find that artist."
 
-    artists = response["similarartists"]["artist"]
+    artist = response["similarartists"]["@attr"]["artist"]
+    artists = [x["name"] for x in response["similarartists"]["artist"]]
 
-    ret = "Artists similar to \"\x02" + inp.strip() + "\x0f\": "
-    for artist in artists:
-        ret = ret + "\"\x02" + artist["name"] + "\x0f\", "
-    say(ret.strip(', '))
+    say("Artists similar to \"\x02{}\x0f\": {}".format(artist, ", ".join(artists)))
+
+
+@hook.api_key('lastfm')
+@hook.command
+def genres(inp, nick='', say=None, api_key=None):
+    """.genres <artist> - Gets genres for artist via LastFM."""
+
+    response = http.get_json(api_url, method="artist.getinfo",
+                             api_key=api_key, artist=inp.strip(), autocorrect=1)
+
+    if 'error' in response:
+        return response["message"]
+
+    tags = [x["name"] for x in response["artist"]["tags"]["tag"]]
+    artist = response["artist"]["name"]
+
+    say("Genres for \"\x02{}\x0f\": {}".format(artist, ", ".join(tags)))
