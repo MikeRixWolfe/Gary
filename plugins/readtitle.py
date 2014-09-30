@@ -18,13 +18,13 @@ from util import hook, http, web, text
 
 html_re = (r'https?\://(www\.)?\w+\.[a-zA-Z]{2,5}(\S)+', re.I)
 
-skipurls = ["youtube", "youtu.be", "tinyurl", "j.mp", "rd.io",
+skipurls = ["youtube", "youtu.be", "tinyurl", "j.mp", "rd.io", "goo.gl",
             "rdio", "reddit", "spotify", "open.spotify.com", "steam"]
 
 
 @hook.regex(*html_re)
 def readtitle(match, say=None, nick=None):
-    parsed_url = match.group().split(' ')[0]
+    parsed_url = match.group().strip().split(' ')[0]
     if any(word in parsed_url for word in skipurls):
         return
     try:

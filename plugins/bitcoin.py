@@ -27,5 +27,5 @@ def litecoin(inp, say=None):
 def dogecoin(inp, say=None):
     """.dogecoin - Gets current exchange rate for dogecoins from BTER."""
     ticker = http.get_json("http://data.bter.com/api/1/ticker/doge_usd")
-    say("Buy: \x0307${!s}\x0f - Sell: \x0307${!s}\x0f - High: \x0307${!s}\x0f - Low: \x0307${!s}\x0f - Volume: {!s} per 1000 DogeCoin".format(
+    say("Buy: \x0307${!s}\x0f - Sell: \x0307${!s}\x0f - High: \x0307${!s}\x0f - Low: \x0307${!s}\x0f - Volume: {!s} (per 1000 DogeCoin)".format(
              float(ticker['buy'])*1000, float(ticker['sell'])*1000, float(ticker['high'])*1000, float(ticker['low'])*1000, ticker['vol_doge']))

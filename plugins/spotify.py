@@ -88,7 +88,10 @@ def spotify_url(match):
     spotify_id = match.group(3)
     url = spuri.format(type, spotify_id)
     # no error catching here, if the API is down fail silently
-    data = http.get_json("http://ws.spotify.com/lookup/1/.json", uri=url)
+    try:
+        data = http.get_json("http://ws.spotify.com/lookup/1/.json", uri=url)
+    except:
+        pass
     if type == "track":
         name = data["track"]["name"]
         artist = data["track"]["artists"][0]["name"]

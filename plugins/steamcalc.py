@@ -37,7 +37,7 @@ def steamcalc(inp, say='', api_key=None):
     games_info = {}
     try:
         while games:
-            games_temp, games = games[:20], games[20:]
+            games_temp, games = games[:10], games[10:]
             gurl = games_url % ','.join(games_temp)
             games_info  = dict(games_info.items() + http.get_json(gurl).items())
     except:
