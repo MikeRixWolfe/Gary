@@ -39,7 +39,7 @@ def showtells(inp, say='', nick='', chan='', db=None):
 @hook.command('rmsg')
 @hook.command('msg')
 @hook.command
-def message(inp, nick='', chan='', db=None, input=None):
+def message(inp, nick='', chan='', conn=None, db=None, input=None, bot=None):
     """.msg/.message <nick> <message> - Relay <message> to <nick> when <nick> is around."""
 
     query = inp.split(' ', 1)
@@ -50,6 +50,12 @@ def message(inp, nick='', chan='', db=None, input=None):
     user_to = query[0].lower()
     message = query[1].strip()
     user_from = nick
+
+    #if user_to in conn.users.keys():
+    #    return "%s is currently online, please use /msg instead." % user_to
+
+    if user_to in bot.config['ignored']:
+        return "I've been instructed not to interact with %s." % user_to
 
     if input.trigger == 'rmsg':
         message = text.rainbow(message)

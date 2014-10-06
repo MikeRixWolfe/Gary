@@ -34,7 +34,7 @@ def auth(inp, nick='', conn=None):
 
 @hook.event('*')
 def user_tracking(paraml, nick=None, input=None, conn=None):
-    if input.command in ('QUIT', 'NICK', 'JOIN', 'PART', 'PRIVMSG') and \
+    if input.command in ('QUIT', 'NICK', 'JOIN', 'PART', 'PRIVMSG', 'KICK') and \
             conn.users.get(conn.nick.lower(), False):
         nick = nick.lower()
         nickserv_name = conn.conf.get('nickserv_name', 'nickserv')
@@ -45,7 +45,9 @@ def user_tracking(paraml, nick=None, input=None, conn=None):
         if input.command == 'PRIVMSG':
             if nick not in conn.users.keys():
                  conn.msg(nickserv_name, nickserv_ident % nick)
-        elif input.command in ('QUIT', 'PART', 'NICK'):
+        elif input.command in ('QUIT', 'PART', 'NICK', 'KICK'):
+            if input.command == 'KICK':
+                nick = paraml[1]
             if nick in conn.users.keys():
                 del conn.users[nick]
             if input.command == 'NICK':
