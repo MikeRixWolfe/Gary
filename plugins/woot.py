@@ -10,6 +10,7 @@ sites = {"woot": "www.woot.com",
          "tools": "tools.woot.com",
          "home": "home.woot.com",
          "tech": "tech.woot.com",
+         "computers": "computers.woot.com",
          "accessories": "accessories.woot.com"}
 
 

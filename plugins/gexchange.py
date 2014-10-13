@@ -32,8 +32,8 @@ def gex(inp):
     # Return
     try:
         data = http.get_json(query_url, q=query[0])
-    except:
-        return "Google Exchange API error, please try again in a few minutes."
+    except Exception as e:
+        return "Google Exchange API error: {}".format(e)
     try:
         return (
             '%s %s to %s = %s (rate: %s)' % (
