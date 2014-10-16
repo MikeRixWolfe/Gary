@@ -59,4 +59,4 @@ def steamcalc(inp, say='', api_key=None):
     total_price = "{0:.2f}".format(sum(prices))
     avg_score = "{0:.1f}".format(sum(scores) / len(scores))
 
-    say("{} has {} games with a total value of ${} and an average metascore of {}".format(persona, len(games_info), total_price, avg_score))
+    return "{} has {} games with a total value of ${} and an average metascore of {}".format(persona, len(games_info), total_price, avg_score)

@@ -12,27 +12,27 @@ def db_init(db):
     return db
 
 
-def get_tells(db, user_to):
-    return db.execute("select user_from, message, time, chan from tell where"
-                      " user_to=lower(?) order by time",
-                      (user_to.lower(),)).fetchall()
+def get_tells(db, user_to, chan):
+    return db.execute("select user_from, message, time from tell where"
+                      " user_to=lower(?) and chan=lower(?) order by time",
+                      (user_to.lower(), chan)).fetchall()
 
 
 @hook.event('*')
 def showtells(inp, say='', nick='', chan='', db=None):
     db_init(db)
-    tells = get_tells(db, nick)
+    tells = get_tells(db, nick, chan)
 
     if not tells:
         return
     for tell in tells:
-        user_from, message, time, chan = tell
+        user_from, message, time = tell
         past = timesince.timesince(time)
-        say("%s: Message from %s, %s ago in %s: %s" %
-            (nick, user_from, past, chan, message))  # notice(
+        say("%s: Message from %s, %s ago: %s" %
+            (nick, user_from, past, message))  # notice(
 
-    db.execute("delete from tell where user_to=lower(?)",
-               (nick,))
+    db.execute("delete from tell where user_to=lower(?) and chan=lower(?)",
+               (nick, chan))
     db.commit()
 
 
