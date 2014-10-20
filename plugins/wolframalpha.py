@@ -4,7 +4,6 @@ from util import hook, http, text
 
 
 @hook.api_key('wolframalpha')
-@hook.command('calc')
 @hook.command
 def wa(inp, api_key=None):
     """.wa/.calc <query> - Computes <query> using Wolfram Alpha."""

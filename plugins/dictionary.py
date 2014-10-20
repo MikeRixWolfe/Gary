@@ -32,7 +32,6 @@ def urban(inp):
     return out
 
 
-@hook.command('dict')
 @hook.command
 def define(inp):
     """.define/.dict <word> - fetches definition of <word>."""
@@ -94,7 +93,6 @@ def define(inp):
     return result
 
 
-@hook.command('e')
 @hook.command
 def etymology(inp):
     """.e/.etymology <word> - Retrieves the etymology of chosen word."""
@@ -113,31 +111,3 @@ def etymology(inp):
 
     return etym
 
-
-api_url = "http://encyclopediadramatica.es/api.php?action=opensearch"
-ed_url = "http://encyclopediadramatica.es/"
-
-
-@hook.command('ed')
-@hook.command
-def drama(inp):
-    """.drama <phrase> - gets first paragraph of Encyclopedia Dramatica article on <phrase>; Note, use proper calitalization e.g. 'Ron Paul'."""
-    try:
-        j = http.get_json(api_url, search=inp)
-    except:
-        return "Error parsing Encyclopedia Dramatica API, please try again in a few minutes"
-    if not j[1]:
-        return 'no results found'
-    article_name = j[1][0].replace(' ', '_').encode('utf8')
-
-    url = ed_url + http.quote(article_name, '')
-    page = http.get_html(url)
-
-    for p in page.xpath('//div[@id="bodyContent"]/p'):
-        if p.text_content():
-            summary = ' '.join(p.text_content().splitlines())
-            if len(summary) > 300:
-                summary = summary[:summary.rfind(' ', 0, 300)] + "..."
-            return '%s :: \x02%s\x02' % (summary, url)
-
-    return "Error"
