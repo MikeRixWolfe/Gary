@@ -1,7 +1,7 @@
 import time
 from util import hook, http, text, web
 
-api = "https://api.woot.com/1/sales/current.rss/"
+api = "http://api.woot.com/1/sales/current.rss/"
 
 sites = {"woot": "www.woot.com",
          "wine": "wine.woot.com",
@@ -50,9 +50,9 @@ def format_woot(w):
         else:
             price = w['price']
         if w['shipping']:
-            price += "+%s Shipping" % w['shipping']
+            price += "+{} Shipping".format(w['shipping'])
         if w['soldoutpercent'] != "0":
-            price += " (%s Gone!)" % w['soldoutpercent']
+            price += " ({}% Gone!)".format(w['soldoutpercent'])
 
     return "\x02{}\x0F - {} [{}]".format(w['product'], price, w['url'])
 
@@ -91,13 +91,13 @@ def woot(inp, chan='', say=''):
 @hook.event('JOIN')
 def wootloop(paraml, nick='', conn=None):
     # If specified chan or not running; alter for multi-channel
-    if paraml[0] != '#geekboy' or nick != conn.nick:
+    if paraml[0] != '#woot' or nick != conn.nick:
         return
     prev_woots = {}
     print(">>> u'Beginning Woot check loop :{}'".format(paraml[0]))
     while True:
         try:
-            time.sleep(600)
+            time.sleep(60)
 
             # Get data
             woots = get_woots(sites)
@@ -113,7 +113,7 @@ def wootloop(paraml, nick='', conn=None):
             for k, v in woots.items():
                 if prev_woots.get(k, {}).get("product", {}) != v["product"]:
                     prev_woots[k] = v
-                    out.append("\x02New {}\x0F: {}".format(k, v["product"]))
+                    out.append("\x02New {}\x0F: {}".format(k, format_woot(v)))
             if out:
                 conn.send("PRIVMSG {} :{}".format(paraml[0], "; ".join(out)))
         except Exception as e:
