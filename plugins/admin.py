@@ -78,8 +78,25 @@ def nick(inp, notice=None, conn=None):
     if not re.match("^[A-Za-z0-9_|.-\]\[]*$", inp.lower()):
         notice("Invalid username!")
         return
+
+    # Remove old nick from users
+    nick = conn.conf.get('nick', '').lower()
+    if nick in conn.users.keys():
+        del conn.users[nick]
+
+    # Change nick
     notice("Attempting to change nick to \"{}\"...".format(inp))
     conn.set_nick(inp)
+
+    # Try to reauth with nickserv
+    nickserv_password = conn.conf.get('nickserv_password', '')
+    nickserv_name = conn.conf.get('nickserv_name', 'nickserv')
+    nickserv_command = conn.conf.get('nickserv_command', 'IDENTIFY %s')
+    nickserv_ident = conn.conf.get('nickserv_ident_command', 'INFO %s')
+    if nickserv_password:
+        conn.msg(nickserv_name, nickserv_command % nickserv_password)
+        time.sleep(1)
+        conn.msg(nickserv_name, nickserv_ident % conn.nick)
 
 
 @hook.command(adminonly=True)
