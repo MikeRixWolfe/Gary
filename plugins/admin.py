@@ -80,9 +80,7 @@ def nick(inp, notice=None, conn=None):
         return
 
     # Remove old nick from users
-    nick = conn.conf.get('nick', '').lower()
-    if nick in conn.users.keys():
-        del conn.users[nick]
+    conn.users.pop(conn.nick.lower(), None)
 
     # Change nick
     notice("Attempting to change nick to \"{}\"...".format(inp))

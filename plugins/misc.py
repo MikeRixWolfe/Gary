@@ -48,8 +48,7 @@ def user_tracking(paraml, nick=None, input=None, conn=None):
         elif input.command in ('QUIT', 'PART', 'NICK', 'KICK'):
             if input.command == 'KICK':
                 nick = paraml[1]
-            if nick in conn.users.keys():
-                del conn.users[nick]
+            conn.users.pop(nick, None)
             if input.command == 'NICK':
                 conn.msg(nickserv_name, nickserv_ident % paraml[0])
 
