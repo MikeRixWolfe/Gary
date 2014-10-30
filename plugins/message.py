@@ -51,8 +51,8 @@ def message(inp, nick='', chan='', conn=None, db=None, input=None, bot=None):
     message = query[1].strip()
     user_from = nick
 
-    #if user_to in conn.users.keys():
-    #    return "%s is currently online, please use /msg instead." % user_to
+    if user_to in conn.users.keys():
+        return "%s is currently online, please use /msg instead." % user_to
 
     if user_to in bot.config['ignored']:
         return "I've been instructed not to interact with %s." % user_to

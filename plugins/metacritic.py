@@ -2,7 +2,7 @@
 
 import re
 from urllib2 import HTTPError
-
+from socket import timeout
 from util import hook, http
 
 
@@ -37,7 +37,9 @@ def metacritic(inp):
     try:
         doc = http.get_html(url)
     except HTTPError:
-        return 'error fetching results'
+        return 'Error fetching results.'
+    except timeout:
+        return 'Socket timeout, please try again later.'
 
     ''' result format:
     -- game result, with score
