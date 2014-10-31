@@ -1,5 +1,5 @@
-BeautifulSoup
-BeautifulSoup4
-yql
-lxml
-GitPython
+BeautifulSoup==3.2.1
+BeautifulSoup4==4.3.2
+yql==0.7.7
+lxml==3.4.0
+GitPython==0.3.2.RC1
