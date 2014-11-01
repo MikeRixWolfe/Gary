@@ -26,7 +26,7 @@ def get_response(code):
 
 def parse_html(document):
     html = etree.HTML(document)
-    output = html.xpath('//div[@class="code"][2]//pre//text()')
+    output = html.xpath('//div[@class="code"][2]//td[2]//pre//text()')
     return output
 
 
@@ -48,7 +48,7 @@ def python(inp, say=None):
     if output == []:
         return "No output"
 
-    return output[-1].encode("ascii", "ignore")
+    return ''.join(output).replace('\n',' ').strip().encode("ascii", "ignore")
 
 
 @hook.command(adminonly=True)
