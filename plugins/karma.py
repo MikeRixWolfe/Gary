@@ -29,7 +29,7 @@ def karma_edit(inp, chan='', nick='', say=None, db=None):
         word = word[1:-1]
 
     if word == nick.lower():
-        return "Please do not karma yourself."
+        return #"Please do not karma yourself."
 
     karma = int(get_karma(db, chan, word))
     delta = inp.group(2)

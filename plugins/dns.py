@@ -1,24 +1,17 @@
-from util import hook
+import re
 import socket
+from util import hook
 
 
 @hook.command
 def dns(inp):
-    """.dns <domain> - resolves IP of Domain."""
+    """.dns <ip|domain> - Resolves IP of Domain or vice versa."""
     try:
         socket.setdefaulttimeout(15)
-        ip = socket.gethostbyname(inp)
-        return "%s resolves to %s" % (inp, ip)
-    except:
-        return "I could not find {}".format(inp)
-
-
-@hook.command
-def rdns(inp):
-    """.rdns <ip> - resolves Hostname of IP."""
-    try:
-        socket.setdefaulttimeout(5)
-        domain = socket.gethostbyaddr(inp)
-        return "%s resolves to %s" % (inp, domain)
+        if not re.match(r'\d+\.\d+\.\d+\.\d+', inp):
+            out = socket.gethostbyname(inp)
+        else:
+            out = socket.gethostbyaddr(inp)[0]
+        return "%s resolves to %s" % (inp, out)
     except:
         return "I could not find {}".format(inp)
