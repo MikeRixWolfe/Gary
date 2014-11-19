@@ -1,42 +1,48 @@
 import random
 
-from util import hook, http, web
+from util import hook, http, text, web
 
 
-def api_get(query, key, is_image=None, num=1):
-    url = ('https://www.googleapis.com/customsearch/v1?cx=007629729846476161907:ud5nlxktgcw'
-           '&fields=items(title,link,snippet)&safe=off' + ('&searchType=image' if is_image else ''))
-    return http.get_json(url, key=key, q=query, num=num)
+def api_get(kind, query):
+    """Use the RESTful Google Search API"""
+    url = 'http://ajax.googleapis.com/ajax/services/search/%s?v=1.0&safe=off'
+    return http.get_json(url % kind, q=query)
 
 
-@hook.api_key('google')
+@hook.command('gis')
 @hook.command
-def gis(inp, api_key=None):
-    """.gis <term> - Finds an image using Google images (safesearch off)."""
+def googleimage(inp):
+    """.gis <query> - Returns first Google Image result for <query>."""
 
-    parsed = api_get(inp, api_key, is_image=True, num=10)
-    if 'items' not in parsed:
-        return 'no images found'
-    return web.try_googl(random.choice(parsed['items'])['link'])
+    parsed = api_get('images', inp)
+    if not 200 <= parsed['responseStatus'] < 300:
+        raise IOError('Error searching for images: {}: {}'.format(parsed['responseStatus'], ''))
+    if not parsed['responseData']['results']:
+        return 'No images found.'
+    return web.try_googl(random.choice(parsed['responseData']['results'][:10])['unescapedUrl'])
 
 
-@hook.api_key('google')
 @hook.command('g')
 @hook.command
-def google(inp, api_key=None):
-    """.g/.google <query> - Returns first Google search result."""
+def google(inp):
+    """.[g]oogle <query> - Returns first google search result for <query>."""
 
-    parsed = api_get(inp, api_key)
-    if 'items' not in parsed:
-        return 'no results found'
+    parsed = api_get('web', inp)
+    if not 200 <= parsed['responseStatus'] < 300:
+        raise IOError('error searching for pages: {}: {}'.format(parsed['responseStatus'], ''))
+    if not parsed['responseData']['results']:
+        return 'No results found.'
 
-    link = web.try_googl(parsed['items'][0]['link'])
-    title = parsed['items'][0]['title']
+    result = parsed['responseData']['results'][0]
 
-    out = u'{} - \x02{}\x02'.format(link, title)
-    out = ' '.join(out.split())
+    title = http.unescape(result['titleNoFormatting'])
+    title = text.truncate_str(title, 60)
+    content = http.unescape(result['content'])
 
-    if len(out) > 300:
-        out = out[:out.rfind(' ')] + '..."'
+    if not content:
+        content = "No description available."
+    else:
+        content = http.html.fromstring(content).text_content()
+        content = text.truncate_str(content, 150)
 
-    return out
+    return u'{} - \x02{}\x02: "{}"'.format(web.try_googl(result['unescapedUrl']), title, content)
