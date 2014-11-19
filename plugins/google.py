@@ -1,5 +1,4 @@
 import random
-
 from util import hook, http, text, web
 
 
@@ -36,13 +35,6 @@ def google(inp):
     result = parsed['responseData']['results'][0]
 
     title = http.unescape(result['titleNoFormatting'])
-    title = text.truncate_str(title, 60)
-    content = http.unescape(result['content'])
+    title = text.truncate_str(title, 100)
 
-    if not content:
-        content = "No description available."
-    else:
-        content = http.html.fromstring(content).text_content()
-        content = text.truncate_str(content, 150)
-
-    return u'{} - \x02{}\x02: "{}"'.format(web.try_googl(result['unescapedUrl']), title, content)
+    return u'{} - \x02{}\x02'.format(web.try_googl(result['unescapedUrl']), title)
