@@ -3,7 +3,7 @@ Scaevolus 2009'''
 
 import re
 
-from util import hook, http
+from util import hook, http, web
 
 
 api_prefix = "http://en.wikipedia.org/w/api.php"
@@ -46,4 +46,4 @@ def wiki(inp):
     if len(desc) > 300:
         desc = desc[:300] + '...'
 
-    return '%s - %s' % (desc, http.quote(url, ':/'))
+    return '%s - %s' % (desc, web.try_googl(http.quote(url, ':/')))

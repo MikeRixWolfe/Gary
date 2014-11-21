@@ -139,7 +139,10 @@ def genres(inp, nick='', say=None, api_key=None):
     if 'error' in response:
         return response["message"]
 
-    tags = [x["name"] for x in response["artist"]["tags"]["tag"]]
+    try:
+        tags = [x["name"] for x in response["artist"]["tags"]["tag"]]
+    except:
+        tags = ["None found"]
     artist = response["artist"]["name"]
 
     say("Genres for \"\x02{}\x0f\": {}".format(artist, ", ".join(tags)))

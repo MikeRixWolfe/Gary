@@ -9,7 +9,6 @@ def api_get(kind, query):
 
 
 @hook.command('gis')
-@hook.command
 def googleimage(inp):
     """.gis <query> - Returns first Google Image result for <query>."""
 
