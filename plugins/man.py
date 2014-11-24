@@ -47,7 +47,7 @@ def man(inp, say=''):
             else:
                 return "There is no man page for {}.".format(command)
     except Exception as e:  # (http.HTTPError, http.URLError) as e:
-        print(">>> u'HTTP Error: {}'".format(e))
+        print ">>> u'HTTP Error: {}'".format(e)
         return "HTTP Error, please try again in a few minutes."
 
 # man -P cat grep | grep -A 1 -e  "-mmap"

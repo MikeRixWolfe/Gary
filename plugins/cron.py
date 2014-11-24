@@ -3,7 +3,6 @@ import time
 import datetime
 from util import hook
 
-running_cron_loops = []
 timestamp_format = '%I:%M'
 datetimemask = '%Y-%m-%d %H:%M'
 
@@ -56,13 +55,12 @@ def clean_db(db, time, chan):
 @hook.singlethread
 @hook.event('JOIN')
 def cron(paraml, nick='', conn=None, db=None):
-    global running_cron_loops
-    if paraml[0] != '#geekboy' or nick != conn.nick or paraml[0] in running_cron_loops:
+    if paraml[0] != '#geekboy' or nick != conn.nick:
         return
-    running_cron_loops.append(paraml[0])
-    print ">>> u'Beginning cron loop :%s'" % paraml[0]
+    time.sleep(1)  # Allow chan list time to update
+    print ">>> u'Beginning cron loop :{}'".format(paraml[0])
     db_init(db)
-    while True:
+    while paraml[0] in conn.channels:
         try:
             time.sleep(60)
             datestamp = str(datetime.datetime.now(EST()))[:16]
@@ -76,6 +74,7 @@ def cron(paraml, nick='', conn=None, db=None):
             clean_db(db, datestamp, paraml[0])
         except:
             print ">>> u'Error running cron loop :%s'" % paraml[0]
+    print ">>> u'Ending cron loop :{}'".format(paraml[0])
 
 
 @hook.command()

@@ -195,18 +195,19 @@ def saleloop(paraml, nick='', conn=None):
     # If specified chan or not running; alter for multi-channel
     if paraml[0] != '#vidya' or nick != conn.nick:
         return
+    time.sleep(1)  # Allow chan list time to update
     mask = ["specials", "coming_soon", "top_sellers", "new_releases",
             "genres", "trailerslideshow", "status"]
     prev_sales = {}
-    print(">>> u'Beginning Steam sale check loop :{}'".format(paraml[0]))
-    while True:
+    print ">>> u'Beginning Steam sale check loop :{}'".format(paraml[0])
+    while paraml[0] in conn.channels:
         try:
             time.sleep(1200)
 
             # Get data
             sales = get_sales(mask)
             if not sales:
-                print(">>> u'Error getting Steam sales :{}'".format(paraml[0]))
+                print ">>> u'Error getting Steam sales :{}'".format(paraml[0])
 
             # Handle restarts
             if not prev_sales:
@@ -220,7 +221,6 @@ def saleloop(paraml, nick='', conn=None):
                     prev_sales[category] = sales[category]  # Update prev
                     conn.send("PRIVMSG {} :{}".format(paraml[0],
                         "\x02New {}\x0F: {}".format(category, '; '.join(items))))
-
         except Exception as e:
-            print(">>> u'Steam saleloop error: {} :{}'".format(e, paraml[0]))
-
+            print ">>> u'Steam saleloop error: {} :{}'".format(e, paraml[0])
+    print ">>> u'Ending Steam sale check loop :{}'".format(paraml[0])

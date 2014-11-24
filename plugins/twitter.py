@@ -85,8 +85,9 @@ def twitter(inp, api_key=None):
 def twitterloop(paraml, nick='', conn=None, bot=None, api_key=None):
     """twitter rss checking loop"""
     server = "%s:%s" % (conn.server, conn.port)
-    if server != "localhost:7666" or paraml[0] != "#vidya" or nick != conn.nick:
+    if paraml[0] != "#vidya" or nick != conn.nick:
         return
+    time.sleep(1)  # Allow chan list time to update
     api_key = bot.config.get('api_keys', None).get('twitter', None)
     if not isinstance(api_key, dict) or any(key not in api_key for key in
         ('consumer', 'consumer_secret', 'access', 'access_secret')):
@@ -95,8 +96,9 @@ def twitterloop(paraml, nick='', conn=None, bot=None, api_key=None):
 
     accounts = ["igndeals", "cheapsharkdeals"]
     prev_tweets = {}
-    print(">>> u'Beginning Twitter RSS loop for %s'" % server)
-    while True:
+    print ">>> u'Beginning Twitter RSS loop :{}'".format(paraml[0])
+    while paraml[0] in conn.channels:
+        time.sleep(60)
         for account in accounts:
             tweet = twitter(account, api_key)
             # if not unchanged, empty, error, or @ reply
@@ -107,4 +109,4 @@ def twitterloop(paraml, nick='', conn=None, bot=None, api_key=None):
                 if prev_tweets.get(account, None) is not None:
                     conn.send("PRIVMSG {} :{}".format(paraml[0], tweet))
                 prev_tweets[account] = tweet
-        time.sleep(60)
+    print ">>> u'Ending Twitter RSS loop :{}'".format(paraml[0])

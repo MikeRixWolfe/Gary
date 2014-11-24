@@ -112,12 +112,12 @@ def redirect(message, voice, bot, db):  # Ugly function
                 text = "I'm sorry %s, I'm afraid I can't do that." % sender
             else:
                 voice.send_sms(recipNumber, "<%s-mobile> %s" % (sender, text))
-                print(">>> u'SMS sent from %s to %s'" % (sender, recip))
+                print ">>> u'SMS sent from %s to %s'" % (sender, recip)
                 return True
         else:
             text = "Sorry, I don't have that user in my phonebook."
         voice.send_sms(senderNumber, text)
-        print(">>> u'SMS relay error returned to %s'" % sender)
+        print ">>> u'SMS relay error returned to %s'" % sender
         return True
     elif pb_cmd:
         recip = pb_cmd.group(1)
@@ -130,7 +130,7 @@ def redirect(message, voice, bot, db):  # Ugly function
         else:
             text = "'%s' does not have a registered phone number." % recip
         voice.send_sms(senderNumber, text)
-        print(">>> u'SMS relay phonebook query returned to %s'" % sender)
+        print ">>> u'SMS relay phonebook query returned to %s'" % sender
         return True
     elif call_cmd:
         recip = call_cmd.group(1)
@@ -145,7 +145,7 @@ def redirect(message, voice, bot, db):  # Ugly function
         else:
             text = "'%s' does not have a registered phone number." % recip
         voice.send_sms(senderNumber, text)
-        print(">>> u'SMS relay call returned to %s'" % sender)
+        print ">>> u'SMS relay call returned to %s'" % sender
         return True
     else:
         return False
@@ -175,30 +175,31 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
 @hook.event('JOIN')
 def parseloop(paraml, nick='', conn=None, bot=None, db=None):
     db_init(db)
-    server = "%s:%s" % (conn.server, conn.port)
-    if server != "localhost:7666" or paraml[0] != "#geekboy" or nick != conn.nick:
+    if paraml[0] != "#geekboy" or nick != conn.nick:
         return
+    time.sleep(1)  # Allow chan list time to update
     voice = Voice()
-    print(">>> u'Beginning SMS parse loop for %s'" % server)
-    while True:
+    print ">>> u'Beginning SMS parse loop :{}'".format(paraml[0])
+    while paraml[0] in conn.channels:
         time.sleep(3)
         try:
             if not voice:
                 voice = Voice()
             voice, sms_count = outputsms(voice, conn, bot, db)
             if sms_count:
-                print(">>> u'Processing {} message(s) complete :{}'".format(sms_count, server))
+                print ">>> u'Processing {} message(s) complete :{}'".format(sms_count, paraml[0])
         except LoginError:
-            print(">>> u'Google Voice login error :{}'".format(server))
+            print ">>> u'Google Voice login error :{}'".format(paraml[0])
             voice = None
             time.sleep(90)
         except ParsingError:
-            print(">>> u'Google Voice parse error :{}'".format(server))
+            print ">>> u'Google Voice parse error :{}'".format(paraml[0])
             voice = None
             time.sleep(3)
         except Exception as e:
-            print(">>> u'Google Voice error: {} :{}'".format(e, server))
+            print ">>> u'Google Voice error: {} :{}'".format(e, paraml[0])
             time.sleep(3)
+    print ">>> u'Ending SMS parse loop :{}'".format(paraml[0])
 
 
 @hook.singlethread
