@@ -1,4 +1,5 @@
 import json
+import time
 from util import hook, http
 
 user_url = "http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=%s&vanityurl=%s"
@@ -37,7 +38,8 @@ def steamcalc(inp, say='', api_key=None):
     games_info = {}
     try:
         while games:
-            games_temp, games = games[:10], games[10:]
+            time.sleep(.2)
+            games_temp, games = games[:1], games[1:]
             gurl = games_url % ','.join(games_temp)
             games_info  = dict(games_info.items() + http.get_json(gurl).items())
     except:
@@ -51,7 +53,7 @@ def steamcalc(inp, say='', api_key=None):
             prices.append(games_info[game]['data']['price_overview']['final'])
             scores.append(games_info[game]['data']['metacritic']['score'])
         except:
-            pass #print games_info[game]
+            pass
 
     prices = [int(price) / 100. for price in prices]
     scores = [float(score) for score in scores]
