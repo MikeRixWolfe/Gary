@@ -63,7 +63,7 @@ def reddit(inp):
     else:
         item = random.choice(data)["data"]
 
-    item["title"] = text.truncate_str(item["title"], 50)
+    item["title"] = text.truncate_str(item["title"], 100)
     item["link"] = short_url.format(item["id"])
 
     rawtime = datetime.fromtimestamp(int(item["created_utc"]))
@@ -74,6 +74,23 @@ def reddit(inp):
     else:
         item["warning"] = ""
 
-    return u'\x02{title}\x02 - posted by \x02{author}\x02' \
-        ' {timesince} ago - {ups} upvotes, {downs} downvotes -' \
-        ' {link}{warning}'.format(**item)
+    return u'{link}{warning} - \x02{title}\x02 - posted by' \
+        ' \x02{author}\x02 {timesince} ago - {ups} upvotes,' \
+        ' {downs} downvotes'.format(**item)
+
+
+@hook.command
+def ris(inp):
+    """.ris <subreddit> - Reddit image search; turns random imgur link from subreddit"""
+
+    try:
+        data = http.get_json("http://reddit.com/r/%s/.json" % inp.split(' ')[0])
+    except Exception as e:
+        return "Error: " + str(e)
+    data = data["data"]["children"]
+    item = None
+    while not item:
+        tempitem = random.choice(data)
+        if tempitem["data"]["domain"] == "i.imgur.com":
+            item = tempitem["data"]
+    return "{url} - \x02{title}\x02".format(**item)
