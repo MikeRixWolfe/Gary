@@ -82,15 +82,18 @@ def reddit(inp):
 @hook.command
 def ris(inp):
     """.ris <subreddit> - Reddit image search; turns random imgur link from subreddit"""
-
+    inp = inp.split(' ')[0]
     try:
-        data = http.get_json("http://reddit.com/r/%s/.json" % inp.split(' ')[0])
+        data = http.get_json("http://reddit.com/r/%s/.json" % inp)
     except Exception as e:
         return "Error: " + str(e)
     data = data["data"]["children"]
     item = None
-    while not item:
-        tempitem = random.choice(data)
+    random.shuffle(data)
+    for tempitem in data:
         if tempitem["data"]["domain"] == "i.imgur.com":
             item = tempitem["data"]
-    return "{url} - \x02{title}\x02".format(**item)
+        if item:
+            return "{} - \x02{}\x02".format(item['url'],
+                item['title'].encode('ascii','ignore'))
+    return "No image posts found for \x02r/{}\x02".format(inp)
