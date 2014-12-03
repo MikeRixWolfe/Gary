@@ -68,7 +68,12 @@ def cycle(inp, conn=None, chan=None, notice=None):
     else:
         target = chan
     notice("Attempting to cycle {}...".format(target))
+    if chan in conn.channels:
+        conn.channels.remove(chan)
     conn.send("PART " + target)
+    time.sleep(1)
+    if chan not in conn.channels:
+        conn.channels.append(chan)
     conn.send("JOIN " + target)
 
 
