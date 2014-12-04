@@ -23,7 +23,7 @@ def set_event(db, time, chan, msg, set_by):
 
 
 def clean_db(db, time):
-    db.execute("delete from cron where time<?", (time,))
+    db.execute("delete from cron where time<=?", (time,))
     db.commit()
 
 
