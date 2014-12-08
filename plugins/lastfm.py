@@ -16,8 +16,7 @@ def nowplaying(inp, nick='', say=None, api_key=None):
     except:
         "LastFM API Error, please try again in a few minutes"
     if 'error' in response:
-        return "error: %s" % response["message"] if inp \
-            else "Your nick is not a Last.fm account. Try '.lastfm username'."
+        return response["message"]
     if not "track" in response["recenttracks"] or len(response["recenttracks"]["track"]) == 0:
         return "No recent tracks found for \x02%s\x0F." % user
 
