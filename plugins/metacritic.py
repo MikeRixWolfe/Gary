@@ -3,7 +3,7 @@
 import re
 from urllib2 import HTTPError
 from socket import timeout
-from util import hook, http
+from util import hook, http, web
 
 
 @hook.command('mc')
@@ -130,7 +130,7 @@ def metacritic(inp):
     except IndexError:
         score = None
 
-    return '[%s] %s - %s, %s -- %s' % (plat.upper(), name,
+    return '[%s] %s - %s, %s - %s' % (plat.upper(), name,
                                        score or 'no score',
                                        'release: %s' % release if release else 'unreleased',
-                                       link)
+                                       web.try_googl(link))
