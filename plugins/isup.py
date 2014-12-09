@@ -1,15 +1,14 @@
 import socket
-from util import hook, http, urlnorm
+from util import hook, http
 
 
 @hook.command
 def isup(inp):
     """.isup <site> - Checks if a site is up or not."""
-    # slightly overcomplicated, esoteric URL parsing
-    scheme, auth, path, query, fragment = http.urlparse.urlsplit(inp.strip())
-
-    domain = auth.encode('utf-8') or path.encode('utf-8')
-    url = urlnorm.normalize(domain, assume_scheme="http")
+    if not inp.startswith('//') and '://' not in inp:
+        inp = '//' + inp
+    urlp = http.urlparse.urlparse(inp, 'http')
+    url = "%s://%s" % (urlp.scheme, urlp.netloc)
 
     try:
         page = http.open(url)
