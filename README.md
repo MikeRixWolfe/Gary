@@ -48,3 +48,9 @@ Gary is **licensed** under the **GPL v3** license. The terms are as follows:
      
      You should have received a copy of the GNU General Public License
      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+## Special Thanks
+* [rmmh](https://github.com/rmmh/skybot)
+* [ClouDev](https://github.com/ClouDev/CloudBot)
+* [lahwran](https://github.com/lahwran/skybot)
+* [NoiSek](https://github.com/NoiSek/classhole)
