@@ -50,7 +50,7 @@ Gary is **licensed** under the **GPL v3** license. The terms are as follows:
      along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## Special Thanks
-This project would not have been possible without the author of the origninal code, or those who carried on his work. Their influences in Gary range from code to inspiration and everything in between. 
+This project would not have been possible without the author of the origninal code that Gary is based on, or those who carried on his work. Their influences in Gary range from code to inspiration and everything in between. 
 * [rmmh](https://github.com/rmmh/skybot)
 * [ClouDev](https://github.com/ClouDev/CloudBot)
 * [lahwran](https://github.com/lahwran/skybot)
