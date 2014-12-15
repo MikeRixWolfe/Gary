@@ -23,7 +23,9 @@ def hats(inp, api_key=None):
             (steamid64, api_key)
         inv = http.get_json(inv_url)
     except:
-        return "Sorry, I couldn't find '%s''s Steam inventory." % inp
+        return "Sorry, I couldn't find %s's Steam inventory." % inp
+    if inv.get("result", None).get("statusDetail", None) == "Permission denied":
+        return "Sorry, %s's backpack is set to private." % inp
 
     # Count Items into Categories
     total, dropped, dhats, dun, un, hats = 0, 0, 0, 0, 0, 0
