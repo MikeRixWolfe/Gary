@@ -10,7 +10,7 @@ locale.setlocale(locale.LC_ALL, '')
 base_url = 'http://gdata.youtube.com/feeds/api/'
 url = base_url + 'videos/%s?v=2&alt=jsonc'
 search_api_url = base_url + 'videos?v=2&alt=jsonc&max-results=1'
-video_url = "http://youtube.com/watch?v=%s"
+video_url = "http://youtu.be/%s"
 
 youtube_re = (r'(?:youtube.*?(?:v=|/v/)|youtu\.be/|yooouuutuuube.*?id=)'
               '([-_a-z0-9]+)', re.I)
