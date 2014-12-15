@@ -30,6 +30,13 @@
 * [Configuration](https://github.com/MikeRixWolfe/Gary/wiki/Configuration)
 * [Plugin Development](https://github.com/MikeRixWolfe/Gary/wiki/Plugin-development)
 
+## Special Thanks
+This project would not have been possible without the author of the origninal code that Gary is based on, or those who carried on his work. Their influences in Gary range from code to inspiration and everything in between. 
+* [rmmh](https://github.com/rmmh/skybot)
+* [ClouDev](https://github.com/ClouDev/CloudBot)
+* [lahwran](https://github.com/lahwran/skybot)
+* [NoiSek](https://github.com/NoiSek/classhole)
+
 ## License
 Gary is **licensed** under the **GPL v3** license. The terms are as follows:
      
@@ -48,10 +55,3 @@ Gary is **licensed** under the **GPL v3** license. The terms are as follows:
      
      You should have received a copy of the GNU General Public License
      along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-## Special Thanks
-This project would not have been possible without the author of the origninal code that Gary is based on, or those who carried on his work. Their influences in Gary range from code to inspiration and everything in between. 
-* [rmmh](https://github.com/rmmh/skybot)
-* [ClouDev](https://github.com/ClouDev/CloudBot)
-* [lahwran](https://github.com/lahwran/skybot)
-* [NoiSek](https://github.com/NoiSek/classhole)
