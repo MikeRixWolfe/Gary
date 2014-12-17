@@ -86,7 +86,7 @@ def outputsms(voice, conn, bot, db):
             messages.append(message)
 
     for message in messages:  # Redirect or output messages
-        if not redirect(message, voice, bot, db):
+        if not redirect(message, voice, bot, db) and message['out'].split()[0].strip('<>') not in blacklist:
             for chan in conn.channels:
                 if chan == '#geekboy':
                     conn.send("PRIVMSG {} :{}".format(chan, message['out']))
