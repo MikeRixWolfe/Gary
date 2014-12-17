@@ -6,6 +6,7 @@ from util import hook, text
 from util.googlevoice import Voice, LoginError, ParsingError
 
 default_privacy = 0  # 0 or 1 for not private/private
+output_channel = "#geekboy"
 
 
 def db_init(db):
@@ -88,7 +89,7 @@ def outputsms(voice, conn, bot, db):
     for message in messages:  # Redirect or output messages
         if not redirect(message, voice, bot, db) and message['out'].split()[0].strip('<>') not in blacklist:
             for chan in conn.channels:
-                if chan == '#geekboy':
+                if chan == output_channel:
                     conn.send("PRIVMSG {} :{}".format(chan, message['out']))
         mark_as_read(db, message)  # Mark all as read
 
@@ -175,7 +176,7 @@ def parsesms(inp, say='', conn=None, bot=None, db=None):
 @hook.event('JOIN')
 def parseloop(paraml, nick='', conn=None, bot=None, db=None):
     db_init(db)
-    if paraml[0] != "#geekboy" or nick != conn.nick:
+    if paraml[0] != output_channel or nick != conn.nick:
         return
     time.sleep(1)  # Allow chan list time to update
     voice = Voice()
