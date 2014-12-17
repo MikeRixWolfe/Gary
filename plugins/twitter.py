@@ -100,7 +100,10 @@ def twitterloop(paraml, nick='', conn=None, bot=None, api_key=None):
     while paraml[0] in conn.channels:
         time.sleep(60)
         for account in accounts:
-            tweet = twitter(account, api_key)
+            try:
+                tweet = twitter(account, api_key)
+            except Exception as e:
+                print ">>> u'Error in Twitter RSS loop :{}'".format(e)
             # if not unchanged, empty, error, or @ reply
             if prev_tweets.get(account, None) != tweet and \
                     tweet is not None and tweet[:5] != "error" \
