@@ -3,6 +3,38 @@ import re
 from util import hook, http, web
 
 
+
+@hook.command
+def geoip2(inp):
+    """.geoip2 <host/IP> - Gets gelocation data via geoip.nekudo.com."""
+    url = "http://geoip.nekudo.com/api/%s" % \
+          (http.quote(inp.encode('utf8'), safe=''))
+
+    try:
+        content = http.get_json(url)
+    except:
+        return "I couldn't find %s" % inp
+
+    if content["city"] or content["country"]["name"]:
+        if content["country"]["name"] == 'Reserved':
+            out = inp + " is reserved."
+        else:
+            out = inp + " seems to be located in "
+            if content["city"]:
+                out += "%s, " % content["city"]
+            if content["country"]["name"]:
+                if content["country"]["name"].split(' ')[0] == 'United':
+                    out += "the %s" % content["country"]["name"]
+                else:
+                    out += "%s" % content["country"]["name"]
+            else:
+                out += "somewhere in the world"
+    else:
+        out = "I couldn't find any geographical information on %s" % inp
+
+    return out
+
+
 @hook.command
 def geoip(inp):
     """.geoip <host/IP> - Gets the location of <host/IP>."""
@@ -28,7 +60,10 @@ def geoip(inp):
             else:
                 out += "somewhere"
             if content["country_name"]:
-                out += " in %s" % content["country_name"]
+                if content["country_name"].split(' ')[0] == 'United':
+                    out += " in the %s" % content["country_name"]
+                else:
+                    out += " in %s" % content["country_name"]
             else:
                 out += ", somewhere in the world"
     else:
