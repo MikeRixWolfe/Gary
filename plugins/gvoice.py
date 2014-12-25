@@ -37,8 +37,11 @@ def check_smslog(db, msg):
 
 
 def mark_as_read(db, msg):
-    db.execute("insert into smslog(id, sender, text, time) values (?,?,?,?)",
-        (msg['id'], msg['from'], msg['text'], msg['time']))
+    try:
+        db.execute("insert into smslog(id, sender, text, time) values (?,?,?,?)",
+            (msg['id'], msg['from'], msg['text'], msg['time']))
+    except Exception as e:
+        print ">>> u'Error marking SMS %s as read: %s'" % (msg['id'], e)
     db.commit()
 
 
@@ -88,9 +91,7 @@ def outputsms(voice, conn, bot, db):
 
     for message in messages:  # Redirect or output messages
         if not redirect(message, voice, bot, db) and message['out'].split()[0].strip('<>') not in blacklist:
-            for chan in conn.channels:
-                if chan == output_channel:
-                    conn.send("PRIVMSG {} :{}".format(chan, message['out']))
+            conn.send("PRIVMSG {} :{}".format(output_channel, message['out']))
         mark_as_read(db, message)  # Mark all as read
 
     return voice, len(messages)
