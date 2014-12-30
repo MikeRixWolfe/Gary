@@ -1,64 +1,66 @@
-import json
-import time
-from util import hook, http
+"""
+Adapted from CloudBotIRC/CloudBot
+"""
 
-user_url = "http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=%s&vanityurl=%s"
-profile_url = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s"
-account_url = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=%s&steamid=%s&format=json"
-games_url = "http://store.steampowered.com/api/appdetails/?appids=%s"
+import re
+from util import hook, http, web
 
 
-@hook.singlethread
-@hook.api_key('steam_key')
-@hook.command(autohelp=True)
-def steamcalc(inp, say='', api_key=None):
-    """.steamcalc <Steam Vanity URL ID> - Gets Steam account value for a given Vanity ID. Uses steamcommunity.com/id/<nickname>."""
-    # Get SteamID
+class SteamError(Exception):
+    pass
+
+
+def percentage(part, whole):
+    return 100 * float(part) / float(whole)
+
+
+CALC_URL = "https://steamdb.info/calculator/"
+PLAYED_RE = re.compile(r"(.*)\((.*)%\)")
+
+
+def get_data(user, currency="us"):
+    """
+    takes a steam user ID and returns a dict containing info about the games the user owns
+    :type user: str
+    :type currency: str
+    :return: dict
+    """
+    data = {}
+
+    # get the page
     try:
-        steamid = http.get_json(user_url % (api_key, http.quote(inp.encode('utf8'), safe='')))['response']['steamid']
-    except:
-        return "'%s' does not appear to be a valid Vanity ID. Uses steamcommunity.com/id/<VanityID>." % inp
+        soup = http.get_soup(CALC_URL, player=user, currency=currency)
+    except Exception as e:
+        raise SteamError("Could not get user info: {}".format(e))
 
-    # Get Steam profile info
+    # get all the data we need
     try:
-        profile = http.get_json(profile_url % (api_key, steamid))['response']['players'][0]
-        persona = profile['personaname']
-    except:
-        return "Error looking up %s's Steam profile." % inp
+        data["name"] = soup.find("h1", {"class": "header-title"}).find("a").text
+        data["status"] = soup.find('td', text='Status').find_next('td').text
+        data["value"] = soup.find("h1", {"class": "calculator-price"}).text
+        data["value_sales"] = soup.find("h1", {"class": "calculator-price-lowest"}).text
+        data["count"] = int(soup.find("div", {"class":
+            "pull-right price-container"}).find("p").find("span", {"class":"number"}).text)
+        played = soup.find('td', text='Games not played').find_next('td').text
+        played = PLAYED_RE.search(played).groups()
+        data["count_unplayed"] = int(played[0])
+        data["count_played"] = data["count"] - data["count_unplayed"]
+        data["percent_unplayed"] = round(percentage(data["count_unplayed"], data["count"]), 1)
+        data["percent_played"] = round(percentage(data["count_played"], data["count"]), 1)
+    except AttributeError:
+        raise SteamError("Could not read info, does this user exist?")
 
-    # Get Steam account games for User
+    return data
+
+
+@hook.command
+def steamcalc(text):
+    """steamcalc <username> - Gets value of steam account. Uses steamcommunity.com/id/<nickname>."""
     try:
-        account = http.get_json(account_url % (api_key, steamid))['response']['games']
-        games = [str(item['appid']) for item in account]
-    except:
-        return "Error looking up %s's Steam inventory." % inp
+        data = get_data(inp.strip().lower())
+    except SteamError as e:
+        return "{}".format(e)
 
-    # Get info for games
-    say("Collecting data for %s, please wait..." % inp)
-    games_info = {}
-    try:
-        while games:
-            time.sleep(.2)
-            games_temp, games = games[:1], games[1:]
-            gurl = games_url % ','.join(games_temp)
-            games_info  = dict(games_info.items() + http.get_json(gurl).items())
-    except:
-        return "Error looking up game data, please try again later."
-
-    # Aggregate Steam data
-    prices = []
-    scores = []
-    for game in games_info:
-        try:
-            prices.append(games_info[game]['data']['price_overview']['final'])
-            scores.append(games_info[game]['data']['metacritic']['score'])
-        except:
-            pass
-
-    prices = [int(price) / 100. for price in prices]
-    scores = [float(score) for score in scores]
-
-    total_price = "{0:.2f}".format(sum(prices))
-    avg_score = "{0:.1f}".format(sum(scores) / len(scores))
-
-    return "{} has {} games with a total value of ${} and an average metascore of {}".format(persona.encode('ascii','ignore'), len(games_info), total_price, avg_score)
+    return "\x02{name}\x02 has \x02{count}\x02 games with a total value of \x02{value}\x02" \
+           " (\x02{value_sales}\x02 during sales). \x02{count_unplayed}\x02" \
+           " (\x02{percent_unplayed}%\x02) have never been played.".format(**data)
