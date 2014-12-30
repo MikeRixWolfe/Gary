@@ -38,3 +38,16 @@ def google(inp, api_key=None):
     title = text.truncate_str(parsed['items'][0]['title'], 250)
 
     return u'{} - \x02{}\x02'.format(link, title)
+
+
+@hook.command
+def map(inp):
+    """.map <place>|<origin to destination> - Gets a Map of place or route from Google Maps."""
+    return web.try_googl('https://www.google.com/maps/?q=' + http.quote_plus(inp))
+
+
+@hook.command
+def lmgtfy(inp, say=''):
+    """.lmgtfy [phrase] - Posts a Google link for the specified phrase."""
+    say(web.try_googl("http://lmgtfy.com/?q={}".format(http.quote_plus(inp))))
+

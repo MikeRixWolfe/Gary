@@ -3,7 +3,6 @@ import re
 from util import hook, http, web
 
 
-
 @hook.command
 def geoip2(inp):
     """.geoip2 <host/IP> - Gets gelocation data via geoip.nekudo.com."""
@@ -21,12 +20,12 @@ def geoip2(inp):
         else:
             out = inp + " seems to be located in "
             if content["city"]:
-                out += "%s, " % content["city"]
+                out += "%s" % content["city"]
             if content["country"]["name"]:
                 if content["country"]["name"].split(' ')[0] == 'United':
-                    out += "the %s" % content["country"]["name"]
+                    out += " in the %s" % content["country"]["name"]
                 else:
-                    out += "%s" % content["country"]["name"]
+                    out += " in %s" % content["country"]["name"]
             else:
                 out += "somewhere in the world"
     else:
@@ -87,27 +86,11 @@ def whereis(inp):
             elif octets.group(1) == "192":
                 out += " is on the local network via copper"
             else:
-                url = "http://freegeoip.net/json/%s" % \
-                    (http.quote(ip.encode('utf8'), safe=''))
-                try:
-                    content = http.get_json(url)
-                except:
-                    content = None
-                if content:
-                    out += " seems to be located in " + content["city"] + \
-                            ", " + content["region_name"] + \
-                            " in " + content["country_name"]
-                else:
-                    out += " is located somewhere in the universe."
+                out += geoip2(ip)
+                return out.replace(ip+' ',' ')
         else:
             out = "Sorry, I couldn't locate that user."
     else:
         out = "Sorry, that user doesn't appear to be logged in."
     return out
 
-
-@hook.command
-def map(inp):
-    """.map <place>|<origin to destination> - Gets a Map of place or route from Google Maps."""
-    return web.try_googl('https://www.google.com/maps/?q=' +
-        http.quote_plus(inp))
