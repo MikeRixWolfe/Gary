@@ -7,7 +7,7 @@ def ignored(inp, notice=None, bot=None, say=None):
     """.ignored - Lists ignored channels/users."""
     ignorelist = bot.config["ignored"]
     if ignorelist:
-        return "Ignored channels/users are: %s" % format(", ".join(ignorelist))
+        return "Ignored channels/users are: %s" % format(", ".join(sorted(ignorelist)))
     else:
         return "No masks are currently ignored."
     return

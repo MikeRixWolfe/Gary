@@ -37,7 +37,7 @@ def restricted(inp, bot=None, say=None):
     """.restricted - Lists channels in restricted mode."""
     chans = bot.config["restrictedmode"]
     if chans:
-        say("Channels in restricted mode are: %s" % format(", ".join(chans)))
+        say("Channels in restricted mode are: %s" % format(", ".join(sorted(chans))))
     else:
         say("No channels are currently in restricted mode.")
     return
@@ -50,7 +50,7 @@ def opers(inp, bot=None, say=None):
     admins = bot.config["admins"]
     allows = admins + opers
     if allows:
-        say("Bot operators are: %s" % format(", ".join(allows)))
+        say("Bot operators are: %s" % format(", ".join(sorted(allows))))
     else:
         say("There are currently no bot operators.")
     return
@@ -100,7 +100,7 @@ def voicers(inp, bot=None, say=None):
     admins = bot.config["admins"]
     allows = admins + opers + voicers
     if allows:
-        return "Users with bot voice are: %s" % format(", ".join(allows))
+        return "Users with bot voice are: %s" % format(", ".join(sorted(allows)))
     else:
         say("There are currently no users with bot voice.")
     return

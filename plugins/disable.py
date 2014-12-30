@@ -9,7 +9,7 @@ def disabled(inp, notice=None, bot=None, say=None):
     disabled = bot.config["disabled"]
 
     if disabled:
-        say("Disabled commands/plugins are: %s" % format(", ".join(disabled)))
+        say("Disabled commands/plugins are: %s" % format(", ".join(sorted(disabled))))
     else:
         say("No commands/plugins are currently disabled.")
 
