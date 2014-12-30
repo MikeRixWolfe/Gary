@@ -32,53 +32,29 @@ def sptfy(inp, sptfy=False):
 
 
 @hook.command
-def sptrack(inp):
-    """.spotify <song> - Search Spotify for <song>."""
+def spotify(inp):
+    """.spotify [-track|-artist|-album] <search term> - Search for specified media via Spotify; defaults to track."""
+    inp = inp.split(' ')
+    if len(inp) > 1 and inp[0] in ['-track', '-artist', '-album']:
+        kind, query = inp.pop(0)[1:], " ".join(inp)
+    else:
+        kind, query = "track", " ".join(inp)
+
     try:
-        data = http.get_json("http://ws.spotify.com/search/1/track.json", q=inp.strip())
+        data = http.get_json("http://ws.spotify.com/search/1/{}.json".format(kind), q=query)
     except Exception as e:
-        return "Could not get track information: {}".format(e)
+        return "Could not get {} information: {}".format(kind, e)
 
     try:
-        type, id = data["tracks"][0]["href"].split(":")[1:]
+        type, id = data[kind+"s"][0]["href"].split(":")[1:]
     except IndexError:
-        return "Could not find track."
+        return "Could not find {}.".format(kind)
     url = sptfy(gateway.format(type, id))
-    return u"\x02{}\x02 by \x02{}\x02 - {}".format(data["tracks"][0]["name"],
-                                                           data["tracks"][0]["artists"][0]["name"], url)
 
-
-@hook.command
-def spalbum(inp):
-    """.spalbum <album> - Search Spotify for <album>."""
-    try:
-        data = http.get_json("http://ws.spotify.com/search/1/album.json", q=inp.strip())
-    except Exception as e:
-        return "Could not get album information: {}".format(e)
-
-    try:
-        type, id = data["albums"][0]["href"].split(":")[1:]
-    except IndexError:
-        return "Could not find album."
-    url = sptfy(gateway.format(type, id))
-    return u"\x02{}\x02 by \x02{}\x02 - {}".format(data["albums"][0]["name"],
-                                                           data["albums"][0]["artists"][0]["name"], url)
-
-
-@hook.command
-def spartist(inp):
-    """.spartist <artist> - Search Spotify for <artist>."""
-    try:
-        data = http.get_json("http://ws.spotify.com/search/1/artist.json", q=inp.strip())
-    except Exception as e:
-        return "Could not get artist information: {}".format(e)
-
-    try:
-        type, id = data["artists"][0]["href"].split(":")[1:]
-    except IndexError:
-        return "Could not find artist."
-    url = sptfy(gateway.format(type, id))
-    return u"\x02{}\x02 - {}".format(data["artists"][0]["name"], url)
+    if kind == 'artist':
+        return u"\x02{}\x02 - {}".format(data["artists"][0]["name"], url)
+    else:
+        return u"\x02{}\x02 by \x02{}\x02 - {}".format(data[kind+"s"][0]["name"], data[kind+"s"][0]["artists"][0]["name"], url)
 
 
 @hook.regex(*http_re)
