@@ -54,7 +54,7 @@ def get_data(user, currency="us"):
 
 
 @hook.command
-def steamcalc(text):
+def steamcalc(inp):
     """steamcalc <username> - Gets value of steam account. Uses steamcommunity.com/id/<nickname>."""
     try:
         data = get_data(inp.strip().lower())
