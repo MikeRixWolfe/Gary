@@ -1,3 +1,4 @@
+from datetime import datetime
 from util import hook, http
 
 api_url = "http://ws.audioscrobbler.com/2.0/?format=json"
@@ -43,7 +44,8 @@ def nowplaying(inp, nick='', say=None, api_key=None):
     if album:
         ret += " on \x02%s\x0f" % album
     if date:
-        ret += " [%s]" % date
+        ret += " [%s]" % (datetime.strptime(date,"%d %b %Y, %H:%M") - \
+            (datetime.utcnow() - datetime.now())).strftime("%d %b %Y, %H:%M")
 
     say(ret)
 
