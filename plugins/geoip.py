@@ -2,73 +2,54 @@ import os
 import re
 from util import hook, http, web
 
+formats = [
+    "{ip} seems to be located in {city}, {region_name} in {country_name}",
+    "{ip} seems to be located in {city} in {country_name}",
+    "{ip} seems to be located in {region_name} in {country_name}",
+    "{ip} seems to be located in {country_name}",
+    "Unable to locate geolocation information for the given location"
+]
 
-@hook.command
-def geoip2(inp):
-    """.geoip2 <host/IP> - Gets gelocation data via geoip.nekudo.com."""
-    url = "http://geoip.nekudo.com/api/%s" % \
-          (http.quote(inp.encode('utf8'), safe=''))
 
-    try:
-        content = http.get_json(url)
-    except:
-        return "I couldn't find %s" % inp
-
-    if content["city"] or content["country"]["name"]:
-        if content["country"]["name"] == 'Reserved':
-            out = inp + " is reserved."
-        else:
-            out = inp + " seems to be located in "
-            if content["city"]:
-                out += "%s" % content["city"]
-            if content["country"]["name"]:
-                if content["country"]["name"].split(' ')[0] == 'United':
-                    out += " in the %s" % content["country"]["name"]
-                else:
-                    out += " in %s" % content["country"]["name"]
+def flatten_dict(d):
+    def items():
+        for key, value in d.items():
+            if isinstance(value, dict):
+                for subkey, subvalue in flatten_dict(value).items():
+                    yield key + "_" + subkey, subvalue
             else:
-                out += "somewhere in the world"
-    else:
-        out = "I couldn't find any geographical information on %s" % inp
+                yield key, value
 
-    return out
+    return dict(items())
+
+
+def fformat(args):
+    """find format string for args based on number of matches"""
+    def match():
+        for f in formats:
+            try:
+                yield f.format(**args), len(re.findall(r'(\{.*?\})',f))
+            except:
+                pass
+
+    return max(dict(match()).iteritems(), key=lambda x: (x[1], len(x[0])))[0]
 
 
 @hook.command
 def geoip(inp):
     """.geoip <host/IP> - Gets the location of <host/IP>."""
-    url = "http://freegeoip.net/json/%s" % \
-          (http.quote(inp.encode('utf8'), safe=''))
+    #url = "http://freegeoip.net/json/%s" % (http.quote(inp.encode('utf8'), safe=''))
+    url = "http://geoip.nekudo.com/api/%s" % (http.quote(inp.encode('utf8'), safe=''))
 
     try:
-        content = http.get_json(url)
+        data = http.get_json(url)
     except:
         return "I couldn't find %s" % inp
 
-    if content["city"] or content["region_name"] or content["country_name"]:
-        if content["country_name"] == 'Reserved':
-            out = inp + " is reserved."
-        else:
-            out = inp + " seems to be located "
-            if content["city"] and content["region_name"]:
-                out += "in %s, %s" % (content["city"], content["region_name"])
-            elif content["city"]:
-                out += "in %s" % content["city"]
-            elif content["region_name"]:
-                out += "in %s" % content["region_name"]
-            else:
-                out += "somewhere"
-            if content["country_name"]:
-                if content["country_name"].split(' ')[0] == 'United':
-                    out += " in the %s" % content["country_name"]
-                else:
-                    out += " in %s" % content["country_name"]
-            else:
-                out += ", somewhere in the world"
-    else:
-        out = "I couldn't find any geographical information on %s" % inp
+    data = flatten_dict(data)
+    data = {k:v for k,v in data.items() if v}
 
-    return out
+    return fformat(data)
 
 
 @hook.command
@@ -86,7 +67,7 @@ def whereis(inp):
             elif octets.group(1) == "192":
                 out += " is on the local network via copper"
             else:
-                out += geoip2(ip)
+                out += geoip(ip)
                 return out.replace(ip+' ',' ')
         else:
             out = "Sorry, I couldn't locate that user."
