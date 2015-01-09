@@ -6,7 +6,7 @@ import re
 from util import hook, http, text, web
 
 
-steam_re = re.compile(r'store.steampowered.com/app/([0-9]+)?.*', re.I)
+steam_re = (r'(.*:)//(store.steampowered.com)(:[0-9]+)?(.*)', re.I)
 
 API_URL = "http://store.steampowered.com/api/appdetails/"
 STORE_URL = "http://store.steampowered.com/app/{}/"
@@ -62,7 +62,7 @@ def format_data(app_id, show_url=True):
     return " - ".join(out)
 
 
-@hook.regex(steam_re)
+@hook.regex(*steam_re)
 def steam_url(match):
     app_id = match.group(1)
     return format_data(app_id, show_url=False)
