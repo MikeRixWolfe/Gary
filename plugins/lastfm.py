@@ -5,21 +5,19 @@ api_url = "http://ws.audioscrobbler.com/2.0/?format=json"
 
 
 @hook.api_key('lastfm')
-@hook.command('np', autohelp=False)
-@hook.command(autohelp=False)
-def nowplaying(inp, nick='', say=None, api_key=None):
+@hook.command('np')
+@hook.command
+def nowplaying(inp, say=None, api_key=None):
     """.np/.nowplaying <user> - Gets a LastFM user's last played track."""
-    user = inp or nick
-
     try:
         response = http.get_json(api_url, method="user.getrecenttracks",
-            api_key=api_key, user=user, limit=1)
+            api_key=api_key, user=inp, limit=1)
     except:
         "LastFM API Error, please try again in a few minutes"
     if 'error' in response:
         return response["message"]
     if not "track" in response["recenttracks"] or len(response["recenttracks"]["track"]) == 0:
-        return "No recent tracks found for \x02%s\x0F." % user
+        return "No recent tracks found for \x02%s\x0F." % inp
 
     tracks = response["recenttracks"]["track"]
 
@@ -38,7 +36,7 @@ def nowplaying(inp, nick='', say=None, api_key=None):
     album = track["album"]["#text"]
     artist = track["artist"]["#text"]
 
-    ret = "\x02%s\x0f's %s - \x02%s\x0f" % (user, status, title)
+    ret = "\x02%s\x0f's %s - \x02%s\x0f" % (inp, status, title)
     if artist:
         ret += " by \x02%s\x0f" % artist
     if album:
