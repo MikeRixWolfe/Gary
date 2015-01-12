@@ -3,7 +3,7 @@ import time
 import json
 import BeautifulSoup
 from util import hook, text
-from util.googlevoice import Voice, LoginError, ParsingError
+from util.googlevoice import Voice, LoginError, ParsingError, ValidationError
 
 default_privacy = 0  # 0 or 1 for not private/private
 output_channel = "#geekboy"
@@ -101,7 +101,6 @@ def redirect(message, voice, bot, db):  # Ugly function
     # Circumvent channel and sms others directly or get phone numbers
     sms_cmd = re.match(r'[\.|!]?(?:SMS|Sms|sms) ([^\ ]+) (.+)', message['text'])
     pb_cmd = re.match(r'[\.|!]?(?:Phonebook|phonebook) ([^\ ]+)', message['text'])
-    call_cmd = re.match(r'[\.|!]?(?:Call|call) ([^\ ]+)', message['text'])
     blacklist = bot.config["gvoice"]["private"]
     senderNumber = message['from'].strip('+: ')[-10:]
     sender = get_name(db, senderNumber)
@@ -133,21 +132,6 @@ def redirect(message, voice, bot, db):  # Ugly function
             text = "'%s' does not have a registered phone number." % recip
         voice.send_sms(senderNumber, text)
         print ">>> u'SMS relay phonebook query returned to %s'" % sender
-        return True
-    elif call_cmd:
-        recip = call_cmd.group(1)
-        recipNumber, private = get_phonenumber(db, recip.lower())
-        if recipNumber:
-            if recipNumber in blacklist or recip.lower() in blacklist or recipNumber == senderNumber:
-                text = "I'm sorry %s, I'm afraid I can't do that." % sender
-            else:
-                voice.call(recipNumber, senderNumber)
-                print ">>> u'SMS relay call command sent from  %s to %s'" % (sender, recip)
-                return True
-        else:
-            text = "'%s' does not have a registered phone number." % recip
-        voice.send_sms(senderNumber, text)
-        print ">>> u'SMS relay call returned to %s'" % sender
         return True
     else:
         return False
@@ -236,8 +220,8 @@ def sms(inp, nick='', chan='', db=None, bot=None):
     except:
         return "Google Voice API error, please try again in a few minutes."
 
-@hook.singlethread
-@hook.command()
+
+@hook.command(adminonly=True)
 def call(inp, say='', nick='', db=None, bot=None):
     """.call <nick> - Calls specified <nick> and connects the call to your number from phonebook via Google Voice."""
     db_init(db)
@@ -245,6 +229,7 @@ def call(inp, say='', nick='', db=None, bot=None):
     if inp.lower() == nick.lower():
         return "You don't want to talk to yourself, I don't even want to talk to you!"
 
+    # Note! Forwarding number must be added and validated within the google voice account
     forwardingNumber, forwardingPrivate = get_phonenumber(db, nick)
     if not forwardingNumber:
         return "Your number needs to be in my phonebook to use this function."
@@ -264,9 +249,10 @@ def call(inp, say='', nick='', db=None, bot=None):
         say("Calling %s from %s's phone..." % (recip, nick))
     except LoginError:
         return "Unable to login to Google Voice, please try again in a few minutes."
+    except ValidationError:
+        return "Unable to place call, forwarding number not validated."
     except Exception as e:
-        #return "Google Voice API error, please try again in a few minutes."
-        return "Unable to place call (%s)" % e
+        return "Google Voice API error, please try again in a few minutes."
 
 
 @hook.command
