@@ -103,6 +103,7 @@ character_replacements = {
     'Y': 'Z',
     'Z': 'A'}
 
+
 def capitalize_first(line):
     """
     capitalises the first letter of words
@@ -110,6 +111,7 @@ def capitalize_first(line):
     """
     line = " ".join(line .split())
     return ' '.join([(s[0].upper() if s[0].isalpha() else s[0]) + s[1:] for s in line.split(' ')])
+
 
 def multiword_replace(text, wordDic):
     """
@@ -148,6 +150,16 @@ def truncate_str(content, length=100, suffix='...'):
         return content
     else:
         return content[:length].rsplit(' ', 1)[0] + suffix
+
+
+def chunk_str(content, length=450):
+    """Chunks a string into smaller strings of given length. Returns chunks."""
+    def chunk(content, length):
+        while content:
+            out = (content+' ')[:length].rsplit(' ', 1)[0]
+            content = content[len(out):].strip()
+            yield out
+    return list(chunk(content, length))
 
 
 def rreplace(s, old, new, occurrence):

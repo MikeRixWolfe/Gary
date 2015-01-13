@@ -1,73 +1,42 @@
 import re
+from util import hook, text
 
-from util import hook
 
-
-@hook.command(autohelp=False)
-def help(inp, bot=None, say=None):
-    """.help [command] - Gives a list of commands or help for a command."""
-
+def get_help(bot, adminonly=False):
     funcs = {}
     disabled = bot.config.get('disabled', [])
+
     for command, (func, args) in bot.commands.iteritems():
         fn = re.match(r'^plugins.(.+\.py)$', func._filename)
-        if fn.group(1).lower() not in disabled:
-            if command not in disabled:
-                if func.__doc__ is not None:
-                    if not args.get('adminonly'):
-                        if func in funcs:
-                            if len(funcs[func]) < len(command):
-                                funcs[func] = command
-                        else:
-                            funcs[func] = command
+        if not any(x in disabled for x in [fn.group(1).lower(), command]):
+            if (args.get('adminonly') or False) is adminonly:
+                if func in funcs:
+                    if command == func.func_name:
+                        funcs[func] = command
+                else:
+                    funcs[func] = command
 
-    commands = dict((value, key) for key, value in funcs.iteritems())
-    commandlist = sorted(commands)
-    overflowlist = list()
-    if not inp:
-        while len('Available commands: ' + ' '.join(commandlist)) >= 460:
-            overflowlist.append(commandlist.pop())
-        if len(overflowlist) > 0:
-            say('Available commands: ' + ' '.join(commandlist))
-            say(' '.join(sorted(overflowlist)))
-        else:
-            say('Available commands: ' + ' '.join(sorted(commands)))
-        say('Tip: .help <command> - Gets more info on that command; arguements in <angle brackets> are required and arguements in [square brackets] are optional for any command')
-    else:
-        if inp in commands:
-            say(commands[inp].__doc__)
+    return {v:k for k,v in funcs.iteritems()}
 
 
 @hook.command('ahelp', autohelp=False, adminonly=True)
-@hook.command(autohelp=False, adminonly=True)
-def adminhelp(inp, bot=None, say=None):
-    """.adminhelp [command] - Gives a list of admin commands or help for a command."""
+@hook.command(autohelp=False)
+def help(inp, say=None, bot=None, input=None):
+    """.help [command] - Gives a list of commands or help for a command."""
+    if input.trigger == 'ahelp':  # The adminonly trigger outputs admin commands instead
+        commands = get_help(bot, True)
+    else:
+        commands = get_help(bot)
 
-    funcs = {}
-    disabled = bot.config.get('disabled', [])
-    for command, (func, args) in bot.commands.iteritems():
-        fn = re.match(r'^plugins.(.+\.py)$', func._filename)
-        if fn.group(1).lower() not in disabled:
-            if command not in disabled:
-                if func.__doc__ is not None:
-                    if args.get('adminonly'):
-                        if func in funcs:
-                            if len(funcs[func]) < len(command):
-                                funcs[func] = command
-                        else:
-                            funcs[func] = command
-
-    commands = dict((value, key) for key, value in funcs.iteritems())
-    commandlist = sorted(commands)
-    overflowlist = list()
     if not inp:
-        while len('Available commands: ' + ' '.join(commandlist)) >= 460:
-            overflowlist.append(commandlist.pop())
-        if len(overflowlist) > 0:
-            say('Available commands: ' + ' '.join(commandlist))
-            say(' '.join(sorted(overflowlist)))
-        else:
-            say('Available commands: ' + ' '.join(sorted(commands)))
+        out = sorted([k for k,v in commands.iteritems() if v.__doc__])
+        for out in text.chunk_str('Available commands: %s' % ' '.join(out)):
+            say(out)
+        say('Tip: .help <command> - Gets more info on that command; arguements in <angle brackets> are required and arguements in [square brackets] are optional for any command')
     else:
         if inp in commands:
-            say(commands[inp].__doc__)
+            say(commands[inp].__doc__ or "Command %s has no additional documentation." % inp)
+        else:
+            say("Unknown command.")
+
+
