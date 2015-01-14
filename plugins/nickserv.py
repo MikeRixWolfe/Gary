@@ -22,7 +22,6 @@ def ident(inp, nick='', conn=None):
 @hook.command(autohelp=False)
 def status(inp, nick=None, say=None, conn=None):
     """.status [all|green|red] - Gets your perceived NickServ status or a specified group."""
-    users = {k:v for k,v in conn.users.items() if k == nick} or conn.users
     if inp == 'all':
         users = conn.users
     elif inp == 'green':
