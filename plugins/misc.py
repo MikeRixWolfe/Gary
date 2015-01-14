@@ -2,8 +2,8 @@ import re
 import socket
 import subprocess
 import time
-
 from util import hook, http
+
 
 socket.setdefaulttimeout(10)  # global setting
 
@@ -23,51 +23,6 @@ def get_version():
         % (revnumber, shorthash)
 
     return shorthash, revnumber
-
-
-@hook.command(autohelp=False)
-def auth(inp, nick='', conn=None):
-    #""".auth - Tries to update your NickServ ident status."""
-    if not conn.users.get(conn.nick.lower(), False):
-        return("I cannot identify with NickServ; priviledged functions disabled.")
-    else:
-        conn.msg(conn.conf.get('nickserv_name', 'nickserv'),
-            conn.conf.get('nickserv_ident_command', 'INFO %s') % nick.lower())
-        return "NickServ ident status updated."
-
-
-@hook.event('*')
-def user_tracking(paraml, nick=None, input=None, conn=None):
-    if input.command in ('QUIT', 'NICK', 'JOIN', 'PART', 'PRIVMSG', 'KICK') and \
-            conn.users.get(conn.nick.lower(), False):
-        nick = nick.lower()
-        nickserv_name = conn.conf.get('nickserv_name', 'nickserv')
-        nickserv_ident = conn.conf.get('nickserv_ident_command', 'INFO %s')
-        if input.command == 'JOIN':
-            if not conn.users.get(nick, False):
-                conn.msg(nickserv_name, nickserv_ident % nick)
-        if input.command == 'PRIVMSG':
-            if nick not in conn.users.keys():
-                 conn.msg(nickserv_name, nickserv_ident % nick)
-        elif input.command in ('QUIT', 'PART', 'NICK', 'KICK'):
-            if input.command == 'KICK':
-                nick = paraml[1]
-            conn.users.pop(nick, None)
-            if input.command == 'NICK':
-                conn.msg(nickserv_name, nickserv_ident % paraml[0])
-
-
-@hook.event('NOTICE')
-def noticed(paraml, chan='', conn=None):
-    if paraml[0] == conn.nick and \
-            chan.lower() == conn.conf.get('nickserv_name', 'nickserv'):
-        if "Nickname:" in paraml[1]:
-            if "ONLINE" in paraml[1]:
-                conn.users[str(paraml[1].split()[1]).lower()] = True
-            else:
-                conn.users[str(paraml[1].split()[1]).lower()] = False
-        elif "not registered" in paraml[1] or "is private" in paraml[1]:
-            conn.users[str(paraml[1].split()[2]).lower()[2:-2]] = False
 
 
 @hook.event('JOIN')
