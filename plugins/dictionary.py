@@ -95,7 +95,7 @@ def define(inp):
 
 @hook.command
 def etymology(inp):
-    """.e/.etymology <word> - Retrieves the etymology of chosen word."""
+    """.etymology <word> - Retrieves the etymology of chosen word."""
     url = 'http://www.etymonline.com/index.php'
     h = http.get_html(url, term=inp)
     etym = h.xpath('//dl')
