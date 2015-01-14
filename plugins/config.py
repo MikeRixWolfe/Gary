@@ -75,12 +75,6 @@ def enable(inp, say=None, bot=None):
     say(config_del(inp, "disabled", bot.config))
 
 
-@hook.command(autohelp=False)
-def censored(inp, say=None, bot=None):
-    """.censored - Lists censored words."""
-    say(config_list("censored", bot.config))
-
-
 @hook.command(adminonly=True)
 def censor(inp, say=None, bot=None):
     """.censor <word> - Censors <word>."""
