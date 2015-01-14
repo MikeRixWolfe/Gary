@@ -1,6 +1,5 @@
-from util import hook
 import random
-import re
+from util import hook
 
 r = "\x02\x0305"  # red
 g = "\x02\x0303"  # green
@@ -25,29 +24,10 @@ answers = [g + "As I see it, yes",
            r + "My sources say no",
            r + "Outlook not so good",
            r + "Very doubtful"]
-nextresponsenumber = -1
 
 
-@hook.command
 @hook.command("8ball")
 def eightball(inp, nick='', say=None):
     """.8ball <question> - Ask the 8ball a question."""
-    global nextresponsenumber
-    inp = inp.strip()
-    if re.match("[a-zA-Z0-9]", inp[-1]):
-        inp += "?"
-    if nextresponsenumber > 0:
-        say("%s: %s %s" % (nick, inp, answers[nextresponsenumber]))
-        nextresponsenumber = -1
-    else:
-        return random.choice(answers)
+    return random.choice(answers)
 
-
-@hook.command("8next", adminonly=True)
-def eightballnext(inp, nick='', input=None, say=None):
-    if not inp.isdigit() or (int(inp) < 0  or int(inp) > 19):
-        return "Please specify 0-19"
-    global nextresponsenumber
-    nextresponsenumber = int(inp.strip())
-    say("next response will be #%d - %s" %
-        (nextresponsenumber, answers[nextresponsenumber]))
