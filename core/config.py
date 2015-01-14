@@ -35,7 +35,7 @@ if not os.path.exists('config'):
               "consumer_secret": ""
             }
           },
-          "censored_strings": [
+          "censored": [
             "DCC SEND",
             "\\0",
             "\\x01",
@@ -82,10 +82,10 @@ if not os.path.exists('config'):
           },
           "ignored": [],
           "muted": [],
-          "opers": [],
-        "rejoin": true,
-          "restrictedmode": [],
-          "voice": []
+          "opered": [],
+          "rejoin": true,
+          "restricted": [],
+          "voiced": []
         }''') + '\n')
 
 

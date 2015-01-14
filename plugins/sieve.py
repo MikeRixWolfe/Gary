@@ -12,12 +12,12 @@ def is_admin(bot, input):
 
 @hook.sieve
 def sieve_suite(bot, input, func, kind, args):
-    opers = bot.config.get('opers', [])
-    voices = bot.config['voice']
+    opers = bot.config.get('opered', [])
+    voices = bot.config.get('voiced', [])
     disabled = bot.config.get('disabled', [])
     ignored = bot.config.get('ignored', [])
     muted = bot.config.get('muted', [])
-    restricted = bot.config.get('restrictedmode', [])
+    restricted = bot.config.get('restricted', [])
     acl = bot.config.get('acls', {})
 
     if kind == "event":

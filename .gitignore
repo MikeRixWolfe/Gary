@@ -4,7 +4,6 @@
 persist
 unused_plugins
 config
-config.*
 *.db
 geekboy.py
 build
