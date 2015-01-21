@@ -89,7 +89,7 @@ def get_sales(mask):
                 # Bundles
                 if set(["id", "url"]).issubset(set(item.keys())):
                     if not item["final_price"] and not item["discounted"]:
-                        item["name"] = item["name"].encode("ascii", "ignore")
+                        item["name"] = item["name"]
                         item["final_price"] = web.try_googl(item["url"])
                         item["discounted"] = True
                 else:
@@ -99,7 +99,7 @@ def get_sales(mask):
                         item["id"] = str(item["url"])[34:-1]
                     appdata = http.get_json("http://store.steampowered.com/api/"
                         "appdetails/?appids={}".format(item["id"]))[str(item["id"])]["data"]
-                    item["name"] = appdata["name"].encode("ascii", "ignore")
+                    item["name"] = appdata["name"]
                     if "Free to Play" in appdata["genres"]:
                         item["final_price"] = 'Free to Play'
                         item["discount_percent"] = '100'
@@ -132,10 +132,10 @@ def get_sales(mask):
 
 def format_sale_item(item):
     if not str(item["final_price"]).isdigit():
-        return "\x02{}\x0F: {}".format(item["name"],
+        return u"\x02{}\x0F: {}".format(item["name"],
             item["final_price"])
     else:
-        return "\x02{}\x0F: ${}.{}({}% off)".format(item["name"],
+        return u"\x02{}\x0F: ${}.{}({}% off)".format(item["name"],
             item["final_price"][:-2],
             item["final_price"][-2:],
             item["discount_percent"])

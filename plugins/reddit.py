@@ -94,6 +94,5 @@ def ris(inp):
         if tempitem["data"]["domain"] == "i.imgur.com":
             item = tempitem["data"]
         if item:
-            return "{} - \x02{}\x02".format(item['url'],
-                item['title'].encode('ascii','ignore'))
+            return u"{} - \x02{}\x02".format(item['url'], item['title'])
     return "No image posts found for \x02r/{}\x02".format(inp)

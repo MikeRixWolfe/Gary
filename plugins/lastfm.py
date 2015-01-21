@@ -36,13 +36,13 @@ def nowplaying(inp, say=None, api_key=None):
     album = track["album"]["#text"]
     artist = track["artist"]["#text"]
 
-    ret = "\x02%s\x0f's %s - \x02%s\x0f" % (inp, status, title)
+    ret = u"\x02%s\x0f's %s - \x02%s\x0f" % (inp, status, title)
     if artist:
-        ret += " by \x02%s\x0f" % artist
+        ret += u" by \x02%s\x0f" % artist
     if album:
-        ret += " on \x02%s\x0f" % album
+        ret += u" on \x02%s\x0f" % album
     if date:
-        ret += " [%s]" % (datetime.strptime(date,"%d %b %Y, %H:%M") - \
+        ret += u" [%s]" % (datetime.strptime(date,"%d %b %Y, %H:%M") - \
             (datetime.utcnow() - datetime.now())).strftime("%d %b %Y, %H:%M")
 
     say(ret)
@@ -95,12 +95,12 @@ def toptrack(inp, nick='', say=None, api_key=None):
     artist = track["artist"]["name"]
     playcount = track["playcount"]
 
-    ret = "\x02%s\x0F's \x02%s\x0F top track - \x02%s\x0f" % (user,
+    ret = u"\x02%s\x0F's \x02%s\x0F top track - \x02%s\x0f" % (user,
                                                               period, title)
     if artist:
-        ret += " by \x02%s\x0f" % artist
+        ret += u" by \x02%s\x0f" % artist
     if playcount:
-        ret += " a total of \x02%s\x0f times" % playcount
+        ret += u" a total of \x02%s\x0f times" % playcount
 
     say(ret)
 
@@ -124,7 +124,8 @@ def similar(inp, nick='', say=None, api_key=None):
     artist = response["similarartists"]["@attr"]["artist"]
     artists = [x["name"] for x in response["similarartists"]["artist"]]
 
-    say("Artists similar to \"\x02{}\x0f\": {}".format(artist, ", ".join(artists)))
+    print artists
+    say(u"Artists similar to \"\x02{}\x0f\": {}".format(artist, u", ".join(artists)))
 
 
 @hook.api_key('lastfm')
@@ -144,4 +145,4 @@ def genres(inp, nick='', say=None, api_key=None):
         tags = ["None found"]
     artist = response["artist"]["name"]
 
-    say("Genres for \"\x02{}\x0f\": {}".format(artist, ", ".join(tags)))
+    say(u"Genres for \"\x02{}\x0f\": {}".format(artist, ", ".join(tags)))
