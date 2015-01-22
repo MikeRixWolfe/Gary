@@ -115,7 +115,7 @@ def get_sales(mask):
                 continue
             # Add appropriate item data to sales
             if item["discounted"]:
-                item = {k: str(v) for k, v in item.items() if k in
+                item = {k: u"{}".format(v) for k, v in item.items() if k in
                     ["name", "final_price", "discount_percent"]}
                 if data[category]["name"] not in sales.keys():
                     sales[data[category]["name"]] = []
@@ -184,9 +184,9 @@ def steamsales(inp, say='', chan=''):
     for category in sales:
         items = [format_sale_item(item) for item in sales[category]]
         if len(items):
-            say("\x02{}\x0F: {}".format(category, '; '.join(items)))
+            say(u"\x02{}\x0F: {}".format(category, "; ".join(items)))
         else:
-            say("\x02{}\x0F: {}".format(category, "None found"))
+            say(u"\x02{}\x0F: {}".format(category, u"None found"))
 
 
 @hook.singlethread
