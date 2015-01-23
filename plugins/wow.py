@@ -19,7 +19,7 @@ def wow_armory_data(link):
     try:
         data = http.get_json(link)
     except Exception as e:
-        return 'Unable to fetch information for {}. Does the realm or character exist? ({})'.format(link, str(e))
+        return 'Unable to fetch information; does the realm or character exist?'
 
     return wow_armory_format(data, link)
 
@@ -43,7 +43,7 @@ def wow_armory_format(data, link):
                 .format(data['name'], data['level'], wow_get_gender(data['gender']), wow_get_class(data['class'], True),
                         data['realm'], data['achievementPoints'], data['totalHonorableKills'], web.try_googl(niceurl))
         except Exception as e:
-            return 'Unable to fetch information for {}. Does the realm or character exist? ({})'.format(niceurl, str(e))
+            return 'Unable to fetch information; does the realm or character exist?'
 
     return 'An unexpected error occured.'
 
