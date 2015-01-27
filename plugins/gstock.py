@@ -8,7 +8,7 @@ def gstock(inp):
     url = "http://finance.google.com/finance/info?client=ig&format=json&q="
 
     try:
-        quote = json.loads(http.get(url + symbol)[3:])[0]
+        quote = json.loads(http.get(url + inp)[3:])[0]
     except:
         return "Google Finance API error, please try again in a few minutes."
 
