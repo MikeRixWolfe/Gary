@@ -20,9 +20,9 @@ def config_add(items, name, config):
     json.dump(config, open('config', 'w'), sort_keys=True, indent=2)
 
     if new:
-        out = text.capitalize_first("{} has been {}. ".format(', '.join(new), name))
+        out = "{} has been {}. ".format(', '.join(new), name)
     if skips:
-        out += text.capitalize_first("{} is already {}.".format(', '.join(skips), name))
+        out += "{} is already {}.".format(', '.join(skips), name)
 
     return out
 
@@ -45,9 +45,9 @@ def config_del(items, name, config):
     json.dump(config, open('config', 'w'), sort_keys=True, indent=2)
 
     if new:
-        out = text.capitalize_first("{} is no longer {}. ".format(', '.join(new), name))
+        out = "{} is no longer {}. ".format(', '.join(new), name)
     if skips:
-        out += text.capitalize_first("{} was not {}.".format(', '.join(skips), name))
+        out += "{} was not {}.".format(', '.join(skips), name)
 
     return out
 
