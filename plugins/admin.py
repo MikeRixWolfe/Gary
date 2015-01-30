@@ -267,28 +267,16 @@ def unlock(inp, conn=None, chan=None, notice=None):
 def say(inp, conn=None, chan=None):
     """.say [channel] <message> - Makes the bot say <message> in [channel]. If [channel] is blank the bot will say the <message> in the channel
     the command was used in."""
-    split = inp.split(" ")
-    if split[0][0] == "#":
-        message = " ".join(split[1:])
-        out = "PRIVMSG {} :{}".format(split[0], message)
-    else:
-        message = " ".join(split[0:])
-        out = "PRIVMSG {} :{}".format(chan, message)
-    conn.send(out)
+    target, msg = inp.split(' ', 1) if inp[0] == '#' else (chan, inp)
+    conn.msg(target, msg)
 
 
 @hook.command(adminonly=True)
 def rsay(inp, conn=None, chan=None):
     """.say [channel] <message> - Makes the bot say <message> in [channel]. If [channel] is blank the bot will
     the command was used in."""
-    split = inp.split(" ")
-    if split[0][0] == "#":
-        message = text.rainbow(" ".join(split[1:]))
-        out = "PRIVMSG {} :{}".format(split[0], message)
-    else:
-        message = text.rainbow(" ".join(split[0:]))
-        out = "PRIVMSG {} :{}".format(chan, message)
-    conn.send(out)
+    target, msg = inp.split(' ', 1) if inp[0] == '#' else (chan, inp)
+    conn.msg(target, text.rainbow(msg))
 
 
 hook.command(adminonly=True)
