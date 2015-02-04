@@ -38,8 +38,8 @@ def fformat(args):
 @hook.command
 def geoip(inp):
     """.geoip <host/IP> - Gets the location of <host/IP>."""
-    #url = "http://freegeoip.net/json/%s" % (http.quote(inp.encode('utf8'), safe=''))
-    url = "http://geoip.nekudo.com/api/%s" % (http.quote(inp.encode('utf8'), safe=''))
+    url = "http://freegeoip.net/json/%s" % (http.quote(inp.encode('utf8'), safe=''))
+    #url = "http://geoip.nekudo.com/api/%s" % (http.quote(inp.encode('utf8'), safe=''))
 
     try:
         data = http.get_json(url)
