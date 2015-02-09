@@ -1,17 +1,14 @@
-import subprocess
+from subprocess import check_output
 from util import hook
 
 
-@hook.command(adminonly=True)
+@hook.command
 def ping(inp):
     """.ping - Pings an IP address or domain."""
+    out = check_output(["ping", "-c", "1", inp.split()[0]])
 
-    command = "ping -c 1 " + inp.split()[0]
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
-    process.wait()
-    result = process.stdout.read()
-    result = result.split('\n')
     try:
-        return result[1]
+        return out.split("\n")[1]
     except:
-        "Host not found"
+        return "Host not found."
+
