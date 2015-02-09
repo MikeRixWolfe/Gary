@@ -87,8 +87,7 @@ def define(inp):
         result = format_output(False)
 
     if len(result) > 450:
-        result = result[:result.rfind(' ', 0, 450)]
-        result = re.sub(r'[^A-Za-z]+\.?$', '', result) + ' ...'
+        result = text.truncate_str(result, 450)
 
     return result
 
@@ -106,8 +105,5 @@ def etymology(inp):
     etym = etym[0].text_content()
     etym = ' '.join(etym.split())
 
-    if len(etym) > 400:
-        etym = etym[:etym.rfind(' ', 0, 400)] + ' ...'
-
-    return etym
+    return text.truncate_str(etym, 400)
 

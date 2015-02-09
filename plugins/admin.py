@@ -2,10 +2,8 @@ from util import hook, text
 import os
 import sys
 import re
-import json
 import time
 import signal
-import subprocess
 
 
 @hook.command("quit", autohelp=False, adminonly=True)
