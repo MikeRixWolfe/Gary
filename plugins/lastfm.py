@@ -108,10 +108,14 @@ def similar(inp, nick='', say=None, api_key=None):
         return response["message"]
 
     try:
+        artist = response["similarartists"]["@attr"]["artist"]
+    except:
+        return 'Artist "{}" not found.'.format(inp)
+
+    try:
         artists = [x["name"] for x in response["similarartists"]["artist"]]
     except:
         artists = ["None found"]
-    artist = response["similarartists"]["@attr"]["artist"]
 
     say(u"Artists similar to \"\x02{}\x0f\": {}".format(artist, u", ".join(artists)))
 
