@@ -21,7 +21,6 @@ def python(inp, say=None):
 def ruby(inp, say=None):
     """.rb/.ruby <code> - Executes Ruby code via Codepad.org."""
     try:
-        url = "http://codepad.org/"
         params = {"lang": "Ruby", "code": inp, "run": "True", "submit": "Submit"}
         document = http.get("http://codepad.org/", query_params=params, get_method="POST")
         html = etree.HTML(document)
