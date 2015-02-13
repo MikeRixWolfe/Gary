@@ -20,19 +20,19 @@ def set_karma(db, chan, word, karma):
     db.commit()
 
 
-@hook.regex(r'((?:\().*(?:\))|\S+)(\+\+|--)')
+@hook.regex(r'(\(.*\)|\S+)(\+\+|--)')
 def karma_edit(inp, chan='', nick='', say=None, db=None):
     db_init(db)
 
-    word = inp.group(1).strip().lower()
+    word, delta = inp.groups()
     if re.match(r'\(.*\)', word):
         word = word[1:-1]
+    word = word.strip().lower()
 
     if word == nick.lower():
         return #"Please do not karma yourself."
 
     karma = int(get_karma(db, chan, word))
-    delta = inp.group(2)
     if delta == "++":
         karma += 1
     elif delta == "--":
@@ -45,11 +45,11 @@ def karma(inp, chan='', say=None, db=None, input=None):
     """.karma <word> - Returns karma of <word>; <word>(++|--) increments or decrements karma of <word>."""
     db_init(db)
 
-    word = inp.strip()
-    if re.match(r'\(.*\)', word):
-            word = word[1:-1]
+    if re.match(r'\(.*\)', inp):
+        inp = inp[1:-1]
+    word = inp.strip().lower()
 
-    karma = get_karma(db, chan, inp.strip())
+    karma = get_karma(db, chan, word)
 
     if karma and karma != '0':
         say("%s has %s karma" % (word, karma))

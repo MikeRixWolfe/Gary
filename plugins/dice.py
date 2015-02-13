@@ -16,16 +16,17 @@ def nrolls(count, n):
     if n == "F":
         return [random.randint(-1, 1) for x in xrange(min(count, 100))]
     if n < 2:  # it's a coin
-        if count < 5000:
+        if count < 100:
             return [random.randint(0, 1) for x in xrange(count)]
         else:  # fake it
             return [int(random.normalvariate(.5 * count, (.75 * count) ** .5))]
     else:
-        if count < 5000:
+        if count < 100:
             return [random.randint(1, n) for x in xrange(count)]
         else:  # fake it
             return [int(random.normalvariate(.5 * (1 + n) * count,
-                                             (((n + 1) * (2 * n + 1) / 6. - (.5 * (1 + n)) ** 2) * count) ** .5))]
+                                             (((n + 1) * (2 * n + 1) / 6. -
+                                             (.5 * (1 + n)) ** 2) * count) ** .5))]
 
 
 #@hook.regex(valid_diceroll, re.I)
@@ -37,7 +38,10 @@ def roll(inp):
     try:  # if inp is a re.match object...
         (inp, desc) = inp.groups()
     except AttributeError:
-        (inp, desc) = valid_diceroll_re.match(inp).groups()
+        try:
+            (inp, desc) = valid_diceroll_re.match(inp).groups()
+        except:
+            return "Invalid diceroll"
 
     if "d" not in inp:
         return

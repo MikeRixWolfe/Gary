@@ -113,6 +113,19 @@ def topfriend(inp, say=None, api_key=None):
 
 @hook.api_key('lastfm')
 @hook.command
+def lfmuser(inp, say=None, api_key=None):
+    """.lfmuser <user> - Gets a LastFM user's data."""
+    try:
+        response = http.get_json(api_url, method="user.getinfo", api_key=api_key, user=inp)["user"]
+    except:
+        return "LastFM API Error, please try again in a few minutes"
+
+    say(u"\x02{name}\x0F has been a member since \x02{registered[#text]}\x0F with " \
+    "\x02{playcount}\x0f scrobbles".format(**response))
+
+
+@hook.api_key('lastfm')
+@hook.command
 def similar(inp, nick='', say=None, api_key=None):
     """.similar <artist> - Gets similar artists via LastFM."""
     try:

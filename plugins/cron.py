@@ -55,8 +55,7 @@ def remindme(inp, nick='', chan='', db=None):
     db_init(db)
     new_event = re.match(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2})\ (.+)', inp)
     if new_event and new_event.group(1) > str(datetime.now())[:16]:
-        timestamp = new_event.group(1)
-        message = new_event.group(2)
+        timestamp, message = new_event.groups()
         try:
             set_event(db, timestamp, chan, message, nick)
         except:
