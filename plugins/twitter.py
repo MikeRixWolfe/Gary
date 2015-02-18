@@ -85,7 +85,7 @@ def twitter(inp, api_key=None):
 def twitterloop(paraml, nick='', conn=None, bot=None, api_key=None):
     """twitter rss checking loop"""
     server = "%s:%s" % (conn.server, conn.port)
-    if paraml[0] != "#vidya" or nick != conn.nick:
+    if paraml[0] != "#vidyaalone" or nick != conn.nick:
         return
     time.sleep(1)  # Allow chan list time to update
     api_key = bot.config.get('api_keys', None).get('twitter', None)
