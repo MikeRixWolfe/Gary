@@ -41,8 +41,8 @@ def get_weather(q):
 
 
 @hook.api_key('yahoo')
-@hook.command
 @hook.command('w')
+@hook.command
 def weather(inp, say=None, api_key=None):
     """.w[eather] <zip code|location> - Gets the current weather conditions."""
     if not isinstance(api_key, dict) or any(key not in api_key for key in
@@ -62,7 +62,10 @@ def weather(inp, say=None, api_key=None):
     if not weather:
         return "Yahoo Weather API error, please try again in a few minutes."
 
-    direction = cards.get(int(weather['wind']['direction']), cards[min(cards.keys(), key=lambda k: abs(k - int(weather['wind']['direction'])))])
+    try:
+        direction = cards.get(int(weather['wind']['direction']), cards[min(cards.keys(), key=lambda k: abs(k - int(weather['wind']['direction'])))])
+    except:
+        return "Error: unable to find weather data for location."
 
     say("\x02{location[city]}, {location[region]}\x0F: {item[condition][temp]}*{units[temperature]} " \
         "and {item[condition][text]}, wind chill {wind[chill]}*{units[temperature]} " \
@@ -88,11 +91,14 @@ def forecast(inp, say=None, api_key=None):
             return "Error: unable to lookup weather ID for location."
         q="SELECT * FROM weather.forecast WHERE woeid=%s" % woeid
 
+    weather = get_weather(q)
+    if not weather:
+        return "Yahoo Weather API error, please try again in a few minutes."
+
     try:
-        weather = get_weather(q)
         days = weather['item']['forecast']
     except:
-        return "Yahoo Weather API error, please try again in a few minutes."
+        return "Error: unable to find weather data for location."
 
     say("\x02{location[city]}, {location[region]}\x0F: ".format(**weather) +
         '; '.join(["\x02{day}\x0F: L {low}*F, H {high}*F, {text}".format(**day) for day in days]))
