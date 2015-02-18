@@ -31,7 +31,7 @@ def get_woeid(inp, api_key):
         return None
 
 
-def get_weather_rest(q):
+def get_weather(q):
     try:
         query = http.get_json("http://query.yahooapis.com/v1/public/yql",
             q=q, format="json")['query']['results']['channel']
@@ -57,7 +57,7 @@ def weather(inp, say=None, api_key=None):
             return "Error: unable to lookup weather ID for location."
         q="SELECT * FROM weather.forecast WHERE woeid=%s" % woeid
 
-    weather = get_weather_rest(q)
+    weather = get_weather(q)
 
     if not weather:
         return "Yahoo Weather API error, please try again in a few minutes."
@@ -89,12 +89,11 @@ def forecast(inp, say=None, api_key=None):
         q="SELECT * FROM weather.forecast WHERE woeid=%s" % woeid
 
     try:
-        weather = get_weather_rest(q)
+        weather = get_weather(q)
         days = weather['item']['forecast']
     except:
         return "Yahoo Weather API error, please try again in a few minutes."
 
-    out = "\x02{location[city]}, {location[region]}\x0F: ".format(**weather)
-
-    say(out + '; '.join(["\x02{day}\x0F: L {low}*F, H {high}*F, {text}".format(**day) for day in days]))
+    say("\x02{location[city]}, {location[region]}\x0F: ".format(**weather) +
+        '; '.join(["\x02{day}\x0F: L {low}*F, H {high}*F, {text}".format(**day) for day in days]))
 
