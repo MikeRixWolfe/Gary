@@ -8,4 +8,4 @@ config
 geekboy.py
 build
 markov.py
-
+steamdb.py

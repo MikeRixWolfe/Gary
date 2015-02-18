@@ -31,7 +31,7 @@ def ruby(inp, say=None):
     return re.sub(" +", " ", " ".join(out).replace("\n", " ")).strip() if out else "No output."
 
 
-@hook.command(adminonly=True)
+#@hook.command(adminonly=True)
 def ply(inp):
     """.ply <prog> - Execute local Python."""
     try:
@@ -39,3 +39,4 @@ def ply(inp):
         return re.sub(" +", " ", out.replace("\n", " ")).strip() if out else "No output."
     except subprocess.CalledProcessError as e:
         return e.output
+
