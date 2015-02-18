@@ -10,7 +10,8 @@ def get_stock_download(inp):
             "and columns='Name,LastTradePriceOnly,Date,LastTradeTime,Change,Open,DaysHigh,DaysLow,Volume'" % inp
         query = http.get_json(url, q = q).get('query', '')
         quote = query.get('results', '').get('row', '')
-        quote['PercentChange'] = "%.2f" % (float(quote['Change']) / float(quote['Open']) * 100)
+        quote['PercentChange'] = "%.2f%%" % (float(quote['Change']) /
+            (abs(float(quote['Change'])) + float(quote['LastTradePriceOnly'])) * 100)
     except:
         return None
 
@@ -64,8 +65,7 @@ def stock(inp, say=''):
 @hook.command
 def stockhistory(inp, say=''):
     """.stockhisory <symbol> - Gets stock history information from Yahoo."""
-    quote = get_stock_console(inp) or get_stock_rest(inp,
-        'SELECT * FROM yahoo.finance.quotes WHERE symbol in ("%s")')
+    quote = get_stock_console(inp) or get_stock_rest(inp)
 
     if not quote:
         return "Yahoo Fianance API error, please try again in a few minutes."
