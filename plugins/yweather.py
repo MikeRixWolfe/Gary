@@ -1,12 +1,5 @@
-import json
-import urllib2
-import lxml.etree
 from util import hook, http
 
-wurl = 'http://xml.weather.yahoo.com/forecastrss?p=%s'
-wurl2 = 'http://xml.weather.yahoo.com/forecastrss?w=%s'
-wser = 'http://xml.weather.yahoo.com/ns/rss/1.0'
-wgeo = "http://where.yahooapis.com/v1/places.q('%s')?appid=%s&format=json"
 
 cards = {
     0: "N",
@@ -30,116 +23,78 @@ cards = {
 
 
 def get_woeid(inp, api_key):
-    url = wgeo % (http.quote_plus(inp), api_key['consumer'])
     try:
-        parsed = http.get_json(url)
-        return parsed.get('places', None).get('place', None)[0].get('woeid', None)
+        parsed = http.get_json("http://where.yahooapis.com/v1/places.q('%s')" % (http.quote_plus(inp)),
+            appid=api_key['consumer'], format="json")
+        return parsed['places']['place'][0]['woeid']
     except:
         return None
+
+
+def get_weather_rest(q):
+    try:
+        query = http.get_json("http://query.yahooapis.com/v1/public/yql",
+            q=q, format="json")['query']['results']['channel']
+    except:
+        return None
+    return query
 
 
 @hook.api_key('yahoo')
 @hook.command
 @hook.command('w')
-def weather(inp, api_key=None):
+def weather(inp, say=None, api_key=None):
     """.w[eather] <zip code|location> - Gets the current weather conditions."""
     if not isinstance(api_key, dict) or any(key not in api_key for key in
             ('consumer', 'consumer_secret')):
         return "Error: API keys not set."
 
     if inp.isdigit():
-        url = wurl % inp + '&u=f'
+        q='SELECT * FROM weather.forecast WHERE location="%s"' % inp
     else:
         woeid = get_woeid(inp, api_key)
         if woeid is None:
             return "Error: unable to lookup weather ID for location."
-        url = wurl2 % woeid + '&u=f'
+        q="SELECT * FROM weather.forecast WHERE woeid=%s" % woeid
 
-    parsed = http.get_xml(url)
-    if len(parsed) != 1:
-        return "Error parsing Yahoo Weather API, please try again later..."
+    weather = get_weather_rest(q)
 
-    try:
-        doc = lxml.etree.parse(urllib2.urlopen(url)).getroot()
-    except:
-        return "Error accessing Yahoo Weather API, please try again later..."
+    if not weather:
+        return "Yahoo Weather API error, please try again in a few minutes."
 
-    location = doc.xpath('*/yweather:location',
-                         namespaces={'yweather': 'http://xml.weather.yahoo.com/ns/rss/1.0'})
-    conditions = doc.xpath('*/*/yweather:condition',
-                           namespaces={'yweather': 'http://xml.weather.yahoo.com/ns/rss/1.0'})
-    wind = doc.xpath('*/yweather:wind',
-                     namespaces={'yweather': 'http://xml.weather.yahoo.com/ns/rss/1.0'})
-    atmosphere = doc.xpath('*/yweather:atmosphere',
-                           namespaces={'yweather': 'http://xml.weather.yahoo.com/ns/rss/1.0'})
-    astronomy = doc.xpath('*/yweather:astronomy',
-                          namespaces={'yweather': 'http://xml.weather.yahoo.com/ns/rss/1.0'})
+    direction = cards.get(int(weather['wind']['direction']), cards[min(cards.keys(), key=lambda k: abs(k - int(weather['wind']['direction'])))])
 
-    try:
-        condition = conditions[0]
-    except IndexError:
-        return "City not found."
-    # there HAS to be a way to clean this crap up
-    return "\x02" + location[0].items()[0][1] + \
-        ", " + \
-        location[0].items()[1][1] + \
-        "\x0F: " + \
-        conditions[0].items()[2][1] + \
-        "*F and " + \
-        conditions[0].items()[0][1] + \
-        ", wind chill " + \
-        wind[0].items()[0][1] + \
-        "*F (" + \
-        wind[0].items()[2][1] + \
-        "MPH " + \
-        cards.get(int(wind[0].items()[1][1]), cards[min(cards.keys(), key=lambda k: abs(k - int(wind[0].items()[1][1])))]) + \
-        "); Humidity at " + \
-        atmosphere[0].items()[0][1] + \
-        "%, visibility at " +  \
-        atmosphere[0].items()[1][1] + \
-        " miles, barometric pressure at " + \
-        atmosphere[0].items()[2][1] + \
-        "."
-        #"(delta " + atmosphere[0].items()[3][1] + ")"
+    say("\x02{location[city]}, {location[region]}\x0F: {item[condition][temp]}*{units[temperature]} " \
+        "and {item[condition][text]}, wind chill {wind[chill]}*{units[temperature]} " \
+        "({wind[chill]}{units[speed]} {}); Humidity at {atmosphere[humidity]}%, visibility at " \
+        "{atmosphere[humidity]}{units[distance]}, barometric pressure at " \
+        "{atmosphere[pressure]}.".format(direction, **weather))
 
 
 @hook.api_key('yahoo')
 @hook.command('f')
 @hook.command
-def forecast(inp, api_key=None):
+def forecast(inp, say=None, api_key=None):
     """.f[orecast] <zip code|location> - Gets the current weather conditions."""
     if not isinstance(api_key, dict) or any(key not in api_key for key in
             ('consumer', 'consumer_secret')):
         return "Error: API keys not set."
 
     if inp.isdigit():
-        url = wurl % inp + '&u=f'
+        q='SELECT * FROM weather.forecast WHERE location="%s"' % inp
     else:
         woeid = get_woeid(inp, api_key)
         if woeid is None:
             return "Error: unable to lookup weather ID for location."
-        url = wurl2 % woeid + '&u=f'
+        q="SELECT * FROM weather.forecast WHERE woeid=%s" % woeid
 
-    parsed = http.get_xml(url)
-    if len(parsed) != 1:
-        return "Error parsing Yahoo Weather API, please try again later..."
-    doc = lxml.etree.parse(urllib2.urlopen(url)).getroot()
-
-    location = doc.xpath('*/yweather:location',
-                         namespaces={'yweather': 'http://xml.weather.yahoo.com/ns/rss/1.0'})
-    forecast = doc.xpath('*/*/yweather:forecast',
-                         namespaces={'yweather': 'http://xml.weather.yahoo.com/ns/rss/1.0'})
     try:
-        fc = forecast[0]
-    except IndexError:
-        return "City not found."
+        weather = get_weather_rest(q)
+        days = weather['item']['forecast']
+    except:
+        return "Yahoo Weather API error, please try again in a few minutes."
 
-    # again, there MUST be a better way!
-    forecast_string = "Forecast for \x02" + \
-        location[0].items()[0][1] + ", " + location[0].items()[1][1] + "\x0F: "
-    for f in forecast:
-        forecast_string += "\x02" + f.items()[0][1] + ", " + f.items()[1][1] + "\x0F: L " + \
-            f.items()[2][1] + "*F, H " + f.items()[3][1] + \
-            "*F, and " + \
-            f.items()[4][1] + "; "
-    return forecast_string
+    out = "\x02{location[city]}, {location[region]}\x0F: ".format(**weather)
+
+    say(out + '; '.join(["\x02{day}\x0F: L {low}*F, H {high}*F, {text}".format(**day) for day in days]))
+
