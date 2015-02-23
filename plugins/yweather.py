@@ -70,7 +70,7 @@ def weather(inp, say=None, api_key=None):
     say("\x02{location[city]}, {location[region]}\x0F: {item[condition][temp]}*{units[temperature]} " \
         "and {item[condition][text]}, wind chill {wind[chill]}*{units[temperature]} " \
         "({wind[speed]}{units[speed]} {}); Humidity at {atmosphere[humidity]}%, visibility at " \
-        "{atmosphere[humidity]}{units[distance]}, barometric pressure at " \
+        "{atmosphere[visibility]}{units[distance]}, barometric pressure at " \
         "{atmosphere[pressure]}.".format(direction, **weather))
 
 
