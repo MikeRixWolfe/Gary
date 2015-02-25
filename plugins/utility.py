@@ -47,7 +47,7 @@ def reverse(inp):
 
 @hook.command
 def rot13(inp):
-    """rot13 <string> - Encode <string> with rot13."""
+    #"""rot13 <string> - Encode <string> with rot13."""
     return inp.encode('rot13')
 
 

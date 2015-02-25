@@ -37,7 +37,7 @@ def cron(paraml, nick='', conn=None, db=None):
     db_init(db)
     while paraml[0] in conn.channels:
         try:
-            time.sleep(30)
+            time.sleep(10)
             datestamp = str(datetime.now())[:16]
             rows = get_events(db, datestamp)
             for row in rows:
@@ -60,7 +60,7 @@ def remindme(inp, nick='', chan='', db=None):
             set_event(db, timestamp, chan, message, nick)
         except:
             return "There was an error inserting your event, please try again later."
-        return "Okay, at {} I will remind you of '{}'.".format(timestamp, message)
+        return "Okay, I'll remind you."
     elif new_event and new_event.group(1) <= str(datetime.now())[:16]:
         return "Please choose a date/time in the future."
     else:
