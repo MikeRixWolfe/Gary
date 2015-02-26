@@ -1,6 +1,7 @@
 import re
 import subprocess
 from lxml import etree
+from urllib import urlencode
 from util import hook, http
 
 
@@ -21,8 +22,9 @@ def python(inp, say=None):
 def ruby(inp, say=None):
     """.rb/.ruby <code> - Executes Ruby code via Codepad.org."""
     try:
-        params = {"lang": "Ruby", "code": inp, "run": "True", "submit": "Submit"}
-        document = http.get("http://codepad.org/", query_params=params, get_method="POST")
+        heads = {'Referer': 'http://codepad.org/'}
+        params = urlencode({"lang": "Ruby", "code": inp, "run": "True", "submit": "Submit"})
+        document = http.get("http://codepad.org/", post_data=params, headers=heads, get_method="POST")
         html = etree.HTML(document)
         out = html.xpath('//div[@class="code"][2]//td[2]//pre//text()')
     except Exception as e:
