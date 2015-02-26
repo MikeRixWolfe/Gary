@@ -20,22 +20,21 @@ def sieve_suite(bot, input, func, kind, args):
     restricted = bot.config.get('restricted', [])
     acl = bot.config.get('acls', {})
 
-    if kind == "event":
-        if func.__name__.lower() in disabled:
-            return None
+    # log everything
+    if func.__name__.lower() == "log":
+        return input
 
-    if kind == "command":
+    # disable function
+    if kind in ("event", "command", "regex"):
         if func.__name__.lower() in disabled and not is_admin(bot, input):
             return None
 
-    if kind == "regex":
-        if func.__name__.lower() in disabled:
-            return None
-
+    # disable plugin
     fn = re.match(r'^plugins/(.+\.py$)', func._filename)
     if fn and fn.group(1).lower() in disabled:
         return None
 
+    # acls
     if acl:
         if 'deny-except' in acl:
             allowed_channels = map(unicode.lower, acl['deny-except'])
@@ -46,25 +45,29 @@ def sieve_suite(bot, input, func, kind, args):
             if input.chan.lower() in denied_channels:
                 return None
 
+    # admins
     if args.get('adminonly'):
         if not is_admin(bot, input):
             return None
 
+    # opers
     if args.get('operonly'):
         if input.nick.lower() not in opers or not is_admin(bot, input):
             return None
 
+    # restricted
     if input.chan in restricted:
         allowlist = opers + voices
         if input.nick.lower() not in allowlist or not is_admin(bot, input):
             return None
 
-    # Possibly move into command/regex above
+    # ignores
     if input.host.lower() in ignored or input.user.lower() in ignored or \
             input.nick.lower() in ignored or input.chan.lower() in ignored:
         if not is_admin(bot, input):
             return None
 
+    # mutes
     if input.chan in muted:
         if not is_admin(bot, input):
             return None
