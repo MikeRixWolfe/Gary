@@ -25,9 +25,14 @@ def sieve_suite(bot, input, func, kind, args):
         return input
 
     # disable function
-    if kind in ("event", "command", "regex"):
+    if kind in ("event", "regex"):
+        if func.__name__.lower() in disabled:
+            return None
+
+    if kind in ("command"):
         if func.__name__.lower() in disabled and not is_admin(bot, input):
             return None
+
 
     # disable plugin
     fn = re.match(r'^plugins/(.+\.py$)', func._filename)
@@ -62,8 +67,8 @@ def sieve_suite(bot, input, func, kind, args):
             return None
 
     # ignores
-    if input.host.lower() in ignored or input.user.lower() in ignored or \
-            input.nick.lower() in ignored or input.chan.lower() in ignored:
+    if any(x in ignored for x in map(lambda y:y.lower(),
+            [input.host, input.user, input.nick, input.chan])):
         if not is_admin(bot, input):
             return None
 

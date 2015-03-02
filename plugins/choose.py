@@ -3,6 +3,7 @@ import random
 from util import hook
 
 
+@hook.command('c')
 @hook.command
 def choose(inp):
     """.choose <choice1>, <choice2>, ... <choice n> - Makes a decision."""

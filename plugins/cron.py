@@ -37,15 +37,15 @@ def cron(paraml, nick='', conn=None, db=None):
     db_init(db)
     while paraml[0] in conn.channels:
         try:
-            time.sleep(10)
+            time.sleep(30)
             datestamp = str(datetime.now())[:16]
             rows = get_events(db, datestamp)
             for row in rows:
                 conn.send("PRIVMSG {} :{}".format(row[2],
                     "%s: %s" % (row[1], row[0])))
             clean_db(db, datestamp)
-        except:
-            print ">>> u'Error running cron loop :{}'".format(paraml[0])
+        except Exception as e:
+            print ">>> u'Error running cron loop :{}'".format(e)
     print ">>> u'Ending cron loop :{}'".format(paraml[0])
 
 
