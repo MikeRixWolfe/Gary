@@ -135,7 +135,7 @@ def diablo(inp):
 
     try:
         career = armory_data(career_link)
-        hero_id = [hero for hero in career['heroes'] if hero['name'].lower() == hero_name][0]['id']
+        hero_id = [hero for hero in career['heroes'] if hero['name'].lower() == hero_name.lower()][0]['id']
     except:
         return 'Unable to fetch information; does the character exist?'
 
