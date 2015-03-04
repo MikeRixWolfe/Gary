@@ -23,13 +23,13 @@ def poll(inp, nick=None, chan=None, say=None):
         else:
             active_polls[chan][nick]['results']['total'] = len(active_polls[chan][nick]['votes'].keys())
             for choice in active_polls[chan][nick]['choices']:
-                active_polls[chan][nick]['results'][choice] = len([x for x in active_polls[chan][nick]['votes'] if active_polls[chan][nick]['votes'][x] == choice])
+                active_polls[chan][nick]['results']['choices'][choice] = len([x for x in active_polls[chan][nick]['votes'] if active_polls[chan][nick]['votes'][x] == choice])
             results = web.haste(dumps(active_polls.get(chan).get(nick), sort_keys=True, indent=2))
             del active_polls[chan][nick]
             say("Results for {}'s poll: {}".format(nick, results))
-
+            return
     if active_polls.get(chan).get(nick) is not None:
-        return "You already have an active poll: '{}'.".format(active_polls[chan][nick]['desc'])
+        return "You already have an active poll: '{}'.".format(active_polls[chan][nick]['description'])
 
     if ':' in inp:
         desc, choices = inp.split(':')
@@ -41,7 +41,7 @@ def poll(inp, nick=None, chan=None, say=None):
         desc = inp
         choices = ["yes", "no"]
 
-    active_polls[chan][nick]['desc'] = desc
+    active_polls[chan][nick]['description'] = desc
     active_polls[chan][nick]['choices'] = choices
     active_polls[chan][nick]['votes']
     say("Poll '{1}' started by {0}; to vote use '.vote {0} <{2}>'.".format(nick, desc, "|".join(choices)))
@@ -55,7 +55,7 @@ def polls(inp, chan=None, say=None):
 
     if inp:
         if active_polls.get(chan).get(inp):
-            say("{}'s '{}' poll choices: {}".format(inp, active_polls.get(chan).get(inp).get('desc'), ', '.join(active_polls.get(chan).get(inp).get('choices'))))
+            say("{}'s '{}' poll choices: {}".format(inp, active_polls.get(chan).get(inp).get('description'), ', '.join(active_polls.get(chan).get(inp).get('choices'))))
         else:
             say("No active poll for {}.".format(inp))
     else:
