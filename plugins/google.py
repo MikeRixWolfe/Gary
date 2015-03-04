@@ -26,7 +26,7 @@ def googleimage(inp, api_key=None):
 @hook.command('g')
 @hook.command
 def google(inp, api_key=None):
-    """.[g]oogle <query> - Returns first google search result for <query>."""
+    """.g[oogle] <query> - Returns first google search result for <query>."""
     try:
         parsed = custom_get(inp, api_key)
     except Exception as e:
@@ -48,6 +48,6 @@ def map(inp):
 
 @hook.command
 def lmgtfy(inp, say=''):
-    """.lmgtfy [phrase] - Posts a Google link for the specified phrase."""
+    """.lmgtfy <query> - Posts a Google link for the specified phrase."""
     say(web.try_googl("http://lmgtfy.com/?q={}".format(http.quote_plus(inp))))
 
