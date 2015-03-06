@@ -1,6 +1,6 @@
 import re
 import random
-from util import hook, http, text, timesince
+from util import hook, http, text, timesince, web
 from datetime import datetime
 
 base_url = "http://reddit.com/r/{}/.json"
@@ -14,18 +14,16 @@ def reddit_url(match):
 
     title = thread.xpath('//title/text()')[0]
     upvotes = thread.xpath(
-        "//span[@class='upvotes']/span[@class='number']/text()")[0]
-    downvotes = thread.xpath(
-        "//span[@class='downvotes']/span[@class='number']/text()")[0]
+        "//div[@class='score']/span[@class='number']/text()")[0]
     author = thread.xpath(
         "//div[@id='siteTable']//a[contains(@class,'author')]/text()")[0]
     timeago = thread.xpath(
         "//div[@id='siteTable']//p[@class='tagline']/time/text()")[0]
     comments = thread.xpath(
-        "//div[@id='siteTable']//a[@class='comments']/text()")[0]
+        "//li[@class='first']/a[@class='comments may-blank']/text()")[0]
 
-    return '\x02{}\x02 - posted by \x02{}\x02 {} ago - {} upvotes, {} downvotes - {}'.format(
-        title, author, timeago, upvotes, downvotes, comments)
+    return u'\x02{}\x02 - posted by \x02{}\x02 {} ago - {} upvotes - {} - {}'.format(
+        title, author, timeago, upvotes, comments, web.try_googl(match.group(0)))
 
 
 @hook.command
