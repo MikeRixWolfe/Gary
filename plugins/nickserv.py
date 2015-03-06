@@ -29,7 +29,7 @@ def status(inp, nick=None, say=None, conn=None):
     elif inp == 'red':
         users = {k:v for k,v in conn.users.items() if not v}
     else:
-        return "You look %s to me" % ("\x033identified\x0f" if conn.users.get(nick, None)
+        return "You look %s to me" % ("\x033identified\x0f" if conn.users.get(nick.lower(), None)
             else "\x034unidentified\x0f")
 
     outs = text.chunk_str(', '.join(sorted(["\x033%s\x0f" % k if v else "\x034%s\x0f" % k
