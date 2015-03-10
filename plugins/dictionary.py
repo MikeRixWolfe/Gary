@@ -3,14 +3,66 @@ import random
 from util import hook, http, text
 
 
+API_URL = 'http://api.wordnik.com/v4/'
+WEB_URL = 'https://www.wordnik.com/words/{}'
+
+
+@hook.api_key('wordnik')
+@hook.command
+def define(inp, say=None, api_key=None):
+    """.define <word> - Returns a definition for <word> from wordnik.com."""
+    # based on edwardslabs/cloudbot's wordnik.py
+    if not api_key:
+        return "This command requires an API key from wordnik.com."
+    word = inp.split(' ')[0]
+    url = API_URL + "word.json/{}/definitions".format(word)
+
+    params = {
+        'api_key': api_key,
+        'limit': 1,
+        'useCanonical': 'false'
+    }
+    json = http.get_json(url, query_params=params)
+
+    if json:
+        data = json[0]
+
+        say("\x02{word}\x02: {text}".format(**data))
+    else:
+        return "I could not find a definition for \x02{}\x02.".format(word)
+
+
+@hook.api_key('wordnik')
+@hook.command("wotd", autohelp=False)
+def wordoftheday(inp, say=None, api_key=None):
+    """.wotd - Rreturns the word of the day from wordnik.com."""
+    # based on edwardslabs/cloudbot's wordnik.py
+    if not api_key:
+        return "This command requires an API key from wordnik.com."
+    url = API_URL + "words.json/wordOfTheDay"
+
+    params = {
+        'api_key': api_key
+    }
+    json = http.get_json(url, query_params=params)
+
+    if json:
+        word = json['word']
+        note = json['note']
+        pos = json['definitions'][0]['partOfSpeech']
+        definition = json['definitions'][0]['text']
+        say(u"The word the day is \x02{}\x0F: ({}) {} {}".format(word, pos, definition, note))
+    else:
+        return "Sorry I couldn't find the word of the day."
+
+
 @hook.command('ud')
 @hook.command
-def urban(inp):
+def urban(inp, say=None):
     """.ud/.urban <phrase> - Looks up <phrase> on urbandictionary.com."""
     base_url = 'http://api.urbandictionary.com/v0'
     define_url = base_url + "/define"
 
-    # fetch the definitions
     try:
         page = http.get_json(define_url, term=inp, referer="http://m.urbandictionary.com")
     except:
@@ -19,81 +71,15 @@ def urban(inp):
     if page['result_type'] == 'no_results':
         return 'Not found.'
 
-    definitions = page['list']
-    definition = random.choice(definitions)
-
+    definition = random.choice(page['list'])
     def_text = " ".join(definition['definition'].split())  # remove excess spaces
-    def_text = text.truncate_str(def_text, 200)
-
     name = definition['word']
-    url = definition['permalink']
-    out = u"\x02{}\x02: {}".format(name, def_text)
 
-    return out
+    say(text.truncate_str(u"\x02{}\x02: {}".format(name, def_text), 400))
 
 
 @hook.command
-def define(inp):
-    """.define/.dict <word> - fetches definition of <word>."""
-    url = 'http://ninjawords.com/'
-
-    try:
-        h = http.get_html(url + http.quote_plus(inp))
-    except:
-        return "API error; please try again in a few minutes."
-
-    definition = h.xpath('//dd[@class="article"] | '
-                         '//div[@class="definition"] |'
-                         '//div[@class="example"]')
-
-    if not definition:
-        return 'No results for ' + inp
-
-    def format_output(show_examples):
-        result = '%s: ' % h.xpath('//dt[@class="title-word"]/a/text()')[0]
-
-        correction = h.xpath('//span[@class="correct-word"]/text()')
-        if correction:
-            result = 'definition for "%s": ' % correction[0]
-
-        sections = []
-        for section in definition:
-            if section.attrib['class'] == 'article':
-                sections += [[section.text_content() + ': ']]
-            elif section.attrib['class'] == 'example':
-                if show_examples:
-                    sections[-1][-1] += ' ' + section.text_content()
-            else:
-                sections[-1] += [section.text_content()]
-
-        for article in sections:
-            result += article[0]
-            if len(article) > 2:
-                result += ' '.join('%d. %s' % (n + 1, section)
-                                   for n, section in enumerate(article[1:]))
-            else:
-                result += article[1] + ' '
-
-        synonyms = h.xpath('//dd[@class="synonyms"]')
-        if synonyms:
-            result += synonyms[0].text_content()
-
-        result = re.sub(r'\s+', ' ', result)
-        result = re.sub('\xb0', '', result)
-        return result
-
-    result = format_output(True)
-    if len(result) > 450:
-        result = format_output(False)
-
-    if len(result) > 450:
-        result = text.truncate_str(result, 450)
-
-    return result
-
-
-@hook.command
-def etymology(inp):
+def etymology(inp, say=None):
     """.etymology <word> - Retrieves the etymology of chosen word."""
     url = 'http://www.etymonline.com/index.php'
     h = http.get_html(url, term=inp)
@@ -105,5 +91,5 @@ def etymology(inp):
     etym = etym[0].text_content()
     etym = ' '.join(etym.split())
 
-    return text.truncate_str(etym, 400)
+    say(text.truncate_str(etym, 400))
 
