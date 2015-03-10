@@ -30,6 +30,7 @@ if not os.path.exists('config'):
               "consumer_secret": ""
             },
             "wolframalpha": "",
+            "wordnik": "",
             "yahoo": {
               "consumer": "",
               "consumer_secret": ""
