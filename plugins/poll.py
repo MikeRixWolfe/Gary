@@ -27,24 +27,23 @@ def poll(inp, nick=None, chan=None, say=None):
             results = web.haste(dumps(active_polls.get(chan).get(nick), sort_keys=True, indent=2))
             del active_polls[chan][nick]
             say("Results for {}'s poll: {}".format(nick, results))
-            return
-    if active_polls.get(chan).get(nick) is not None:
+    elif active_polls.get(chan).get(nick) is not None:
         return "You already have an active poll: '{}'.".format(active_polls[chan][nick]['description'])
-
-    if ':' in inp:
-        desc, choices = inp.split(':')
-        c = findall(r'([^,]+)', choices)
-        if len(c) == 1:
-            c = findall(r'(\S+)', choices)
-        choices = list(set(x.strip() for x in c))
     else:
-        desc = inp
-        choices = ["yes", "no"]
+        if ':' in inp:
+            desc, choices = inp.split(':')
+            c = findall(r'([^,]+)', choices)
+            if len(c) == 1:
+                c = findall(r'(\S+)', choices)
+            choices = list(set(x.strip() for x in c))
+        else:
+            desc = inp
+            choices = ["yes", "no"]
 
-    active_polls[chan][nick]['description'] = desc
-    active_polls[chan][nick]['choices'] = choices
-    active_polls[chan][nick]['votes']
-    say("Poll '{1}' started by {0}; to vote use '.vote {0} <{2}>'.".format(nick, desc, "|".join(choices)))
+        active_polls[chan][nick]['description'] = desc
+        active_polls[chan][nick]['choices'] = choices
+        active_polls[chan][nick]['votes']
+        say("Poll '{1}' started by {0}; to vote use '.vote {0} <{2}>'.".format(nick, desc, "|".join(choices)))
 
 
 @hook.command(autohelp=False)
