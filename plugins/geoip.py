@@ -49,7 +49,7 @@ def geoip(inp):
     data = flatten_dict(data)
     data = {k:v for k,v in data.items() if v}
 
-    return fformat(data)
+    return fformat(data).replace('in United', 'in the United')
 
 
 @hook.command
