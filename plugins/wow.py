@@ -115,7 +115,7 @@ def wow_region_shortname(region):
 @hook.command('wow')
 @hook.command
 def armory(inp):
-    """.armory [realm] [character name] [region = US] - Look up character and returns API data."""
+    """.armory/.wow <realm> <character name> [region = US] - Look up character and returns API data."""
 
     # Splits the input, builds the API url, and returns the formatted data to user.
     splitinput = inp.lower().split()

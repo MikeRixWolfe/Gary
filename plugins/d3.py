@@ -100,7 +100,7 @@ def region_shortname(region):
 @hook.command('d3')
 @hook.command
 def diablo(inp):
-    """.diablo [battle-tag] [character name] [region = US] - Look up character and returns API data."""
+    """.diablo <battle-tag> <character name> [region = US] - Look up character and returns API data."""
 
     # Splits the input, builds the API url, and returns the formatted data to user.
     splitinput = inp.lower().split()
