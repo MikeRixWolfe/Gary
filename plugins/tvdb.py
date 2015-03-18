@@ -6,7 +6,6 @@ from lxml import etree
 from util import hook, http
 
 base_url = "http://thetvdb.com/api/"
-api_key = "469B73127CA0C411"
 
 
 def get_zipped_xml(*args, **kwargs):
@@ -18,7 +17,7 @@ def get_zipped_xml(*args, **kwargs):
     return etree.parse(ZipFile(zip_buffer, "r").open(path))
 
 
-def get_episodes_for_series(seriesname):
+def get_episodes_for_series(seriesname, api_key):
     res = {"error": None, "ended": False, "episodes": None, "name": None}
     # http://thetvdb.com/wiki/index.php/API:GetSeries
     try:
@@ -75,11 +74,11 @@ def get_episode_info(episode):
     return (first_aired, airdate, episode_desc)
 
 
+@hook.api_key('tvdb')
 @hook.command
-@hook.command('tv')
-def tvnext(inp):
+def tvnext(inp, api_key=None):
     """.tvnext <series> - Get the next episode of <series>."""
-    episodes = get_episodes_for_series(inp)
+    episodes = get_episodes_for_series(inp, api_key)
 
     if episodes["error"]:
         return episodes["error"]
