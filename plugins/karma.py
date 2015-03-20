@@ -15,8 +15,11 @@ def get_karma(db, chan, word):
 
 
 def set_karma(db, chan, word, karma):
-    db.execute("insert or replace into karma(chan, word, karma)"
-        "values(?,?,?)", (chan, word.lower(), karma))
+    try:
+        db.execute("insert or replace into karma(chan, word, karma)"
+            "values(?,?,?)", (chan, word.lower(), karma))
+    except:
+        pass
     db.commit()
 
 

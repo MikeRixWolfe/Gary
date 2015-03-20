@@ -18,6 +18,7 @@ def get_db_connection(conn, name=''):
     try:
         if db.execute("PRAGMA journal_mode").fetchone()[0] != 'wal':
             db.execute("PRAGMA journal_mode=WAL")
+            db.execute("PRAGMA busy_timeout = 3000")
             db.commit()
     except:
         pass

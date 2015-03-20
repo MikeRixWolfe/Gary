@@ -2,7 +2,6 @@ import time
 import json
 import os
 from util import hook, http, web
-from datetime import datetime
 from collections import OrderedDict
 
 debug = False
