@@ -9,27 +9,18 @@ skipurls = ["youtube", "youtu.be", "rd.io", "rdio", "reddit", "spotify",
             "open.spotify.com", "steam"]
 
 
-def prep_url(url):
+def get_info(url):
     if not url.startswith('//') and '://' not in url:
         url = 'http://' + url
-
     try:
-        url = urlopen(url).url
-    except:
-        pass
-
-    return url
-
-
-def get_title(url):
-    try:
-        request_url = http.get_html(url)
-        titleget = request_url.xpath('//title/text()')[0]
-        return unicode(titleget.strip()) or "No Title"
+        request_url = urlopen(url)
+        url = request_url.url
+        title = http.html.fromstring(request_url.read()).xpath('//title/text()')[0]
+        return web.try_googl(url), title.strip() or "No Title"
     except http.HTTPError as e:
-        return "{} {}".format(e.code, e.msg)
+        return web.try_googl(url), "{} {}".format(e.code, e.msg)
     except:
-        return "No Title"
+        return web.try_googl(url), "No Title"
 
 
 @hook.regex(html_re, re.I)
@@ -39,7 +30,7 @@ def readtitle(match, say=None, nick=None):
     if any(word in purl for word in skipurls):
         return
 
-    say(u"{} - {}".format(web.try_googl(purl), get_title(prep_url(purl))))
+    say(u"{} - {}".format(*get_info(purl)))
 
 
 @hook.command
@@ -56,12 +47,13 @@ def shorten(inp, chan='', say=None, db=None):
     else:
         url = inp
 
-    say("{} - {}".format(web.try_googl(url), get_title(prep_url(url))))
+    say("{} - {}".format(*get_info(url)))
 
 
 @hook.command(autohelp=False)
 def linkdump(inp, chan="", say="", db=None):
     """.linkdump - Gets today's links dumped in channel."""
+    say("Generating today's linkdump...")
     today = datetime.today()
     period = float(datetime(today.year, today.month, today.day).strftime('%s'))
     rows = db.execute("select nick, msg, time from log where uts >= ? and chan = ? and " \
@@ -73,8 +65,7 @@ def linkdump(inp, chan="", say="", db=None):
 
     links = [u"via {} [{}]: {} - {}".format(row[0],
         re.search(r'(\d+\:\d+:\d+)', row[2]).group(0),
-        web.try_googl(re.search(html_re, row[1]).group(0)),
-        get_title(prep_url(re.search(html_re, row[1]).group(0))))
+        *get_info(re.search(html_re, row[1]).group(0)))
         for row in rows]
 
     say("Today's link dump: " + web.haste('\n'.join(links), 'txt'))
