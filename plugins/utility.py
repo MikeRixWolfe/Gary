@@ -138,15 +138,3 @@ def munge(inp):
 #    """munge <text> - Munges up <text>."""
     return text.munge(inp)
 
-# colors - based on code by Reece Selwood - <https://github.com/hitzler/homero>
-
-@hook.command(autohelp=False)
-def spam(inp, say=None):
-    say(text.rainbow("~SPAM~"))
-
-
-@hook.command
-def shorten(inp):
-    #".shorten <url> - Shortens a URL with goo.gl"
-    url = web.try_googl(inp)
-    return url
