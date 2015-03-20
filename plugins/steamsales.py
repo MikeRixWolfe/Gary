@@ -108,11 +108,6 @@ def get_sales(mask):
                                 "price_overview"]["final"]
                             item["discount_percent"] = appdata[
                                 "price_overview"]["discount_percent"]
-                    else:
-                        # Normal items
-                        if item["final_price"] == 0:
-                            item["final_price"] = 'Free to Play'
-                            item["discount_percent"] = '100'
                     item["discounted"] = True if int(item["discount_percent"]) > 0 \
                         else False
             except:
