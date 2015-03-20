@@ -97,17 +97,22 @@ def get_sales(mask):
                     if "url" in item.keys() and "id" not in item.keys():
                         data[category]["name"] = item["name"] or data[category]["name"]
                         item["id"] = str(item["url"])[34:-1]
-                    appdata = http.get_json("http://store.steampowered.com/api/"
-                        "appdetails/?appids={}".format(item["id"]))[str(item["id"])]["data"]
-                    item["name"] = appdata["name"]
-                    if "Free to Play" in appdata["genres"]:
-                        item["final_price"] = 'Free to Play'
-                        item["discount_percent"] = '100'
+                        appdata = http.get_json("http://store.steampowered.com/api/"
+                            "appdetails/?appids={}".format(item["id"]))[str(item["id"])]["data"]
+                        item["name"] = appdata["name"]
+                        if "Free to Play" in appdata["genres"]:
+                            item["final_price"] = 'Free to Play'
+                            item["discount_percent"] = '100'
+                        else:
+                            item["final_price"] = appdata[
+                                "price_overview"]["final"]
+                            item["discount_percent"] = appdata[
+                                "price_overview"]["discount_percent"]
                     else:
-                        item["final_price"] = appdata[
-                            "price_overview"]["final"]
-                        item["discount_percent"] = appdata[
-                            "price_overview"]["discount_percent"]
+                        # Normal items
+                        if item["final_price"] == 0:
+                            item["final_price"] = 'Free to Play'
+                            item["discount_percent"] = '100'
                     item["discounted"] = True if int(item["discount_percent"]) > 0 \
                         else False
             except:
