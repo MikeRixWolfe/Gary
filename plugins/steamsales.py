@@ -20,7 +20,7 @@ def log_sales_data(sales, filename):
 
 
 def get_featured():
-    sales_url = "http://store.steampowered.com/api/featured/"
+    sales_url = "http://store.steampowered.com/api/featured/?l=english"
     try:
         sales = http.get_json(sales_url)
     except:
@@ -33,7 +33,7 @@ def get_featured():
 
 
 def get_featuredcategories():
-    sales_url = "http://store.steampowered.com/api/featuredcategories/"
+    sales_url = "http://store.steampowered.com/api/featuredcategories/?l=english"
     try:
         sales = http.get_json(sales_url)
     except:
@@ -214,12 +214,14 @@ def saleloop(paraml, nick='', conn=None):
 
             # Output appropriate data
             for category in sales:
-                items = [format_sale_item(item) for item in sales[category]
-                    if item not in prev_sales.get(category, [])]
+                items = [item for item in sales[category]
+                    if not any(item['name'] == old.get('name', '')
+                    for old in prev_sales.get(category, []))]
                 if len(items):
                     prev_sales[category] = sales[category]  # Update prev
                     conn.send("PRIVMSG {} :{}".format(paraml[0],
-                        "\x02New {}\x0F: {}".format(category, '; '.join(items))))
+                        "\x02New {}\x0F: {}".format(category,
+                        '; '.join([format_sale_item(item) for item in items]))))
         except Exception as e:
             print ">>> u'Steam saleloop error: {} :{}'".format(e, paraml[0])
     print ">>> u'Ending Steam sale check loop :{}'".format(paraml[0])
