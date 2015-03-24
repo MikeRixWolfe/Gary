@@ -63,7 +63,8 @@ def weather(inp, say=None, api_key=None):
         return "Yahoo Weather API error, please try again in a few minutes."
 
     try:
-        direction = cards.get(float(weather['wind']['direction']), cards[min(cards.keys(), key=lambda k: abs(k - float(weather['wind']['direction'])))])
+        direction = cards.get(float(weather['wind']['direction']),
+            cards[min(cards.keys(), key=lambda k: abs(k - float(weather['wind']['direction'])))])
     except:
         return "Error: unable to find weather data for location."
 
