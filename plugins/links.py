@@ -6,7 +6,7 @@ from util import hook, http, web
 html_re = r'https?://[^\s<>"]+|www\.[^\s<>"]+'
 
 skipurls = ["youtube", "youtu.be", "rd.io", "rdio", "reddit", "spotify",
-            "open.spotify.com", "steam"]
+            "open.spotify.com", "steam", "imgur", "i.imgur"]
 
 
 def get_info(url):
