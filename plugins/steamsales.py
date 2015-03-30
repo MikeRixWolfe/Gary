@@ -219,9 +219,9 @@ def saleloop(paraml, nick='', conn=None):
                     for old in prev_sales.get(category, []))]
                 if len(items):
                     prev_sales[category] = sales[category]  # Update prev
-                    conn.send("PRIVMSG {} :{}".format(paraml[0],
-                        "\x02New {}\x0F: {}".format(category,
-                        '; '.join([format_sale_item(item) for item in items]))))
+                    conn.send(u"PRIVMSG {} :{}".format(paraml[0],
+                        u"\x02New {}\x0F: {}".format(category,
+                        u"; ".join([format_sale_item(item) for item in items]))))
         except Exception as e:
             print ">>> u'Steam saleloop error: {} :{}'".format(e, paraml[0])
     print ">>> u'Ending Steam sale check loop :{}'".format(paraml[0])
