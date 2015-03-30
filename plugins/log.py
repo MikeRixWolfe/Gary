@@ -26,7 +26,8 @@ ctcp_formats = {
     'FINGER': ''
 }
 
-irc_color_re = re.compile(r'(\x03(\d{2}(,\d{2})?)|[\x0f\x02\x16\x1f])')
+irc_color_re = re.compile(r'(\x03(\d{1,2}(,\d{1,2})?)|[\x0f\x02\x16\x1f])')
+
 
 
 def db_init(db):

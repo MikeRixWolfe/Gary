@@ -21,8 +21,8 @@ def sieve_suite(bot, input, func, kind, args):
     acl = bot.config.get('acls', {})
 
     # log everything
-    if func.__name__.lower() == "log":
-        return input
+    #if func.__name__.lower() == "log":
+    #    return input
 
     # disable function
     if kind in ("event", "regex"):

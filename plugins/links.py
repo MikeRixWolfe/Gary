@@ -47,7 +47,7 @@ def shorten(inp, chan='', say=None, db=None):
     else:
         url = inp
 
-    say("{} - {}".format(*get_info(url)))
+    say(u"{} - {}".format(*get_info(url)))
 
 
 @hook.command(autohelp=False)
