@@ -16,7 +16,7 @@ def get_info(url):
         request_url = urlopen(url)
         url = request_url.url
         title = http.html.fromstring(request_url.read()).xpath('//title/text()')[0]
-        title = u' '.join(re.sub(u'\r|\n', u' ', title).split())
+        title = u' '.join(re.sub(u'\r|\n', u' ', title).split(' '))
         return web.try_googl(url), title or None
     except http.HTTPError as e:
         return web.try_googl(url), "[{} {}]".format(e.code, e.msg)
@@ -30,7 +30,7 @@ def readtitle(match, say=None, nick=None):
     if any(word in purl for word in skipurls):
         return
 
-    url, title = get_info(url)
+    url, title = get_info(purl)
     if (title or len(url) < len(purl)):
         say(url + (u" - {}".format(title) if title else ""))
 
