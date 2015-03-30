@@ -94,7 +94,7 @@ def twitterloop(paraml, nick='', conn=None, bot=None, api_key=None):
             print "Twitter RSS Loop Error: API keys not set."
             return
 
-    accounts = ["igndeals", "cheapsharkdeals"]
+    accounts = ["igndeals", "cheapsharkdeals", "videogamedeals"]
     prev_tweets = {}
     print ">>> u'Beginning Twitter RSS loop :{}'".format(paraml[0])
     while paraml[0] in conn.channels:

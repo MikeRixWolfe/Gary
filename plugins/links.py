@@ -16,21 +16,23 @@ def get_info(url):
         request_url = urlopen(url)
         url = request_url.url
         title = http.html.fromstring(request_url.read()).xpath('//title/text()')[0]
-        return web.try_googl(url), title.strip() or "No Title"
+        title = re.sub('  ',' ',re.sub('\n',' ',title)).strip()
+        return web.try_googl(url), title or None
     except http.HTTPError as e:
-        return web.try_googl(url), "{} {}".format(e.code, e.msg)
+        return web.try_googl(url), "[{} {}]".format(e.code, e.msg)
     except:
-        return web.try_googl(url), "No Title"
+        return web.try_googl(url), None
 
 
 @hook.regex(html_re, re.I)
 def readtitle(match, say=None, nick=None):
     purl = match.group()
-
     if any(word in purl for word in skipurls):
         return
 
-    say(u"{} - {}".format(*get_info(purl)))
+    url, title = get_info(url)
+    if (title or len(url) < len(purl)):
+        say(url + (u" - {}".format(title) if title else ""))
 
 
 @hook.command
@@ -47,9 +49,11 @@ def shorten(inp, chan='', say=None, db=None):
     else:
         url = inp
 
-    say(u"{} - {}".format(*get_info(url)))
+    url, title = get_info(url)
+    say(url + (u" - {}".format(title) if title else ""))
 
 
+@hook.singlethread
 @hook.command(autohelp=False)
 def linkdump(inp, chan="", say="", db=None):
     """.linkdump - Gets today's links dumped in channel."""
@@ -63,10 +67,12 @@ def linkdump(inp, chan="", say="", db=None):
     if not rows:
         return "No links yet today (beginning with 'http')"
 
-    links = [u"via {} [{}]: {} - {}".format(row[0],
-        re.search(r'(\d+\:\d+:\d+)', row[2]).group(0),
-        *get_info(re.search(html_re, row[1]).group(0)))
-        for row in rows]
+    links = []
+    for row in rows:
+        who, stamp = row[0], re.search(r'(\d+\:\d+:\d+)', row[2]).group(0)
+        url, title = get_info(re.search(html_re, row[1]).group(0))
+        links.append(u"via {} [{}]: {}".format(who, stamp,
+            (url + (u" - {}".format(title) if title else ""))))
 
-    say("Today's link dump: " + web.haste('\n'.join(links), 'txt'))
+    say("Today's link dump: " + web.haste(u'\n'.join(links).encode('utf-8'), 'txt'))
 

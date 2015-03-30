@@ -1,4 +1,4 @@
-from util import hook, http, web
+from util import hook, http
 
 
 @hook.command
@@ -14,4 +14,4 @@ def domainr(inp, say=''):
     for domain in data['results']:
         domains.append(("\x034" if domain['availability'] == "taken" else (
             "\x033" if domain['availability'] == "available" else "\x038")) + domain['domain'] + "\x0f" + domain['path'])
-    say("Domains: {} - {}".format(", ".join(domains), web.try_googl("http://domainr.com/?q=" + inp.strip())))
+    say("Domains: {}".format(", ".join(domains)))
