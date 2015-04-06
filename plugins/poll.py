@@ -63,7 +63,7 @@ def polls(inp, chan=None, say=None):
 
 @hook.command(autohelp=True)
 def vote(inp, nick=None, chan=None):
-    """.vote <poll> <choice> - Vote on a poll; responds on error and silently records on success."""
+    """.vote <poll owner> <choice> - Vote on a poll; responds on error and silently records on success."""
     global active_polls
     active_polls[chan]  # init
 
