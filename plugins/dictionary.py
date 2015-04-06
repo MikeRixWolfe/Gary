@@ -27,7 +27,7 @@ def define(inp, say=None, api_key=None):
     if json:
         data = json[0]
 
-        say("\x02{word}\x02: {text}".format(**data))
+        say(u"\x02{word}\x02: {text}".format(**data))
     else:
         return "I could not find a definition for \x02{}\x02.".format(word)
 
