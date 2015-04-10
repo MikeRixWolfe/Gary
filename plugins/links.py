@@ -19,7 +19,7 @@ def get_info(url):
         title = u' '.join(re.sub(u'\r|\n', u' ', title).split())
         return web.try_googl(url), title or None
     except http.HTTPError as e:
-        return web.try_googl(url), "[{} {}]".format(e.code, e.msg)
+        return web.try_googl(url), None #"[{} {}]".format(e.code, e.msg)
     except:
         return web.try_googl(url), None
 
