@@ -41,10 +41,14 @@ def get_episodes_for_series(seriesname, api_key):
         res["error"] = "error contacting thetvdb.com"
         return res
 
-    series_name = series.xpath('//SeriesName/text()')[0]
-
-    if series.xpath('//Status/text()')[0] == 'Ended':
-        res["ended"] = True
+    try:
+        series_name = series.xpath('//SeriesName/text()')[0]
+        if series.xpath('//Status/text()')[0] == 'Ended':
+            res["ended"] = True
+    except:
+        series_name = series.xpath('//SeriesName/text()')
+        if series.xpath('//Status/text()') == 'Ended':
+            res["ended"] = True
 
     res["episodes"] = series.xpath('//Episode')
     res["name"] = series_name
