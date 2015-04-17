@@ -35,7 +35,7 @@ def define(inp, say=None, api_key=None):
 @hook.api_key('wordnik')
 @hook.command("wotd", autohelp=False)
 def wordoftheday(inp, say=None, api_key=None):
-    """.wotd - Rreturns the word of the day from wordnik.com."""
+    """.wotd - Returns the word of the day from wordnik.com."""
     # based on edwardslabs/cloudbot's wordnik.py
     if not api_key:
         return "This command requires an API key from wordnik.com."
