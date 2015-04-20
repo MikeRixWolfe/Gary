@@ -27,7 +27,7 @@ def format_data(app_id, show_url=True):
     out = []
 
     # basic info
-    out.append("\x02{}\x02".format(game["name"]))
+    out.append(u"\x02{}\x02".format(game["name"]))
     desc = text.strip_html(game["about_the_game"])
     #out.append(text.truncate_str(desc, 70))
 
