@@ -78,6 +78,7 @@ def cycle(inp, conn=None, chan=None, notice=None):
 @hook.command(adminonly=True)
 def nick(inp, notice=None, conn=None):
     """.nick <nick> - Changes the bots nickname to <nick>."""
+    # Validate nick
     if not re.match("^[A-Za-z0-9_|.-\]\[]*$", inp.lower()):
         notice("Invalid username!")
         return
@@ -85,24 +86,28 @@ def nick(inp, notice=None, conn=None):
     # Remove old nick from users
     conn.users.pop(conn.nick.lower(), None)
 
-    # Change nick
+    # Try to change nick and establish it with nickserv
     notice("Attempting to change nick to \"{}\"...".format(inp))
-    conn.set_nick(inp)
 
-    # Try to reauth with nickserv, possibly registering nick
     nickserv_password = conn.conf.get('nickserv_password', '')
     nickserv_name = conn.conf.get('nickserv_name', 'nickserv')
     nickserv_reg = conn.conf.get('nickserv_reg_command', 'REGISTER %s AUTOREGISTERED')
+    nickserv_rec = conn.conf.get('nickserv_rec_command', ' RECOVER %s %s')
     nickserv_ident = conn.conf.get('nickserv_ident_command', 'IDENTIFY %s')
     nickserv_info = conn.conf.get('nickserv_info_command', 'INFO %s')
+
+    if nickserv_password:
+        conn.msg(nickserv_name, nickserv_rec % (inp, nickserv_password))
+        time.sleep(1)
+    conn.set_nick(inp)
     if nickserv_password:
         conn.msg(nickserv_name, nickserv_reg % nickserv_password)
         time.sleep(1)
         conn.msg(nickserv_name, nickserv_ident % nickserv_password)
         time.sleep(1)
         conn.msg(nickserv_name, nickserv_info % inp)
-
-    notice("Change nick to \"{}\" complete!".format(inp))
+    else:
+        conn.users[inp.lower()] = False
 
 
 @hook.command(adminonly=True)

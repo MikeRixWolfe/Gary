@@ -5,31 +5,31 @@ identified for security reasons. This may be useful if the adminonly concept
 is expanded to a full permissions manager for security on priveleged groups.
 """
 
+from time import sleep
 from util import hook, text
 
 
-@hook.command(autohelp=False)
-def ident(inp, nick='', conn=None):
-    """.ident - Tries to update your NickServ ident status."""
-    if not conn.users.get(conn.nick.lower(), False):
-        return("I cannot identify with NickServ; priviledged functions disabled.")
-    else:
-        conn.msg(conn.conf.get('nickserv_name', 'nickserv'),
-            conn.conf.get('nickserv_info_command', 'INFO %s') % nick.lower())
-        return "NickServ ident status updated."
-
-
+@hook.singlethread  # Don't flood nickserv
 @hook.command(autohelp=False)
 def status(inp, nick=None, say=None, conn=None):
     """.status [all|green|red] - Gets your perceived NickServ status or a specified group."""
+    # Update status; users get mad if their info is out of date
+    if not conn.users.get(nick.lower(), False):
+        conn.msg(conn.conf.get('nickserv_name', 'nickserv'),
+            conn.conf.get('nickserv_info_command', 'INFO %s') % nick.lower())
+        sleep(1)
+
     if inp == 'all':
         users = conn.users
     elif inp == 'green':
         users = {k:v for k,v in conn.users.items() if v}
     elif inp == 'red':
         users = {k:v for k,v in conn.users.items() if not v}
+    elif inp == 'bot':
+        return "I am %s." % ("\x033identified\x0f" if conn.users.get(conn.nick.lower(), None)
+            else "\x034unidentified\x0f")
     else:
-        return "You look %s to me" % ("\x033identified\x0f" if conn.users.get(nick.lower(), None)
+        return "You look %s to me." % ("\x033identified\x0f" if conn.users.get(nick.lower(), None)
             else "\x034unidentified\x0f")
 
     outs = text.chunk_str(', '.join(sorted(["\x033%s\x0f" % k if v else "\x034%s\x0f" % k
