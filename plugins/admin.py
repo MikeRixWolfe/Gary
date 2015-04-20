@@ -92,7 +92,7 @@ def nick(inp, notice=None, conn=None):
     # Try to reauth with nickserv, possibly registering nick
     nickserv_password = conn.conf.get('nickserv_password', '')
     nickserv_name = conn.conf.get('nickserv_name', 'nickserv')
-    nickserv_reg = conn.conf.get('nickserv_reg_command', 'REGISTER %S AUTOREGISTERED')
+    nickserv_reg = conn.conf.get('nickserv_reg_command', 'REGISTER %s AUTOREGISTERED')
     nickserv_ident = conn.conf.get('nickserv_ident_command', 'IDENTIFY %s')
     nickserv_info = conn.conf.get('nickserv_info_command', 'INFO %s')
     if nickserv_password:
