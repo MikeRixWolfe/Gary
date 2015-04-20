@@ -15,7 +15,7 @@ def ident(inp, nick='', conn=None):
         return("I cannot identify with NickServ; priviledged functions disabled.")
     else:
         conn.msg(conn.conf.get('nickserv_name', 'nickserv'),
-            conn.conf.get('nickserv_ident_command', 'INFO %s') % nick.lower())
+            conn.conf.get('nickserv_info_command', 'INFO %s') % nick.lower())
         return "NickServ ident status updated."
 
 
@@ -44,19 +44,19 @@ def nickserv_tracking(paraml, nick=None, input=None, conn=None):
             conn.users.get(conn.nick.lower(), False):
         nick = nick.lower()
         nickserv_name = conn.conf.get('nickserv_name', 'nickserv')
-        nickserv_ident = conn.conf.get('nickserv_ident_command', 'INFO %s')
+        nickserv_info = conn.conf.get('nickserv_info_command', 'INFO %s')
         if input.command == 'JOIN':
             if not conn.users.get(nick, False):
-                conn.msg(nickserv_name, nickserv_ident % nick)
+                conn.msg(nickserv_name, nickserv_info % nick)
         if input.command == 'PRIVMSG':
             if nick not in conn.users.keys():
-                 conn.msg(nickserv_name, nickserv_ident % nick)
+                 conn.msg(nickserv_name, nickserv_info % nick)
         elif input.command in ('QUIT', 'PART', 'NICK', 'KICK'):
             if input.command == 'KICK':
                 nick = paraml[1]
             conn.users.pop(nick, None)
             if input.command == 'NICK':
-                conn.msg(nickserv_name, nickserv_ident % paraml[0])
+                conn.msg(nickserv_name, nickserv_info % paraml[0])
 
 
 @hook.event('NOTICE')

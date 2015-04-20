@@ -89,15 +89,20 @@ def nick(inp, notice=None, conn=None):
     notice("Attempting to change nick to \"{}\"...".format(inp))
     conn.set_nick(inp)
 
-    # Try to reauth with nickserv
+    # Try to reauth with nickserv, possibly registering nick
     nickserv_password = conn.conf.get('nickserv_password', '')
     nickserv_name = conn.conf.get('nickserv_name', 'nickserv')
-    nickserv_command = conn.conf.get('nickserv_command', 'IDENTIFY %s')
-    nickserv_ident = conn.conf.get('nickserv_ident_command', 'INFO %s')
+    nickserv_reg = conn.conf.get('nickserv_reg_command', 'REGISTER %S AUTOREGISTERED')
+    nickserv_ident = conn.conf.get('nickserv_ident_command', 'IDENTIFY %s')
+    nickserv_info = conn.conf.get('nickserv_info_command', 'INFO %s')
     if nickserv_password:
-        conn.msg(nickserv_name, nickserv_command % nickserv_password)
+        conn.msg(nickserv_name, nickserv_reg % nickserv_password)
         time.sleep(1)
-        conn.msg(nickserv_name, nickserv_ident % conn.nick)
+        conn.msg(nickserv_name, nickserv_ident % nickserv_password)
+        time.sleep(1)
+        conn.msg(nickserv_name, nickserv_info % inp)
+
+    notice("Change nick to \"{}\" complete!".format(inp))
 
 
 @hook.command(adminonly=True)
