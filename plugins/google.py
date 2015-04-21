@@ -1,7 +1,6 @@
 import random
 from util import hook, http, text, web
 
-
 base_url = 'https://www.googleapis.com/customsearch/v1'
 
 

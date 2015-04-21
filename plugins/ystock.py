@@ -76,6 +76,7 @@ def stockhistory(inp, say=''):
         quote['Color'] = "5"
     else:
         quote['Color'] = "3"
+        quote['ChangeFromYearLow'] = "+" + quote['ChangeFromYearLow']
 
     say("%(Name)s - $%(LastTradePriceOnly)s " \
           "\x03%(Color)s%(ChangeFromYearLow)s (%(PercentChangeFromYearLow)s)\x03 " \

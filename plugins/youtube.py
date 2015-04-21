@@ -39,7 +39,6 @@ def youtube(inp, say=None, api_key=None):
         "part": "snippet",
         "safeSearch": "none",
         "maxResults": 1,
-        "order": "viewCount",
         "type": "video"
     }
     result = http.get_json(search_url, query_params=params)
