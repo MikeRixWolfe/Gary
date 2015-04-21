@@ -1,59 +1,49 @@
-import locale
 import re
-import time
-
 from util import hook, http, web
-from random import choice
 
-locale.setlocale(locale.LC_ALL, '')
-
-base_url = 'http://gdata.youtube.com/feeds/api/'
-url = base_url + 'videos/%s?v=2&alt=jsonc'
-search_api_url = base_url + 'videos?v=2&alt=jsonc&max-results=1'
-video_url = "http://youtu.be/%s"
+base_url = 'https://www.googleapis.com/youtube/v3/'
+search_url = base_url + 'search'
+video_url = base_url + 'videos'
+short_url = "http://youtu.be/"
 
 youtube_re = (r'(?:youtube.*?(?:v=|/v/)|youtu\.be/|yooouuutuuube.*?id=)'
               '([-_a-z0-9]+)', re.I)
 
 
+@hook.api_key('google')
 @hook.regex(*youtube_re)
-def youtube_url(match, bot=None, say=None):
-    # if "autoreply" in bot.config and not bot.config["autoreply"]:
-    #    return
-    url = web.try_googl(video_url % match)
-    say(url + " - " + get_video_description(match.group(1)))
+def youtube_url(match, say=None, api_key=None):
+    params = {"part": "snippet",
+              "id": match.group(1),
+              "key": api_key
+    }
+    result = http.get_json(video_url, query_params=params)
 
-
-def get_video_description(vid_id):
-    j = http.get_json(url % vid_id)
-
-    if j.get('error'):
+    if result.get('error') or not result.get('items') or len(result['items']) < 1:
         return
 
-    j = j['data']
-
-    out = '\x02%s\x02' % j['title']
-
-    if 'contentRating' in j:
-        out += ' - \x034NSFW\x02'
-
-    return out
+    say('{} - \x02{title}\x02'.format(web.try_googl(short_url+ match.group(1)),
+        **result['items'][0]['snippet']))
 
 
-@hook.command('y')
-@hook.command('yt')
+@hook.api_key('google')
 @hook.command
-def youtube(inp, say=None):
+def youtube(inp, say=None, api_key=None):
     """.youtube <query> - Returns the first YouTube search result for <query>."""
+    params = {"part": "snippet",
+              "safeSearch": "none",
+              "maxResults": 1,
+              "order": "viewCount",
+              "type": "video",
+              "q": inp,
+              "key": api_key
+    }
+    result = http.get_json(search_url, query_params=params)
 
-    j = http.get_json(search_api_url, q=inp)
+    if result.get('error') or not result.get('items') or len(result['items']) < 1:
+        return "None found."
 
-    if 'error' in j:
-        return 'error performing search'
+    video = result['items'][0]
+    say("{} - \x02{title}\x02".format(web.try_googl(short_url+video['id']['videoId']),
+        **video['snippet']))
 
-    if j['data']['totalItems'] == 0:
-        return 'no results found'
-
-    vid_id = j['data']['items'][0]['id']
-
-    say(get_video_description(vid_id) + " - " + video_url % vid_id)
