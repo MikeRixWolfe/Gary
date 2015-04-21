@@ -2,10 +2,23 @@ import random
 from util import hook, http, text, web
 
 
+base_url = 'https://www.googleapis.com/customsearch/v1'
+
+
 def custom_get(query, key, is_image=None, num=1):
-    url = ('https://www.googleapis.com/customsearch/v1?cx=004144994778178413853:cmzcjpe52xq'
-           '&fields=items(title,link,snippet)&safe=off' + ('&searchType=image' if is_image else ''))
-    return http.get_json(url, key=key, q=query, num=num)
+    params = {
+        "q": query,
+        "cx": key['cx'],
+        "key": key['access'],
+        "num": num,
+        "fields": "items(title,link,snippet)",
+        "safe": "off"
+    }
+
+    if is_image:
+        params["searchType"] = "image"
+
+    return http.get_json(base_url, query_params=params)
 
 
 @hook.api_key('google')

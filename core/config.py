@@ -15,8 +15,10 @@ if not os.path.exists('config'):
           ],
           "api_keys": {
             "giphy": "",
-            "google": "",
-            "google_cx": "",
+            "google": {
+              "access": "",
+              "cx": ""
+            },
             "lastfm": "",
             "lastfm_secret": "",
             "rdio_key": "",

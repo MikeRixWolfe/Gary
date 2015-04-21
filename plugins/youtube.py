@@ -13,9 +13,10 @@ youtube_re = (r'(?:youtube.*?(?:v=|/v/)|youtu\.be/|yooouuutuuube.*?id=)'
 @hook.api_key('google')
 @hook.regex(*youtube_re)
 def youtube_url(match, say=None, api_key=None):
-    params = {"part": "snippet",
-              "id": match.group(1),
-              "key": api_key
+    params = {
+        "id": match.group(1),
+        "key": api_key['access'],
+        "part": "snippet"
     }
     result = http.get_json(video_url, query_params=params)
 
@@ -27,16 +28,19 @@ def youtube_url(match, say=None, api_key=None):
 
 
 @hook.api_key('google')
+@hook.command('y')
+@hook.command('yt')
 @hook.command
 def youtube(inp, say=None, api_key=None):
     """.youtube <query> - Returns the first YouTube search result for <query>."""
-    params = {"part": "snippet",
-              "safeSearch": "none",
-              "maxResults": 1,
-              "order": "viewCount",
-              "type": "video",
-              "q": inp,
-              "key": api_key
+    params = {
+        "q": inp,
+        "key": api_key['access'],
+        "part": "snippet",
+        "safeSearch": "none",
+        "maxResults": 1,
+        "order": "viewCount",
+        "type": "video"
     }
     result = http.get_json(search_url, query_params=params)
 
