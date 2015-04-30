@@ -14,6 +14,7 @@ if not os.path.exists('config'):
             "bears"
           ],
           "api_keys": {
+            "domainr": "",
             "giphy": "",
             "google": {
               "access": "",

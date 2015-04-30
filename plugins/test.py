@@ -8,10 +8,10 @@ def test(inp, nick='', say=None):
 
 
 @hook.command(autohelp=False)
-def kitchensink(inp, nick='', say=None):
+def kitchensink(inp, say=None):
     return "This function is still in development."
 
 
 @hook.regex(r'^bot roll call')
-def rollcall(inp, chan='', say=None):
+def rollcall(inp, say=None):
     say("Knock knock, Church")

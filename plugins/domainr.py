@@ -1,11 +1,12 @@
 from util import hook, http
 
 
+@hook.api_key('domainr')
 @hook.command
-def domainr(inp, say=''):
+def domainr(inp, say='', api_key=None):
     """.domainr <domain> - Use domai.nr's API to search for a domain, and similar domains."""
     try:
-        data = http.get_json('http://domainr.com/api/json/search?q=' + inp)
+        data = http.get_json('https://api.domainr.com/v1/search', q=inp, client_id=api_key)
     except (http.URLError, http.HTTPError) as e:
         return "Unable to get data for some reason. Try again later."
     if data['query'] == "":
