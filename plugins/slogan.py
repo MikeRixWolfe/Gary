@@ -14,11 +14,3 @@ def slogan(inp, say=''):
         inp = text.capitalize_first(inp)
     say(out.replace('<text>', inp))
 
-
-@hook.command
-def sloganspam(inp, say=''):
-    for x in range(0, 5):
-        out = random.choice(slogans)
-        if inp.lower() and out.startswith("<text>"):
-            inp = text.capitalize_first(inp)
-        say(out.replace('<text>', inp))
