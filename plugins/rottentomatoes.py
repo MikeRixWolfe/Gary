@@ -12,7 +12,7 @@ def rt(inp, api_key=None):
 
     results = http.get_json(movie_search_url, q=inp, apikey=api_key)
     if results['total'] == 0:
-        return 'No results.'
+        return "I couldn't find that."
 
     movie = results['movies'][0]
     title = movie['title']
@@ -22,7 +22,7 @@ def rt(inp, api_key=None):
     url = movie['links']['alternate']
 
     if critics_score == -1:
-        return
+        return "I couldn't find that (perhaps check your spelling?)"
 
     reviews = http.get_json(movie_reviews_url %
                             id, apikey=api_key, review_type='all')
