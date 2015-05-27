@@ -120,6 +120,9 @@ def get_sales(mask):
                     sales[data[category]["name"]] = []
                 sales[data[category]["name"]].append(item)
 
+    # Strip out bad items
+    sales = {category:[item for item in items if item["name"] != "Uninitialized"] for category,items in sales.items()}
+
     sales = {k: sorted(v, key=lambda v: v["name"]) for k, v in sales.items()}
 
     if debug:
