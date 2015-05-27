@@ -10,8 +10,8 @@ def imdb(inp):
     except:
         return "API timeout, please try again in a few seconds."
 
-    if content['Response'] == 'Movie Not Found':
-        return 'Movie not found.'
+    if content['Response'] == 'False':
+        return content['Error']
     elif content['Response'] == 'True':
         content['URL'] = 'http://www.imdb.com/title/%(imdbID)s' % content
 
