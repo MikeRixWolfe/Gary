@@ -45,4 +45,4 @@ def wa(inp, api_key=None):
     if not ret:
         return 'No results'
 
-    return text.truncate_str(ret.split('. ')[0], 230)
+    return text.truncate_str(ret.split('. ')[0].strip("Result: "), 230)
