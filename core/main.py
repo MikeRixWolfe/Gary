@@ -22,7 +22,7 @@ class Input(dict):
             else:
                 conn.msg(chan, nick + ': ' + msg)
 
-        def pm(msg):
+        def pm(nick, msg):
             conn.msg(nick, msg)
 
         def set_nick(nick):
