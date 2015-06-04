@@ -121,7 +121,8 @@ def get_sales(mask):
                 sales[data[category]["name"]].append(item)
 
     # Filter and sort items
-    sales = {category: sorted([item for item in items if item["name"] != "Uninitialized"], key=lambda x: x["name"]) for category, items in sales.items()}
+    sales = {category: sorted([item for item in items if item["name"] != "Uninitialized"],
+        key=lambda x: x["name"]) for category, items in sales.items()}
 
     if debug:
         log_sales_data(sales, "sales")
