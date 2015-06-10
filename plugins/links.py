@@ -40,8 +40,7 @@ def shorten(inp, chan='', say=None, db=None):
     # Useful if readtitle is disabled
     if inp == 'that':
         try:
-            row = db.execute("select msg from log where chan = ? and " \
-                "(msg like '%http://%' or msg like '%https://%' or msg like '%www.%') " \
+            row = db.execute("select msg from links where chan = ? " \
                 "order by uts desc limit 1", (chan,)).fetchone()
             url = re.search(html_re, row[0]).group()
         except:
@@ -60,8 +59,7 @@ def linkdump(inp, chan="", say="", db=None):
     say("Generating today's linkdump...")
     today = datetime.today()
     period = float(datetime(today.year, today.month, today.day).strftime('%s'))
-    rows = db.execute("select nick, msg, time from log where uts >= ? and chan = ? and " \
-        "(msg like '%http://%' or msg like '%https://%' or msg like '%www.%')",
+    rows = db.execute("select nick, msg, time from links where uts >= ? and chan = ? ",
         (period, chan)).fetchall()
 
     if not rows:
