@@ -75,7 +75,7 @@ def urban(inp, say=None):
     def_text = " ".join(definition['definition'].split())  # remove excess spaces
     name = definition['word']
 
-    say(text.truncate_str(u"\x02{}\x02: {}".format(name, def_text), 400))
+    say(u"\x02{}\x02: {} [via Urban Dictionary]".format(name, text.truncate_str(def_text, 400)))
 
 
 @hook.command
