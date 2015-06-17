@@ -48,7 +48,7 @@ def stock(inp, say=''):
 
     if not quote:
         return "Yahoo Fianance API error, please try again in a few minutes."
-    if quote.get('Volume', None) in (None, 'N/A'):
+    if quote.get('Volume', None) in (None, 'N/A', '0', 0):
         return "Unknown ticker symbol '%s'" % inp
 
     if float(quote['Change']) < 0:
@@ -69,7 +69,7 @@ def stockhistory(inp, say=''):
 
     if not quote:
         return "Yahoo Fianance API error, please try again in a few minutes."
-    if quote.get('Volume', None) in (None, 'N/A'):
+    if quote.get('Volume', None) in (None, 'N/A', '0', 0):
         return "Unknown ticker symbol '%s'" % inp
 
     if float(quote['ChangeFromYearLow']) < 0:
