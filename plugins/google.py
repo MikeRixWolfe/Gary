@@ -23,7 +23,7 @@ def custom_get(query, key, is_image=None, num=1):
 @hook.api_key('google')
 @hook.command('gis')
 def googleimage(inp, api_key=None):
-    """.gis <query> - Returns first Google Image result for <query>."""
+    """.gis <query> - Returns a random image from the first 10 Google Image results for <query>."""
     try:
         parsed = custom_get(inp, api_key, is_image=True, num=10)
     except Exception as e:
@@ -38,7 +38,7 @@ def googleimage(inp, api_key=None):
 @hook.command('g')
 @hook.command
 def google(inp, api_key=None):
-    """.g[oogle] <query> - Returns first google search result for <query>."""
+    """.g[oogle] <query> - Returns first Google search result for <query>."""
     try:
         parsed = custom_get(inp, api_key)
     except Exception as e:
