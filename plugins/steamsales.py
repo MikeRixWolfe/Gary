@@ -1,7 +1,7 @@
 import time
 import json
 import os
-from util import hook, http, web
+from util import hook, http, text, web
 from collections import OrderedDict
 
 debug = False
@@ -65,7 +65,7 @@ def get_sales(mask):
     for item in flash_data["large_capsules"]:
         if "discount_expiration" not in item.keys():
             item["discount_expiration"] = 9999999999
-        if item["discount_expiration"] - fetchtime <= 28800:
+        if item["discount_expiration"] - fetchtime <= 43200:
             data["flash"]["items"].append(item)
         else:
             data["featured"]["items"].append(item)
@@ -88,7 +88,7 @@ def get_sales(mask):
                 # Bundles
                 if set(["id", "url"]).issubset(set(item.keys())):
                     if not item["final_price"] and not item["discounted"]:
-                        item["name"] = item["name"]
+                        item["name"] = item["name"].replace(" Advertising App", "")
                         item["final_price"] = web.try_googl(item["url"])
                         item["discounted"] = True
                 else:
@@ -185,7 +185,8 @@ def steamsales(inp, say='', chan=''):
     for category in sales:
         items = [format_sale_item(item) for item in sales[category]]
         if len(items):
-            say(u"\x02{}\x0F: {}".format(category, "; ".join(items)))
+            for out in text.chunk_str(u"\x02New {}\x0F: {}".format(category, u"; ".join(items))):
+                say(out)
         else:
             say(u"\x02{}\x0F: {}".format(category, u"None found"))
 
@@ -216,14 +217,12 @@ def saleloop(paraml, nick='', conn=None):
 
             # Output appropriate data
             for category in sales:
-                items = [item for item in sales[category]
-                    if not any(item['name'] == old.get('name', '')
-                    for old in prev_sales.get(category, []))]
+                items = [format_sale_item(item) for item in sales[category]
+                    if item not in prev_sales.get(category, [])]
                 if len(items):
                     prev_sales[category] = sales[category]  # Update prev
-                    conn.send(u"PRIVMSG {} :{}".format(paraml[0],
-                        u"\x02New {}\x0F: {}".format(category,
-                        u"; ".join([format_sale_item(item) for item in items]))))
+                    for out in text.chunk_str(u"\x02New {}\x0F: {}".format(category, u"; ".join(items))):
+                        conn.send(u"PRIVMSG {} :{}".format(paraml[0], out))
         except Exception as e:
             print ">>> u'Steam saleloop error: {} :{}'".format(e, paraml[0])
     print ">>> u'Ending Steam sale check loop :{}'".format(paraml[0])
