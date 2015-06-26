@@ -47,6 +47,6 @@ def youtube(inp, say=None, api_key=None):
         return "None found."
 
     video = result['items'][0]
-    say("{} - \x02{title}\x02".format(web.try_googl(short_url+video['id']['videoId']),
+    say(u"{} - \x02{title}\x02".format(web.try_googl(short_url+video['id']['videoId']),
         **video['snippet']))
 
