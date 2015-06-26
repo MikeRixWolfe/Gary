@@ -73,27 +73,3 @@ def setkarma(inp, chan='', db=None):
     set_karma(db, chan, word, karma)
     return "Karma of %s set to %s" % (word, karma)
 
-
-@hook.command(autohelp=False)
-def topkarma(inp, chan='', say=None, db=None):
-    """.topkarma - Returns 3 highest karma'd items."""
-    db_init(db)
-    items = db.execute("select word, karma from karma where chan=? " \
-        "order by karma desc limit 3", (chan,)).fetchall()
-    message = "Top karma'd items: "
-    for item in items:
-        message = message + item[0] + " with " + str(item[1]) + ", "
-    say(message[:-2])
-
-
-@hook.command(autohelp=False)
-def botkarma(inp, chan='', say=None, db=None):
-    """.botkarma - Returns 3 lowest karma'd items."""
-    db_init(db)
-    items = db.execute(
-        "select word, karma from karma where chan=? order by karma limit 3",
-        (chan,)).fetchall()
-    message = "Lowest karma'd items: "
-    for item in items:
-        message = message + item[0] + " with " + str(item[1]) + ", "
-    say(message[:-2])
