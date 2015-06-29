@@ -88,7 +88,6 @@ def get_sales(mask):
                 # Bundles
                 if set(["id", "url"]).issubset(set(item.keys())):
                     if not item["final_price"] and not item["discounted"]:
-                        item["name"] = item["name"].replace(" Advertising App", "")
                         item["final_price"] = web.try_googl(item["url"])
                         item["discounted"] = True
                 else:
@@ -114,6 +113,7 @@ def get_sales(mask):
                 continue
             # Add appropriate item data to sales
             if item["discounted"]:
+                item["name"] = item["name"].replace(" Advertising App", "")
                 item = {k: u"{}".format(v) for k, v in item.items() if k in
                     ["name", "final_price", "discount_percent"]}
                 if data[category]["name"] not in sales.keys():
