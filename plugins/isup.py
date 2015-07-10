@@ -18,7 +18,7 @@ def isup(inp):
     except socket.timeout as e:
         code = 'Socket Timeout'
     except Exception as e:
-        return "Huh? That doesn't look like a site on the interwebs."
+        return "Huh? I couldn't find that anywhere on the interwebs."
 
     if code == 200:
         return "It's just you. {} is \x02\x033up\x02\x0f.".format(url)
