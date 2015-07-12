@@ -3,10 +3,13 @@ from util import hook, http
 
 @hook.command
 def imdb(inp):
-    """.imdb <movie> - Gets information about <movie> from IMDb."""
+    """.imdb <movie> [year] - Gets information about a movie from IMDb."""
+    year = ""
+    if inp.split()[-1].isdigit():
+        inp, year = ' '.join(inp.split()[:-1]), inp.split()[-1]
 
     try:
-        content = http.get_json("http://www.omdbapi.com/", t=inp)
+        content = http.get_json("http://www.omdbapi.com/", t=inp, y=year, plot='short', r='json')
     except:
         return "API timeout, please try again in a few seconds."
 

@@ -83,7 +83,7 @@ def sysuptime(inp, bot=None):
     return "Uptime: \x02{}\x02".format(uptime_string[:-7])
 
 
-@hook.command(autohelp=False)
+@hook.command(adminonly=True, autohelp=False)
 def pid(inp):
     """.pid - Prints the bot's PID."""
     return "PID: \x02{}\x02".format(os.getpid())
