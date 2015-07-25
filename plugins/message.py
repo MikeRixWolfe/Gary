@@ -48,8 +48,8 @@ def message(inp, nick='', chan='', conn=None, db=None, input=None, bot=None):
     except:
         return message.__doc__
 
-    if recip in conn.users.keys():
-        return "{} is currently online, please use /msg instead.".format(recip)
+    #if recip in conn.users.keys():
+    #    return "{} is currently online, please use /msg instead.".format(recip)
     if recip in bot.config['ignored']:
         return "I've been instructed not to interact with {}.".format(recip)
     if recip == nick.lower():
