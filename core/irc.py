@@ -29,7 +29,7 @@ def censor(text):
 class crlf_tcp(object):
     "Handles tcp connections that consist of utf-8 lines ending with crlf"
 
-    def __init__(self, host, port, timeout=300):
+    def __init__(self, host, port, timeout=360):
         self.ibuffer = ""
         self.obuffer = ""
         self.oqueue = Queue.Queue()  # lines to be sent out
@@ -95,7 +95,7 @@ class crlf_tcp(object):
 
 class crlf_ssl_tcp(crlf_tcp):
     "Handles ssl tcp connetions that consist of utf-8 lines ending with crlf"
-    def __init__(self, host, port, ignore_cert_errors, timeout=500):
+    def __init__(self, host, port, ignore_cert_errors, timeout=360):
         self.ignore_cert_errors = ignore_cert_errors
         crlf_tcp.__init__(self, host, port, timeout)
 
