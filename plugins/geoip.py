@@ -1,4 +1,3 @@
-import os
 import re
 from util import hook, http, web
 
@@ -50,28 +49,4 @@ def geoip(inp):
     data = {k:v for k,v in data.items() if v}
 
     return fformat(data).replace('in United', 'in the United')
-
-
-@hook.command
-def whereis(inp):
-    """.whereis <user> - Gets the IP and location of a system user."""
-    cmd = "w -hs %s | awk '{print $3}' | sort | head -n 1" % inp.split()[0]
-    ip = os.popen(cmd).read().strip()
-    if ip:
-        octets = re.match(r'.*?(\d+)\W{1}(\d+)\W{1}(\d+)\W{1}(\d+).*', ip)
-        if octets:
-            ip = ".".join(octets.groups())
-            out = inp.split()[0] + " (" + ip + ")"
-            if octets.group(1) == "10":
-                out += " is on the local network via wifi"
-            elif octets.group(1) == "192":
-                out += " is on the local network via copper"
-            else:
-                out += geoip(ip)
-                return out.replace(ip+' ',' ')
-        else:
-            out = "Sorry, I couldn't locate that user."
-    else:
-        out = "Sorry, that user doesn't appear to be logged in."
-    return out
 
