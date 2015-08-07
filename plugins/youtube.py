@@ -23,7 +23,7 @@ def youtube_url(match, say=None, api_key=None):
     if result.get('error') or not result.get('items') or len(result['items']) < 1:
         return
 
-    say('{} - \x02{title}\x02'.format(web.try_googl(short_url+ match.group(1)),
+    say(u'{} - \x02{title}\x02'.format(web.try_googl(short_url+ match.group(1)),
         **result['items'][0]['snippet']))
 
 
