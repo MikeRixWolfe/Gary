@@ -63,7 +63,7 @@ def sieve_suite(bot, input, func, kind, args):
     # restricted
     if input.chan in restricted:
         allowlist = opers + voices
-        if input.nick.lower() not in allowlist or not is_admin(bot, input):
+        if input.nick.lower() not in allowlist and not is_admin(bot, input):
             return None
 
     # ignores
