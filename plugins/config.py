@@ -2,6 +2,19 @@ import json
 from util import hook, text
 
 
+@hook.command(adminonly=True, autohelp=False)
+def suggestions(inp, bot=None):
+    """.suggestions - Toggles fuzzy matching suggestions for mistyped commands."""
+    if bot.config.get("suggestions", True):
+        bot.config["suggestions"] = False
+        json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
+        return "Command suggestions are now disabled."
+    else:
+        bot.config["suggestions"] = True
+        json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
+        return "Command suggestions are now enabled."
+
+
 def config_add(items, name, config):
     out = ""
     new = []

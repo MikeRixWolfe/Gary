@@ -179,9 +179,10 @@ def main(conn, out):
             command = match_command(trigger)
 
             if isinstance(command, list):  # multiple potential matches
-                input = Input(conn, *out)
-                input.reply("did you mean %s or %s?" %
-                            (', '.join(command[:-1]), command[-1]))
+                if bot.config.get("suggestions", True):
+                    input = Input(conn, *out)
+                    input.reply("did you mean %s or %s?" %
+                                (', '.join(command[:-1]), command[-1]))
             elif command in bot.commands:
                 input = Input(conn, *out)
                 input.trigger = trigger
