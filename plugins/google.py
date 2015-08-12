@@ -1,4 +1,5 @@
 import random
+import re
 from util import hook, http, text, web
 
 base_url = 'https://www.googleapis.com/customsearch/v1'
@@ -48,7 +49,7 @@ def google(inp, api_key=None):
 
     link = web.try_googl(parsed['items'][0]['link'])
     title = text.truncate_str(parsed['items'][0]['title'], 250)
-
+    title = u' '.join(re.sub(u'\r|\n', u' ', title).split()).strip('| ')
     return u"{} - \x02{}\x02".format(link, title)
 
 
