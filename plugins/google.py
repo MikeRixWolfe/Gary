@@ -62,5 +62,6 @@ def map(inp):
 @hook.command
 def lmgtfy(inp, say=''):
     """.lmgtfy <query> - Posts a Google link for the specified phrase."""
-    say(web.try_googl("http://lmgtfy.com/?q={}".format(http.quote_plus(inp))))
+    say("{} - Let me Google that for you".format(
+        web.try_googl("http://lmgtfy.com/?q={}".format(http.quote_plus(inp)))))
 
