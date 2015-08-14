@@ -13,17 +13,20 @@ def reddit_url(match):
     thread = http.get_html(match.group(0))
 
     title = thread.xpath('//title/text()')[0]
-    upvotes = thread.xpath(
-        "//div[@class='score']/span[@class='number']/text()")[0]
-    author = thread.xpath(
-        "//div[@id='siteTable']//a[contains(@class,'author')]/text()")[0]
-    timeago = thread.xpath(
-        "//div[@id='siteTable']//p[@class='tagline']/time/text()")[0]
-    comments = thread.xpath(
-        "//li[@class='first']/a[@class='comments may-blank']/text()")[0]
+    try:
+        upvotes = thread.xpath(
+            "//div[@class='score']/span[@class='number']/text()")[0]
+        author = thread.xpath(
+            "//div[@id='siteTable']//a[contains(@class,'author')]/text()")[0]
+        timeago = thread.xpath(
+            "//div[@id='siteTable']//p[@class='tagline']/time/text()")[0]
+        comments = thread.xpath(
+            "//li[@class='first']/a[@class='comments may-blank']/text()")[0]
 
-    return u'\x02{}\x02 - posted by \x02{}\x02 {} ago - {} upvotes - {} - {}'.format(
-        title, author, timeago, upvotes, comments, web.try_googl(match.group(0)))
+        return u'\x02{}\x02 - posted by \x02{}\x02 {} ago - {} upvotes - {} - {}'.format(
+            title, author, timeago, upvotes, comments, web.try_googl(match.group(0)))
+    except:  # Subreddit
+        return u'\x02{}\x02 - {}'.format(title, web.try_googl(match.group(0)))
 
 
 @hook.command
