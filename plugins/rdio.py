@@ -8,7 +8,7 @@ rdio_re = (r'(.*:)//(rd.io|www.rdio.com|rdio.com)(:[0-9]+)?(.*)', re.I)
 
 
 @hook.regex(*rdio_re)
-def rdio_url(match, bot=None):
+def rdio_url(match, say=None, bot=None):
     api_key = bot.config.get("api_keys", {}).get("rdio_key")
     api_secret = bot.config.get("api_keys", {}).get("rdio_secret")
     if not api_key:
@@ -25,15 +25,14 @@ def rdio_url(match, bot=None):
             name = info['name']
             artist = info['artist']
             album = info['album']
-            return u"Rdio track: \x02{}\x02 by \x02{}\x02 - {}".format(name,
-                    artist, album)
+            say(u"\x02{}\x02 by \x02{}\x02 - {}".format(name, artist, album))
         elif 'artist' in info and not 'album' in info:  # Album
             name = info['name']
             artist = info['artist']
-            return u"Rdio album: \x02{}\x02 by \x02{}\x02".format(name, artist)
+            say(u"\x02{}\x02 by \x02{}\x02".format(name, artist))
         else:  # Artist
             name = info['name']
-            return u"Rdio artist: \x02{}\x02".format(name)
+            say(u"\x02{}\x02".format(name))
 
 
 def getdata(inp, types, api_key, api_secret):

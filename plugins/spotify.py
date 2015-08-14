@@ -59,7 +59,7 @@ def spotify(inp):
 
 @hook.regex(*http_re)
 @hook.regex(*spotify_re)
-def spotify_url(match):
+def spotify_url(match, say=None):
     type = match.group(2)
     spotify_id = match.group(3)
     url = spuri.format(type, spotify_id)
@@ -72,13 +72,11 @@ def spotify_url(match):
         name = data["track"]["name"]
         artist = data["track"]["artists"][0]["name"]
         album = data["track"]["album"]["name"]
-        return u"Spotify Track: \x02{}\x02 by \x02{}\x02 from the album \x02{}\x02 - {}".format(name, artist,
-                                                                                                        album, sptfy(
-                gateway.format(type, spotify_id)))
+        say(u"\x02{}\x02 by \x02{}\x02 from the album \x02{}\x02 - {}".format(name, artist,
+            album, sptfy(gateway.format(type, spotify_id))))
     elif type == "artist":
-        return u"Spotify Artist: \x02{}\x02 - {}".format(data["artist"]["name"],
-                                                                 sptfy(gateway.format(type, spotify_id)))
+        say(u"\x02{}\x02 - {}".format(data["artist"]["name"],
+            sptfy(gateway.format(type, spotify_id))))
     elif type == "album":
-        return u"Spotify Album: \x02{}\x02 - \x02{}\x02 - {}".format(data["album"]["artist"],
-                                                                             data["album"]["name"],
-                                                                             sptfy(gateway.format(type, spotify_id)))
+        say(u"\x02{}\x02 - \x02{}\x02 - {}".format(data["album"]["artist"],
+            data["album"]["name"], sptfy(gateway.format(type, spotify_id))))
