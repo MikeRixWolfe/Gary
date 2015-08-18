@@ -41,7 +41,10 @@ def youtube(inp, say=None, api_key=None):
         "maxResults": 1,
         "type": "video"
     }
-    result = http.get_json(search_url, query_params=params)
+    try:
+        result = http.get_json(search_url, query_params=params)
+    except Exception as e:
+        return "Error accessing Youtube, please try again in a few minutes."
 
     if result.get('error') or not result.get('items') or len(result['items']) < 1:
         return "None found."

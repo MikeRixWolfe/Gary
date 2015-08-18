@@ -29,7 +29,7 @@ def time_command(inp, bot=None):
             place = text.capitalize_first(" ".join(request.xpath("//pod[@" \
                 "title='Input interpretation']/subpod/plaintext/text()")).split('|')[0])
             place = place.replace("Current Time In", "").strip()
-        return "\x02{}\x02 - {}".format(place, time)
+        return u"\x02{}\x02 - {}".format(place, time)
     else:
         return "Could not get the time for '{}'.".format(inp)
 
