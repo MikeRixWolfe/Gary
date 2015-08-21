@@ -38,7 +38,7 @@ def around(inp, nick='', chan='', say='', db=None, input=None):
         out = "Users around today: "
 
     rows = db.execute("select distinct nick from seen where uts >= ? and "
-        "server = lower(?) and chan = lower(?) order by nick", (period,
+        "server = lower(?) and chan = lower(?) order by uts desc", (period,
         input.server, chan)).fetchall()
     rows = ([row[0] for row in rows] if rows else None)
 
