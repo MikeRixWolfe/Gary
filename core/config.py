@@ -15,6 +15,10 @@ if not os.path.exists('config'):
           ],
           "api_keys": {
             "domainr": "",
+            "everyoneapi": {
+              "account_sid": "",
+              "auth_token": ""
+            },
             "giphy": "",
             "google": {
               "access": "",
@@ -27,6 +31,11 @@ if not os.path.exists('config'):
             "rottentomatoes": "",
             "steam_key": "",
             "tvdb": "",
+            "twilio": {
+              "account_sid": "",
+              "auth_token": "",
+              "number": ""
+          },
             "twitter": {
               "access": "",
               "access_secret": "",
