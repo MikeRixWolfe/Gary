@@ -46,4 +46,4 @@ def wiki(inp):
     if len(desc) > 300:
         desc = desc[:300] + '...'
 
-    return '%s - %s' % (desc, web.try_googl(http.quote(url, ':/')))
+    return u'%s - %s' % (web.try_googl(http.quote(url, ':/')), desc)

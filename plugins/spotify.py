@@ -3,11 +3,11 @@ from urllib import urlencode
 
 from util import hook, http, web
 
-gateway = 'http://open.spotify.com/{}/{}'  # http spotify gw address
+gateway = 'http://play.spotify.com/{}/{}'  # http spotify gw address
 spuri = 'spotify:{}:{}'
 
 spotify_re = (r'(spotify:(track|album|artist|user):([a-zA-Z0-9]+))', re.I)
-http_re = (r'(open\.spotify\.com\/(track|album|artist|user)\/'
+http_re = (r'((?:open|play)\.spotify\.com\/(track|album|artist|user)\/'
            '([a-zA-Z0-9]+))', re.I)
 
 
@@ -72,11 +72,11 @@ def spotify_url(match, say=None):
         name = data["track"]["name"]
         artist = data["track"]["artists"][0]["name"]
         album = data["track"]["album"]["name"]
-        say(u"\x02{}\x02 by \x02{}\x02 from the album \x02{}\x02 - {}".format(name, artist,
-            album, sptfy(gateway.format(type, spotify_id))))
+        say(u"{} - \x02{}\x02 by \x02{}\x02 on \x02{}\x02".format(
+            sptfy(gateway.format(type, spotify_id)), name, artist, album))
     elif type == "artist":
-        say(u"\x02{}\x02 - {}".format(data["artist"]["name"],
-            sptfy(gateway.format(type, spotify_id))))
+        say(u"{} - \x02{}\x02".format(sptfy(gateway.format(type, spotify_id)),
+            data["artist"]["name"]))
     elif type == "album":
-        say(u"\x02{}\x02 - \x02{}\x02 - {}".format(data["album"]["artist"],
-            data["album"]["name"], sptfy(gateway.format(type, spotify_id))))
+        say(u"{} - \x02{}\x02 by \x02{}\x02".format(sptfy(gateway.format(type, spotify_id)),
+            data["album"]["name"], data["album"]["artist"]))

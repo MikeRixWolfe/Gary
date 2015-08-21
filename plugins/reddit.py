@@ -9,7 +9,7 @@ reddit_re = (r'.*((www\.)?reddit\.com/r[^ ]+)', re.I)
 
 
 @hook.regex(*reddit_re)
-def reddit_url(match):
+def reddit_url(match, say=None):
     thread = http.get_html(match.group(0))
 
     title = thread.xpath('//title/text()')[0]
@@ -23,10 +23,10 @@ def reddit_url(match):
         comments = thread.xpath(
             "//li[@class='first']/a[@class='comments may-blank']/text()")[0]
 
-        return u'\x02{}\x02 - posted by \x02{}\x02 {} ago - {} upvotes - {} - {}'.format(
-            title, author, timeago, upvotes, comments, web.try_googl(match.group(0)))
+        say(u'{} - \x02{}\x02 - posted by \x02{}\x02 {} ago - {} upvotes - {}'.format(
+            web.try_googl(match.group(0)), title, author, timeago, upvotes, comments))
     except:  # Subreddit
-        return u'\x02{}\x02 - {}'.format(title, web.try_googl(match.group(0)))
+        say(u'{} - \x02{}\x02'.format(web.try_googl(match.group(0)), title))
 
 
 @hook.command

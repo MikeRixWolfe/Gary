@@ -32,34 +32,34 @@ def format_data(app_id, show_url=True):
     #out.append(text.truncate_str(desc, 70))
 
     # genres
-    genres = ", ".join([g['description'] for g in game["genres"]])
-    out.append("\x02{}\x02".format(genres))
-
-    # release date
-    if game['release_date']['coming_soon']:
-        out.append("coming \x02{}\x02".format(game['release_date']['date']))
-    else:
-        out.append("released \x02{}\x02".format(game['release_date']['date']))
+    out.append(u", ".join([g['description'] for g in game["genres"]]))
 
     # pricing
     if game['is_free']:
-        out.append("\x02free\x02")
+        out.append(u"\x02free\x02")
     else:
         price = game['price_overview']
 
         if price['final'] == price['initial']:
-            out.append("\x02$%d.%02d\x02" % divmod(price['final'], 100))
+            out.append(u"\x02$%d.%02d\x02" % divmod(price['final'], 100))
         else:
-            price_now = "$%d.%02d" % divmod(price['final'], 100)
-            price_original = "$%d.%02d" % divmod(price['initial'], 100)
+            price_now = u"$%d.%02d" % divmod(price['final'], 100)
+            price_original = u"$%d.%02d" % divmod(price['initial'], 100)
 
-            out.append("\x02{}\x02 (was \x02{}\x02)".format(price_now, price_original))
+            out.append(u"\x02{}\x02 (was \x02{}\x02)".format(price_now, price_original))
 
+    # release date
+    if game['release_date']['coming_soon']:
+        out.append(u"coming \x02{}\x02".format(game['release_date']['date']))
+    else:
+        out.append(u"released \x02{}\x02".format(game['release_date']['date']))
+
+    # url
     if show_url:
         url = web.try_googl(STORE_URL.format(game['steam_appid']))
-        out.append(url)
+        out.insert(0, url)
 
-    return " - ".join(out)
+    return u" - ".join(out)
 
 
 @hook.regex(*steam_re)

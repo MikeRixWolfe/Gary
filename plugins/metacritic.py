@@ -130,7 +130,7 @@ def metacritic(inp):
     except IndexError:
         score = None
 
-    return '[%s] %s - %s, %s - %s' % (plat.upper(), name,
-                                       score or 'no score',
-                                       'release: %s' % release if release else 'unreleased',
-                                       web.try_googl(link))
+    return u'{} - [{}] {} - {}, {}'.format(web.try_googl(link),
+        plat.upper(), name, score or 'no score',
+        'release: %s' % release if release else 'unreleased')
+
