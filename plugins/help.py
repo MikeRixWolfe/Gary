@@ -32,7 +32,7 @@ def help(inp, say=None, bot=None, input=None):
         out = sorted([k for k,v in commands.iteritems() if v.__doc__])
         for out in text.chunk_str('Available commands: %s' % ' '.join(out)):
             say(out)
-        say('Tip: .help <command> - Gets more info on that command; arguements in <angle brackets> are required and arguements in [square brackets] are optional for any command')
+        say('Tip: .help <command> - Gets more info on that command; arguments in <chevrons> are required, and arguments in [brackets] are optional for any command')
     else:
         if inp in commands:
             say(commands[inp].__doc__ or "Command %s has no additional documentation." % inp)

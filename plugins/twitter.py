@@ -31,7 +31,7 @@ def twitter(inp, api_key=None):
         if index < 0:
             index = 0
         if index >= 20:
-            return 'error: only supports up to the 20th tweet'
+            return 'Error: only supports up to the 20th tweet'
 
         if re.match(r'^#', inp):
             doing_search = True
@@ -51,24 +51,24 @@ def twitter(inp, api_key=None):
                   503: 'twitter is overloaded (lol, RoR)',
                   410: 'twitter shut off api v1.'}
         if e.code == 404:
-            return 'error: invalid ' + ['username', 'tweet id'][getting_id]
+            return 'Error: invalid ' + ['username', 'tweet id'][getting_id]
         if e.code in errors:
-            return 'error: ' + errors[e.code]
-        return 'error: unknown %s' % e.code
+            return 'Error: ' + errors[e.code]
+        return 'Error: unknown %s' % e.code
 
     if doing_search:
         try:
             tweet = tweet["statuses"]
             if not index_specified:
                 index = random.randint(0, len(tweet) - 1)
-        except KeyError:
-            return 'error: no results'
+        except:
+            return 'Error: no results'
 
     if not getting_id:
         try:
             tweet = tweet[index]
         except IndexError:
-            return 'error: not that many tweets found'
+            return 'Error: not that many tweets found'
 
     text = http.unescape(tweet["text"])
     screen_name = tweet["user"]["screen_name"]
