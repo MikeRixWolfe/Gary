@@ -39,7 +39,7 @@ def metacritic(inp):
     except HTTPError:
         return 'Error fetching results.'
     except timeout:
-        return 'Socket timeout, please try again later.'
+        return 'Socket timeout, please try again in a few minutes.'
 
     ''' result format:
     -- game result, with score

@@ -75,7 +75,7 @@ def woot(inp, chan='', say=''):
 
     # If sales not returned
     if not woots:
-        return "Woot API error, please try again in a few minutes..."
+        return "Woot API error, please try again in a few minutes."
 
     # Output appiropriate data
     for k, v in woots.items():

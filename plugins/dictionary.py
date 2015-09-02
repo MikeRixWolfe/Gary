@@ -66,7 +66,7 @@ def urban(inp, say=None):
     try:
         page = http.get_json(define_url, term=inp, referer="http://m.urbandictionary.com")
     except:
-        return "Error reading the Urban Dictionary API; please try again later.."
+        return "Error reading the Urban Dictionary API; please try again in a few minutes."
 
     if page['result_type'] == 'no_results':
         return 'Not found.'

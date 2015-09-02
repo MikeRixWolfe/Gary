@@ -59,7 +59,7 @@ def remindme(inp, nick='', chan='', db=None):
         try:
             set_event(db, timestamp, chan, message, nick)
         except:
-            return "There was an error inserting your event, please try again later."
+            return "There was an error inserting your event, please try again in a few minutes."
         return "Okay, I'll remind you."
     elif new_event and new_event.group(1) <= str(datetime.now())[:16]:
         return "Please choose a date/time in the future."
