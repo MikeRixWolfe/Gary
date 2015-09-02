@@ -17,21 +17,18 @@ def nowplaying(inp, say=None, api_key=None):
 
     if 'error' in response:
         return response["message"]
-    if not "track" in response["recenttracks"] or len(response["recenttracks"]["track"]) == 0:
+    if not response["recenttracks"].get("track", None):
         return "No recent tracks found for \x02%s\x0F." % inp
 
     tracks = response["recenttracks"]["track"]
+    track = tracks if type(tracks) == dict else tracks[0]  # *Should* be list
 
-    if isinstance(tracks, list):  # Partially scrobbled track
-        track = tracks[0]
+    if not track.get('date', False) or track.get('@attr', {}).get('nowplaying', False):
         status = 'current track'
         date = None
-    elif isinstance(tracks, dict):  # Last scrobbled track
-        track = tracks
+    else:
         status = 'last track'
         date = track["date"]["#text"]
-    else:
-        return "Error parsing track listing."
 
     title = track["name"]
     album = track["album"]["#text"]
@@ -43,7 +40,7 @@ def nowplaying(inp, say=None, api_key=None):
     if album:
         ret += u" on \x02%s\x0f" % album
     if date:
-        ret += u" [%s]" % (datetime.strptime(date,"%d %b %Y, %H:%M") - \
+        ret += u" [%s]" % (datetime.strptime(date, "%d %b %Y, %H:%M") -
             (datetime.utcnow() - datetime.now())).strftime("%d %b %Y, %H:%M")
 
     say(ret)
