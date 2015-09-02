@@ -13,7 +13,7 @@ def nowplaying(inp, say=None, api_key=None):
         response = http.get_json(api_url, method="user.getrecenttracks",
             api_key=api_key, user=inp, limit=1)
     except:
-        return "LastFM API Error, please try again in a few minutes"
+        return "LastFM API Error, please try again in a few minutes."
 
     if 'error' in response:
         return response["message"]
@@ -56,18 +56,18 @@ def toptrack(inp, say=None, api_key=None):
         response = http.get_json(api_url, method="user.gettoptracks",
             api_key=api_key, user=user, period=period, limit=1)
     except:
-        return "LastFM API Error, please try again in a few minutes"
+        return "LastFM API Error, please try again in a few minutes."
 
     if 'error' in response:
         return response["message"]
-    if not "track" in response["toptracks"] or len(response["toptracks"]["track"]) == 0:
+    if not response["toptracks"].get("track", None):
         if period == "1month":
             return "The 1month flag is currently broken in the LastFM API; a bug report has been filed."
         else:
             return "No recent tracks for user \x02{}\x0F found.".format(user)
 
     say(u"\x02{}\x0F's \x02{}\x0F top track is \x02{name}\x0f by \x02{artist[name]}\x0f " \
-        "with a total of \x02{playcount}\x0f plays".format(user, period, **response["toptracks"]["track"]))
+        "with a total of \x02{playcount}\x0f plays".format(user, period, **response["toptracks"]["track"][0]))
 
 
 @hook.api_key('lastfm')
@@ -80,15 +80,15 @@ def topartist(inp, nick='', say=None, api_key=None):
         response = http.get_json(api_url, method="user.gettopartists",
             api_key=api_key, user=user, period=period, limit=1)
     except:
-        return "LastFM API Error, please try again in a few minutes"
+        return "LastFM API Error, please try again in a few minutes."
 
     if 'error' in response:
         return response["message"]
-    if not "artist" in response["topartists"] or len(response["topartists"]["artist"]) == 0:
+    if not response["topartists"].get("artist", None):
         return "No recent artists for user \x02{}\x0F found.".format(user)
 
     say(u"\x02{}\x0F's \x02{}\x0F top artist is \x02{name}\x0f with a total of " \
-        "\x02{playcount}\x0f plays".format(user, period, **response["topartists"]["artist"]))
+        "\x02{playcount}\x0f plays".format(user, period, **response["topartists"]["artist"][0]))
 
 
 @hook.api_key('lastfm')
@@ -103,7 +103,7 @@ def topfriend(inp, say=None, api_key=None):
             limit=1)["comparison"]["result"]["score"] for friend in friends]
         friend, score = max(dict(zip(friends, scores)).iteritems(), key=lambda x: x[1])
     except:
-        return "LastFM API Error, please try again in a few minutes"
+        return "LastFM API Error, please try again in a few minutes."
 
     say(u"\x02{}\x0F's top friend is \x02{}\x0F with a score of \x02{}\x0f".format(inp, friend, score))
 
@@ -115,10 +115,12 @@ def lfmuser(inp, say=None, api_key=None):
     try:
         response = http.get_json(api_url, method="user.getinfo", api_key=api_key, user=inp)["user"]
     except:
-        return "LastFM API Error, please try again in a few minutes"
+        return "LastFM API Error, please try again in a few minutes."
 
-    say(u"\x02{name}\x0F has been a member since \x02{registered[#text]}\x0F with " \
-    "\x02{playcount}\x0f scrobbles".format(**response))
+    registered = (datetime.utcfromtimestamp(int(response['registered']['unixtime']) + .1) -
+        (datetime.utcnow() - datetime.now())).strftime("%d %b %Y")
+    say(u"\x02{name}\x0F has been a member since \x02{}\x0F and has " \
+    "\x02{playcount}\x0f scrobbles".format(registered, **response))
 
 
 @hook.api_key('lastfm')
@@ -129,7 +131,7 @@ def similar(inp, nick='', say=None, api_key=None):
         response = http.get_json(api_url, method="artist.getsimilar",
             api_key=api_key, artist=inp.strip(), limit=5, autocorrect=1)
     except:
-        return "LastFM API Error, please try again in a few minutes"
+        return "LastFM API Error, please try again in a few minutes."
 
     if 'error' in response:
         return response["message"]
@@ -155,7 +157,7 @@ def genres(inp, nick='', say=None, api_key=None):
         response = http.get_json(api_url, method="artist.getinfo",
             api_key=api_key, artist=inp.strip(), autocorrect=1)
     except:
-        return "LastFM API Error, please try again in a few minutes"
+        return "LastFM API Error, please try again in a few minutes."
 
     if 'error' in response:
         return response["message"]
