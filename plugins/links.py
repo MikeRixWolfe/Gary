@@ -37,7 +37,7 @@ def readtitle(match, say=None, nick=None):
 
 @hook.command
 def shorten(inp, chan='', say=None, db=None):
-    # Useful if readtitle is disabled
+    """.shorten <link|that> - Shortens a link, or the last link that was said."""
     if inp == 'that':
         try:
             row = db.execute("select msg from links where chan = ? " \

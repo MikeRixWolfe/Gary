@@ -20,22 +20,22 @@ def cnam(inp, api_key=None):
     if data['data'].get('expanded_name', None) or data['data'].get('cnam', None):
         if data['data'].get('expanded_name', None):
             out.append("Name: {}".format(
-                ' '.join([data['data'].get('expanded_name', None).get('first', None),
-                data['data'].get('expanded_name', None).get('last', None)])))
+                ' '.join([data['data'].get('expanded_name', {}).get('first', None),
+                data['data'].get('expanded_name', {}).get('last', None)])))
         else:
             out.append("Name: {}".format(data['data']['cnam']))
 
-    if data.get('type', None) or data['data'].get('linetype', None):
+    if data.get('type', None) and data['data'].get('linetype', None):
         out.append("Type: {}".format(', '.join([data.get('type', None),
         data['data'].get('linetype', None)])))
 
-    if data['data'].get('location', None).get('city', None) or \
-            data['data'].get('location', None).get('state', None):
+    if data['data'].get('location', {}).get('city', None) and \
+            data['data'].get('location', {}).get('state', None):
         out.append("Location: {}".format(', '.join([
-            data['data'].get('location', None).get('city', None),
-            data['data'].get('location', None).get('state', None)])))
+            data['data'].get('location', {}).get('city', None),
+            data['data'].get('location', {}).get('state', None)])))
 
-    if data['data'].get('carrier', None).get('name', None):
+    if data['data'].get('carrier', {}).get('name', None):
         out.append("Carrier: {}".format(data['data']['carrier']['name']))
 
     return ' | '.join(out)

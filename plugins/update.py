@@ -15,7 +15,7 @@ def update(inp, bot=None):
     except Exception as e:
         return e
     if "\n" in pull:
-        return web.haste(pull)
+        return "{}: {}".format(pull.split(r'\n')[0], web.haste(pull))
     else:
         return pull
 
