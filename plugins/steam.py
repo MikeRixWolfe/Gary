@@ -65,7 +65,6 @@ def format_data(app_id, show_url=True):
 @hook.regex(*steam_re)
 def steam_url(match):
     app_id = match.group(1)
-    print app_id
     return format_data(app_id, show_url=False)
 
 
@@ -82,5 +81,4 @@ def steam(text):
         return "No game found."
 
     app_id = result['data-ds-appid']
-    print app_id
     return format_data(app_id)
