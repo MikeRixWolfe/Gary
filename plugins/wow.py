@@ -14,10 +14,10 @@ import re
 from util import hook, http, web
 
 
-def wow_armory_data(link):
+def wow_armory_data(link, api_key):
     """Sends the API request, and returns the data accordingly (in json if raw, nicely formatted if not)."""
     try:
-        data = http.get_json(link)
+        data = http.get_json(link, fields='items', locale='en_US', api_key=api_key['consumer'])
     except Exception as e:
         return 'Unable to fetch information; does the realm or character exist?'
 
@@ -38,10 +38,11 @@ def wow_armory_format(data, link):
         niceurl = link.replace('/api/wow/', '/wow/en/') + '/simple'
 
         try:
-            return '{0} is a level \x0307{1}\x0F {2} {3} on {4} with \x0307{5}\x0F achievement points and \x0307{6}' \
+            return '{0} is a level \x0307{1}(ilvl {8}/{9})\x0F {2} {3} on {4} with \x0307{5}\x0F achievement points and \x0307{6}' \
                    '\x0F honourable kills. Armory Profile: {7}' \
                 .format(data['name'], data['level'], wow_get_gender(data['gender']), wow_get_class(data['class'], True),
-                        data['realm'], data['achievementPoints'], data['totalHonorableKills'], web.try_googl(niceurl))
+                        data['realm'], data['achievementPoints'], data['totalHonorableKills'], web.try_googl(niceurl),
+                        data['items']['averageItemLevelEquipped'], data['items']['averageItemLevel'])
         except Exception as e:
             return 'Unable to fetch information; does the realm or character exist?'
 
@@ -112,10 +113,13 @@ def wow_region_shortname(region):
         return False
 
 
+@hook.api_key('mashery')
 @hook.command('wow')
 @hook.command
-def armory(inp):
+def armory(inp, api_key=None):
     """.armory/.wow <realm> <character name> [region = US] - Look up character and returns API data."""
+    if not isinstance(api_key, dict) or any(key not in api_key for key in ('consumer', 'consumer_secret')):
+        return "error: api keys not set"
 
     # Splits the input, builds the API url, and returns the formatted data to user.
     splitinput = inp.lower().split()
@@ -153,6 +157,6 @@ def armory(inp):
 
     link = "http://{0}.battle.net/api/wow/character/{1}/{2}".format(region, realm, char_name)
 
-    return wow_armory_data(link)
+    return wow_armory_data(link, api_key)
 
 

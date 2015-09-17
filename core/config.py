@@ -26,6 +26,11 @@ if not os.path.exists('config'):
             },
             "lastfm": "",
             "lastfm_secret": "",
+            "mashery":
+            {
+              "consumer": "",
+              "consumer_secret": ""
+            },
             "rdio_key": "",
             "rdio_secret": "",
             "rottentomatoes": "",
