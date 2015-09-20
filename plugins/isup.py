@@ -5,10 +5,7 @@ from util import hook, http
 @hook.command
 def isup(inp):
     """.isup <site> - Checks if a site is up or not."""
-    if not inp.startswith('//') and '://' not in inp:
-        inp = '//' + inp
-    urlp = http.urlparse.urlparse(inp, 'http')
-    url = "%s://%s" % (urlp.scheme, urlp.netloc)
+    url = 'http://' + inp if '://' not in inp else inp
 
     try:
         page = http.open(url)
