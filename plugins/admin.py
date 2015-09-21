@@ -42,14 +42,14 @@ def join(inp, conn=None, notice=None):
 
 @hook.command(adminonly=True)
 def connect(inp, conn=None, notice=None):
-    """.connect <channel> - Joins <channel>."""
+    """.connect <network> - Connects to a network."""
     notice("Attempting to connect to {}...".format(inp))
     conn.send("CONNECT " + inp)
 
 
 @hook.command(autohelp=False, adminonly=True)
 def part(inp, conn=None, chan=None, notice=None):
-    """.part <channel> - Leaves <channel>. If [channel] is blank the bot will leave the channel the command was used in."""
+    """.part [channel] - Leaves a channel. If [channel] is blank the bot will leave the channel the command was used in."""
     if inp:
         target = inp
     else:
@@ -60,19 +60,26 @@ def part(inp, conn=None, chan=None, notice=None):
 
 @hook.command(autohelp=False, adminonly=True)
 def cycle(inp, conn=None, chan=None, notice=None):
-    """.cycle <channel> - Cycles <channel>. If [channel] is blank the bot will cycle the channel the command was used in."""
+    """.cycle [channel] [delay=1] - Cycles a channel with a given delay. Channel and delay default to the current channel and 1 respectively."""
     if inp:
-        target = inp
+        if len(inp.split(' ', 1)) == 2:
+            target, delay = inp.split(' ', 1)
+        else:
+            if inp.isdigit():
+                target, delay = chan, inp
+            else:
+                target, delay = inp, 1
     else:
-        target = chan
+        target, delay = chan, 1
+
     notice("Attempting to cycle {}...".format(target))
     if chan in conn.channels:
         conn.channels.remove(chan)
-    conn.send("PART " + target)
-    time.sleep(1)
+    conn.cmd("PART {}".format(target), ["Rejoining in {} seconds".format(delay)])
+    time.sleep(int(delay))
     if chan not in conn.channels:
         conn.channels.append(chan)
-    conn.send("JOIN " + target)
+    conn.send("JOIN {}".format(target))
 
 
 @hook.command(adminonly=True)
