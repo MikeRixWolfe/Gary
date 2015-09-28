@@ -63,9 +63,9 @@ def format_data(app_id, show_url=True):
 
 
 @hook.regex(*steam_re)
-def steam_url(match):
+def steam_url(match, say=None):
     app_id = match.group(1)
-    return format_data(app_id, show_url=False)
+    say(format_data(app_id, show_url=False))
 
 
 @hook.command()

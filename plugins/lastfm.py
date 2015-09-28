@@ -150,9 +150,10 @@ def similar(inp, nick='', say=None, api_key=None):
 
 
 @hook.api_key('lastfm')
+@hook.command('genres')
 @hook.command
-def genres(inp, nick='', say=None, api_key=None):
-    """.genres <artist> - Gets genres for artist via LastFM."""
+def tags(inp, nick='', say=None, api_key=None):
+    """.tags/genres <artist> - Gets genres for artist via LastFM."""
     try:
         response = http.get_json(api_url, method="artist.getinfo",
             api_key=api_key, artist=inp.strip(), autocorrect=1)
@@ -168,4 +169,4 @@ def genres(inp, nick='', say=None, api_key=None):
         tags = ["None found"]
     artist = response["artist"]["name"]
 
-    say(u"Genres for \"\x02{}\x0f\": {}".format(artist, ", ".join(tags)))
+    say(u"Tags for \"\x02{}\x0f\": {}".format(artist, ", ".join(tags)))

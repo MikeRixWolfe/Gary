@@ -15,4 +15,4 @@ def domainr(inp, say='', api_key=None):
     for domain in data['results']:
         domains.append(("\x034" if domain['availability'] == "taken" else (
             "\x033" if domain['availability'] == "available" else "\x038")) + domain['domain'] + "\x0f" + domain['path'])
-    say("Domains: {}".format(", ".join(domains) or "None found"))
+    say(u"Domains: {}".format(u", ".join(domains) or "None found"))
