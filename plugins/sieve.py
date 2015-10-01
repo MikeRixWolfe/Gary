@@ -12,8 +12,8 @@ def is_admin(bot, input):
 
 @hook.sieve
 def sieve_suite(bot, input, func, kind, args):
-    opers = bot.config.get('moded', [])
-    voices = bot.config.get('allowed', [])
+    moded = bot.config.get('moded', [])
+    allowed = bot.config.get('allowed', [])
     disabled = bot.config.get('disabled', [])
     ignored = bot.config.get('ignored', [])
     muted = bot.config.get('muted', [])
@@ -55,14 +55,14 @@ def sieve_suite(bot, input, func, kind, args):
         if not is_admin(bot, input):
             return None
 
-    # opers
-    if args.get('operonly'):
-        if input.nick.lower() not in opers or not is_admin(bot, input):
+    # mods
+    if args.get('modonly'):
+        if input.nick.lower() not in moded or not is_admin(bot, input):
             return None
 
     # restricted
     if input.chan in restricted:
-        allowlist = opers + voices
+        allowlist = moded + allowed
         if input.nick.lower() not in allowlist and not is_admin(bot, input):
             return None
 
