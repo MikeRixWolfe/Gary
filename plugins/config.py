@@ -153,37 +153,37 @@ def unrestrict(inp, chan=None, say=None, bot=None):
 
 
 @hook.command(autohelp=False)
-def opers(inp, say=None, bot=None):
-    """.opers - Lists bot opers."""
-    say(config_list("opered", bot.config))
+def mods(inp, say=None, bot=None):
+    """.mods - Lists bot moderators."""
+    say(config_list("moded", bot.config))
 
 
 @hook.command(adminonly=True)
-def oper(inp, say=None, bot=None):
-    """.oper <user> - Adds <user> to opers."""
-    say(config_add(inp, "opered", bot.config))
+def mod(inp, say=None, bot=None):
+    """.mod <user> - Adds a user as a bot moderators."""
+    say(config_add(inp, "moded", bot.config))
 
 
 @hook.command(adminonly=True)
-def deoper(inp, say=None, bot=None):
-    """.deoper <user> - Removes <user> from opers."""
-    say(config_del(inp, "opered", bot.config))
+def demod(inp, say=None, bot=None):
+    """.demod <user> - Removes a user as a bot moderator."""
+    say(config_del(inp, "moded", bot.config))
 
 
 @hook.command(autohelp=False)
-def voicers(inp, say=None, bot=None):
-    """.voicers - Lists users with bot voice."""
-    say(config_list("voiced", bot.config))
+def allowed(inp, say=None, bot=None):
+    """.allowed - Lists users allowed to interact with the bot in restricted channels."""
+    say(config_list("allowed", bot.config))
 
 
 @hook.command(adminonly=True)
-def voicer(inp, say=None, bot=None):
-    """.voicer <user> - Adds <user> to voicers."""
-    say(config_add(inp, "voiced", bot.config))
+def allow(inp, say=None, bot=None):
+    """.allow <user> - Allows a user to interact with the bot in restricted channels."""
+    say(config_add(inp, "allowed", bot.config))
 
 
 @hook.command(adminonly=True)
-def devoicer(inp, say=None, bot=None):
-    """.devoicer <user> - Removes <user> from voicers."""
-    say(config_del(inp, "voiced", bot.config))
+def disallow(inp, say=None, bot=None):
+    """.disallow <user> - Disallows a user to interact with the bot in restricted channels."""
+    say(config_del(inp, "allowed", bot.config))
 

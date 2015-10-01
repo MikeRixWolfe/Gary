@@ -96,10 +96,10 @@ if not os.path.exists('config'):
           },
           "ignored": [],
           "muted": [],
-          "opered": [],
+          "moded": [],
           "rejoin": true,
           "restricted": [],
-          "voiced": []
+          "allowed": []
         }''') + '\n')
 
 
