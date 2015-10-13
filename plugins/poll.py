@@ -7,7 +7,6 @@ from util import hook, web
 def tree():  # autovivification
     return defaultdict(tree)
 
-
 active_polls = tree()
 
 
@@ -77,3 +76,4 @@ def vote(inp, nick=None, chan=None):
         return "Please use form '.vote <poll> <choice>'; check active polls with '.polls'."
 
     active_polls[chan][poll]['votes'][nick] = vote
+
