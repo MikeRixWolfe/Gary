@@ -73,7 +73,7 @@ def vote(inp, nick=None, chan=None):
         if vote not in active_polls.get(chan).get(poll).get('choices'):
             return "Invalid vote; valid choices are: {}".format(', '.join(active_polls.get(chan).get(poll).get('choices')))
     else:
-        return "Please use form '.vote <poll> <choice>'; check active polls with '.polls'."
+        return "Please use form '.vote <poll owner> <choice>'; check active polls with '.polls'."
 
     active_polls[chan][poll]['votes'][nick] = vote
 
