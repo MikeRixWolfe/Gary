@@ -77,7 +77,7 @@ def weather(inp, say=None, api_key=None):
 @hook.command('f')
 @hook.command
 def forecast(inp, say=None, api_key=None):
-    """.f[orecast] <zip code|location> - Gets the current weather conditions."""
+    """.f[orecast] <zip code|location> - Gets the weather forecast."""
     if not isinstance(api_key, dict) or any(key not in api_key for key in
             ('consumer', 'consumer_secret')):
         return "Error: API keys not set."
