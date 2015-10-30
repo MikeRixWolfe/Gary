@@ -37,7 +37,7 @@ def format_data(app_id, show_url=True):
     # pricing
     if game['is_free']:
         out.append(u"\x02free\x02")
-    else:
+    elif game.get('price_overview', False):
         price = game['price_overview']
 
         if price['final'] == price['initial']:
