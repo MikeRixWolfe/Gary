@@ -38,6 +38,13 @@ def status(inp, nick=None, say=None, conn=None):
     for out in outs: say(out)
 
 
+@hook.command(autohelp=False, adminonly=True)
+def statusreset(inp, conn=None):
+    """.statusreset - Remove unidentified users from the user list so they may be rechecked."""
+    conn.users = {k:v for k,v in conn.users.items() if v}
+    return "Done."
+
+
 @hook.event('*')
 def nickserv_tracking(paraml, nick=None, input=None, conn=None):
     if input.command in ('QUIT', 'NICK', 'JOIN', 'PART', 'PRIVMSG', 'KICK') and \
