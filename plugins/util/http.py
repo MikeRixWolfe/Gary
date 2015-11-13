@@ -10,14 +10,14 @@ import urllib
 import urllib2
 import urlparse
 
-from hashlib import sha1 
+from hashlib import sha1
 from urllib import quote, quote_plus as _quote_plus
 from urllib2 import HTTPError, URLError
 
 from lxml import etree, html
 from bs4 import BeautifulSoup
 
-ua_gary = 'Gary/1.0 http://github.com/michaelrixwolfe/gary'
+ua_gary = 'Gary/2.0 (http://github.com/michaelrixwolfe/gary)'
 
 ua_firefox = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.6) ' \
              'Gecko/20070725 Firefox/2.0.0.6'
@@ -73,13 +73,13 @@ def open(url, query_params=None, headers=None, post_data=None,
         timestamp = oauth_timestamp()
         api_url, req_data = string.split(url, "?")
         unsigned_request = oauth_unsigned_request(nonce, timestamp, req_data, oauth_keys['consumer'], oauth_keys['access'])
-        
+
         signature = oauth_sign_request("GET", api_url, req_data, unsigned_request, oauth_keys['consumer_secret'], oauth_keys['access_secret'])
-        
+
         header = oauth_build_header(nonce, signature, timestamp, oauth_keys['consumer'], oauth_keys['access'])
         request.add_header('Authorization', header)
 
-    
+
     if cookies:
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(jar))
     else:
@@ -118,7 +118,7 @@ def oauth_timestamp():
     return str(int(time.time()))
 
 def oauth_unsigned_request(nonce, timestamp, req, consumer, token):
-    d = { 'oauth_consumer_key':consumer, 
+    d = { 'oauth_consumer_key':consumer,
           'oauth_nonce':nonce,
           'oauth_signature_method':'HMAC-SHA1',
           'oauth_timestamp':timestamp,
@@ -127,12 +127,12 @@ def oauth_unsigned_request(nonce, timestamp, req, consumer, token):
 
     k,v = string.split(req, "=")
     d[k] = v
-    
+
     unsigned_req = ''
-    
+
     for x in sorted(d, key=lambda key: key):
         unsigned_req += x + "=" + d[x] + "&"
-    
+
     unsigned_req = quote(unsigned_req[:-1])
 
     return unsigned_req
@@ -147,7 +147,7 @@ def oauth_build_header(nonce, signature, timestamp, consumer, token):
           'oauth_version':'1.0' }
 
     header='OAuth '
-    
+
     for x in sorted(d, key=lambda key: key):
         header += x + '="' + d[x] + '", '
 
@@ -161,10 +161,14 @@ def oauth_sign_request(method, url, params, unsigned_request, consumer_secret, t
     hash = hmac.new(key, base, sha1)
 
     signature = quote(binascii.b2a_base64(hash.digest())[:-1])
-    
+
     return signature
 
 def unescape(s):
     if not s.strip():
         return s
     return html.fromstring(s).text_content()
+
+def get_title(url, tag=".//title"):
+    return get_html(url).find(tag).text
+
