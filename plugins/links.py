@@ -3,10 +3,10 @@ from datetime import datetime
 from urllib2 import urlopen
 from util import hook, http, web
 
-html_re = r'https?://(?:www\.)?([^\/]+)\/?\S*'
+html_re = r'https?://(?:www\.)?([^/]+)/?\S*'
 
-skipurls = ["youtube.com", "youtu.be", "rd.io", "rdio.com", "reddit.com", "spotify.com",
-            "open.spotify.com", "steam.com", "imgur.com", "i.imgur.com", "j.mp", "goo.gl"]
+skipurls = ["youtube.com", "youtu.be", "rd.io", "rdio.com", "reddit.com",
+            "spotify.com", "steam.com", "imgur.com", "j.mp", "goo.gl"]
 
 
 def get_info(url):
@@ -16,16 +16,14 @@ def get_info(url):
         title = http.get_title(url)
         title = u' '.join(re.sub(u'\r|\n', u' ', title).split()).strip('| ')
         return web.try_googl(url), title or None
-    except http.HTTPError as e:
-        return web.try_googl(url), None #"[{} {}]".format(e.code, e.msg)
     except:
         return web.try_googl(url), None
 
 
 @hook.regex(html_re, re.I)
-def readtitle(match, say=None, nick=None):
-    if match.group(1) in skipurls:
-        #print u">>> Link skipped: {}".format(match.group(1))
+def readtitle(match, say=None):
+    if http.urlparse.urlparse(match.group()).hostname in skipurls:
+        print u">>> Link skipped: {}".format(match.group(1))
         return
 
     url, title = get_info(match.group())
