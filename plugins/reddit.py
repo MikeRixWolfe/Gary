@@ -10,9 +10,9 @@ reddit_re = (r'((?:www\.)?reddit\.com/[^ ]+)', re.I)
 
 @hook.regex(*reddit_re)
 def reddit_url(match, say=None):
-    thread = http.get_html('http://'+match.group(0))
-    title = thread.xpath('//title/text()')[0]
     try:
+        thread = http.get_html('http://'+match.group(0))
+        title = thread.xpath('//title/text()')[0]
         upvotes = thread.xpath(
             "//div[@class='score']/span[@class='number']/text()")[0]
         author = thread.xpath(
