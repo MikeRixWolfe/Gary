@@ -59,7 +59,7 @@ def nickserv_tracking(paraml, nick=None, input=None, conn=None):
             if nick not in conn.users.keys():
                  conn.msg(nickserv_name, nickserv_info % nick)
         elif input.command in ('QUIT', 'PART', 'NICK', 'KICK') and \
-                nick != conn.nick:
+                nick.lower() != conn.nick.lower():
             if input.command == 'KICK':
                 nick = paraml[1].lower()
             conn.users.pop(nick, None)
