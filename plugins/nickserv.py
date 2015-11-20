@@ -55,12 +55,13 @@ def nickserv_tracking(paraml, nick=None, input=None, conn=None):
         if input.command == 'JOIN':
             if not conn.users.get(nick, False):
                 conn.msg(nickserv_name, nickserv_info % nick)
-        if input.command == 'PRIVMSG':
+        elif input.command == 'PRIVMSG':
             if nick not in conn.users.keys():
                  conn.msg(nickserv_name, nickserv_info % nick)
-        elif input.command in ('QUIT', 'PART', 'NICK', 'KICK'):
+        elif input.command in ('QUIT', 'PART', 'NICK', 'KICK') and \
+                nick != conn.nick:
             if input.command == 'KICK':
-                nick = paraml[1]
+                nick = paraml[1].lower()
             conn.users.pop(nick, None)
             if input.command == 'NICK':
                 conn.msg(nickserv_name, nickserv_info % paraml[0])
