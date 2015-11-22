@@ -22,7 +22,7 @@ def get_info(url):
 
 @hook.regex(html_re, re.I)
 def readtitle(match, say=None):
-    if http.urlparse.urlparse(match.group()).hostname in skipurls:
+    if http.urlparse.urlparse(match.group()).hostname.strip('www.') in skipurls:
         print u">>> Link skipped: {}".format(match.group(1))
         return
 
