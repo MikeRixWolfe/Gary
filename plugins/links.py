@@ -1,6 +1,5 @@
 import re
 from datetime import datetime
-from urllib2 import urlopen
 from util import hook, http, web
 
 html_re = r'https?://(?:www\.)?([^/]+)/?\S*'
@@ -22,7 +21,7 @@ def get_info(url):
 
 @hook.regex(html_re, re.I)
 def readtitle(match, say=None):
-    if http.urlparse.urlparse(match.group()).hostname.strip('www.') in skipurls:
+    if re.match(r'^.*?([^/\.]+\.[^/\.]+)$', match.group(1)).group(1) in skipurls:
         print u">>> Link skipped: {}".format(match.group(1))
         return
 
