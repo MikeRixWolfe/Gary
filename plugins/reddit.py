@@ -13,20 +13,22 @@ def reddit_url(match, say=None):
     try:
         thread = http.get_html('http://'+match.group(0))
         title = thread.xpath('//title/text()')[0]
-        upvotes = thread.xpath(
-            "//div[@class='score']/span[@class='number']/text()")[0]
-        author = thread.xpath(
-            "//div[@id='siteTable']//a[contains(@class,'author')]/text()")[0]
-        timeago = thread.xpath(
-            "//div[@id='siteTable']//p[@class='tagline']/time/text()")[0]
-        comments = thread.xpath(
-            "//li[@class='first']/a[@class='comments may-blank']/text()")[0]
+        try:
+            upvotes = thread.xpath(
+                "//div[@class='score']/span[@class='number']/text()")[0]
+            author = thread.xpath(
+                "//div[@id='siteTable']//a[contains(@class,'author')]/text()")[0]
+            timeago = thread.xpath(
+                "//div[@id='siteTable']//p[@class='tagline']/time/text()")[0]
+            comments = thread.xpath(
+                "//li[@class='first']/a[@class='comments may-blank']/text()")[0]
 
-        say(u'{} - \x02{}\x02 - posted by \x02{}\x02 {} ago - {} upvotes - {}'.format(
-            web.try_googl(match.group(0)), title, author, timeago, upvotes, comments))
-    except:  # Subreddit
-        say(u'{} - \x02{}\x02'.format(web.try_googl(match.group(0)), title))
-
+            say(u'{} - \x02{}\x02 - posted by \x02{}\x02 {} ago - {} upvotes - {}'.format(
+                web.try_googl(match.group(0)), title, author, timeago, upvotes, comments))
+        except:  # Subreddit
+            say(u'{} - \x02{}\x02'.format(web.try_googl(match.group(0)), title))
+    except:  # weird link
+        say(u'{} - \x02Reddit\x02'.format(web.try_googl(match.group(0))))
 
 @hook.command
 def reddit(inp):

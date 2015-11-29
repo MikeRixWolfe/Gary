@@ -209,7 +209,7 @@ def saleloop(paraml, nick='', conn=None):
             # Get data
             sales = get_sales(mask)
             if not sales:
-                print ">>> u'Error getting Steam sales :{}'".format(paraml[0])
+                print ">>> u'No Steam sales found :{}'".format(paraml[0])
 
             # Handle restarts
             if not prev_sales:
