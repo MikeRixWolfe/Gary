@@ -1,4 +1,4 @@
-import time
+IMPort time
 import re
 from datetime import datetime
 from util import hook
@@ -132,7 +132,7 @@ def log(paraml, input=None, bot=None, db=None):
         if input.command not in ('MODE'):
             log_seen(db, input.server, input.chan, input.nick,
                 input.user, input.host, input.command, input.msg)
-        if re.match('https?://[^\s<>"]+|www\.[^\s<>"]+', input.msg):
+        if re.match('https?://(?:www\.)?([^/]+)/?\S*', input.msg):
             log_link(db, input.server, input.chan, input.nick,
                 input.user, input.host, input.command, input.msg)
 

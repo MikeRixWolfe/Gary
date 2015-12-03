@@ -15,7 +15,7 @@ def get_factoid(db, chan, word):
     return (row[0] if row else None)
 
 
-@hook.regex(r'^(no\ )?(?:G|g)ary(?:\:\ |\,\ |\ )([^\(].*?[^\)]|\(.*\))\ (?:is)\ (also\ )?(.+)')
+@hook.regex(r'^(no\ )?(?:G|g)ary(?:\:\ |\,\ )([^\(].*?[^\)]|\(.*\))\ (?:is)\ (also\ )?(.+)')
 def set_factoid(inp, nick='', chan='', say=None, db=None):
     db_init(db)
 
