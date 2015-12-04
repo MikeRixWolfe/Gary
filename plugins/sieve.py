@@ -90,7 +90,7 @@ def sieve_suite(bot, input, func, kind, args):
             return None
 
     # rate limiting
-    if kind == "command":
+    if kind == "command" and input.chan[0] == '#':
         if not is_mod(bot, input) and not is_admin(bot, input):
             global timeouts
             limit = 3
@@ -116,7 +116,8 @@ def sieve_suite(bot, input, func, kind, args):
             if len(timeouts[input.server][input.user]['msgs']) > limit:
                 timeouts[input.server][input.user]['timeout'] = time()
                 input.reply("You have been timed out for {} minutes " \
-                    "for using commands too quickly.".format(timeout))
+                    "for using commands too quickly. Feel free to PM me " \
+                    "to explore my functions freely.".format(timeout))
                 return None
 
     return input
