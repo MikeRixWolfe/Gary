@@ -153,8 +153,8 @@ def unrestrict(inp, chan=None, say=None, bot=None):
 
 
 @hook.command(autohelp=False)
-def mods(inp, say=None, bot=None):
-    """.mods - Lists bot moderators."""
+def moded(inp, say=None, bot=None):
+    """.moded - Lists bot moderators."""
     say(config_list("moded", bot.config))
 
 

@@ -1,5 +1,8 @@
 import re
+from time import time
 from util import hook
+
+timeouts = {}
 
 
 def is_admin(bot, input):
@@ -10,9 +13,18 @@ def is_admin(bot, input):
     else:
         return False
 
+
+def is_mod(bot, input):
+    nick = input.nick.lower()
+    moded = bot.config.get('moded', [])
+    if nick in moded and input.conn.users.get(nick, False):
+        return True
+    else:
+        return False
+
+
 @hook.sieve
 def sieve_suite(bot, input, func, kind, args):
-    moded = bot.config.get('moded', [])
     allowed = bot.config.get('allowed', [])
     disabled = bot.config.get('disabled', [])
     ignored = bot.config.get('ignored', [])
@@ -57,24 +69,55 @@ def sieve_suite(bot, input, func, kind, args):
 
     # mods
     if args.get('modonly'):
-        if input.nick.lower() not in moded or not is_admin(bot, input):
+        if not is_mod(bot, input) and not is_admin(bot, input):
             return None
 
     # restricted
     if input.chan in restricted:
-        allowlist = moded + allowed
-        if input.nick.lower() not in allowlist and not is_admin(bot, input):
-            return None
+        if input.nick.lower() not in allowed:
+            if not is_mod(bot, input) and not is_admin(bot, input):
+                return None
 
     # ignores
     if any(x in ignored for x in map(lambda y:y.lower(),
             [input.host, input.user, input.nick, input.chan])):
-        if not is_admin(bot, input):
+        if not is_mod(bot, input) and not is_admin(bot, input):
             return None
 
     # mutes
     if input.chan in muted:
-        if not is_admin(bot, input):
+        if not is_mod(bot, input) and not is_admin(bot, input):
             return None
 
+    # rate limiting
+    if kind == "command":
+        if not is_mod(bot, input) and not is_admin(bot, input):
+            global timeouts
+            limit = 3
+            timeout = 5
+
+            if timeouts.get(input.server, None) is None:
+                timeouts[input.server] = {}
+
+            if timeouts[input.server].get(input.user, None) is None:
+                timeouts[input.server][input.user] = {}
+                timeouts[input.server][input.user]['msgs'] = [time()]
+                timeouts[input.server][input.user]['timeout'] = 0
+            else:
+                timeouts[input.server][input.user]['msgs'].append(time())
+                timeouts[input.server][input.user]['msgs'] = [msg for msg in
+                    timeouts[input.server][input.user]['msgs'] if time() - msg < 60]
+
+            if time() - timeouts[input.server][input.user]['timeout'] < timeout * 60:
+                return None
+            else:
+                timeouts[input.server][input.user]['timeout'] = 0
+
+            if len(timeouts[input.server][input.user]['msgs']) > limit:
+                timeouts[input.server][input.user]['timeout'] = time()
+                input.reply("You have been timed out for {} minutes " \
+                    "for using commands too quickly.".format(timeout))
+                return None
+
     return input
+
