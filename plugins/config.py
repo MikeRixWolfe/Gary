@@ -76,25 +76,25 @@ def disabled(inp, say=None, bot=None):
     say(config_list("disabled", bot.config))
 
 
-@hook.command(adminonly=True)
+@hook.command(modonly=True)
 def disable(inp, say=None, bot=None):
     """.disable <command/plugin> - Disables <command/plugin>."""
     say(config_add(inp, "disabled", bot.config))
 
 
-@hook.command(adminonly=True)
+@hook.command(modonly=True)
 def enable(inp, say=None, bot=None):
     """.enable <command/plugin> - Enables <command/plugin>."""
     say(config_del(inp, "disabled", bot.config))
 
 
-@hook.command(adminonly=True)
+@hook.command(modonly=True)
 def censor(inp, say=None, bot=None):
     """.censor <word> - Censors <word>."""
     say(config_add(inp, "censored", bot.config))
 
 
-@hook.command(adminonly=True)
+@hook.command(modonly=True)
 def uncensor(inp, say=None, bot=None):
     """.uncensor <word> - Uncensors <word>."""
     say(config_del(inp, "censored", bot.config))
@@ -106,26 +106,26 @@ def ignored(inp, say=None, bot=None):
     say(config_list("ignored", bot.config))
 
 
-@hook.command(adminonly=True)
+@hook.command(modonly=True)
 def ignore(inp, say=None, bot=None):
     """.ignore <channel|host|nick> - Ignores channel/host/nick."""
     say(config_add(inp, "ignored", bot.config))
 
 
-@hook.command(adminonly=True)
+@hook.command(modonly=True)
 def unignore(inp, say=None, bot=None):
     """.unignore <channel|host|nick> - Unignores channel/host/nick."""
     say(config_del(inp, "ignored", bot.config))
 
 
-@hook.command(adminonly=True, autohelp=False)
+@hook.command(modonly=True, autohelp=False)
 def mute(inp, chan=None, say=None, bot=None):
     """.mute - Mutes bot in channel."""
     config_add(chan, "muted", bot.config)
     say(":(")
 
 
-@hook.command(adminonly=True, autohelp=False)
+@hook.command(modonly=True, autohelp=False)
 def unmute(inp, chan=None, say=None, bot=None):
     """.unmute - Unmutes bot in channel."""
     config_del(chan, "muted", bot.config)
@@ -138,14 +138,14 @@ def restricted(inp, say=None, bot=None):
     say(config_list("restricted", bot.config))
 
 
-@hook.command(adminonly=True, autohelp=False)
+@hook.command(modonly=True, autohelp=False)
 def restrict(inp, chan=None, say=None, bot=None):
     """.restrict - Sets current channel to restricted mode."""
     inp = inp or chan
     say(config_add(inp, "restricted", bot.config))
 
 
-@hook.command(adminonly=True, autohelp=False)
+@hook.command(modonly=True, autohelp=False)
 def unrestrict(inp, chan=None, say=None, bot=None):
     """.unrestrict - Removes current channel from restricted mode."""
     inp = inp or chan
@@ -176,13 +176,13 @@ def allowed(inp, say=None, bot=None):
     say(config_list("allowed", bot.config))
 
 
-@hook.command(adminonly=True)
+@hook.command(modonly=True)
 def allow(inp, say=None, bot=None):
     """.allow <user> - Allows a user to interact with the bot in restricted channels."""
     say(config_add(inp, "allowed", bot.config))
 
 
-@hook.command(adminonly=True)
+@hook.command(modonly=True)
 def disallow(inp, say=None, bot=None):
     """.disallow <user> - Disallows a user to interact with the bot in restricted channels."""
     say(config_del(inp, "allowed", bot.config))
