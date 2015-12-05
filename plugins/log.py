@@ -1,4 +1,4 @@
-IMPort time
+import time
 import re
 from datetime import datetime
 from util import hook
