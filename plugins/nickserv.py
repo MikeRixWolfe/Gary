@@ -28,6 +28,12 @@ def status(inp, nick=None, say=None, conn=None):
     elif inp == 'bot':
         return "I am %s." % ("\x033identified\x0f" if conn.users.get(conn.nick.lower(), None)
             else "\x034unidentified\x0f")
+    elif inp:
+        if inp.lower() in conn.users:
+            return "%s looks %s to me." % (inp, "\x033identified\x0f" if conn.users.get(inp.lower())
+                else "\x034unidentified\x0f")
+        else:
+            return "I haven't seen %s lately." % inp
     else:
         return "You look %s to me." % ("\x033identified\x0f" if conn.users.get(nick.lower(), None)
             else "\x034unidentified\x0f")
