@@ -169,4 +169,4 @@ def tags(inp, nick='', say=None, api_key=None):
         tags = ["None found"]
     artist = response["artist"]["name"]
 
-    say(u"Tags for \"\x02{}\x0f\": {}".format(artist, ", ".join(tags)))
+    say(u"Tags for \"\x02{}\x0f\": {}".format(artist, ", ".join(tags) or "None found"))
