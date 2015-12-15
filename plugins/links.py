@@ -4,8 +4,8 @@ from util import hook, http, web
 
 html_re = r'https?://(?:www\.)?([^/]+)/?\S*'
 
-skipurls = ["youtube.com", "youtu.be", "rd.io", "rdio.com", "reddit.com",
-            "spotify.com", "steam.com", "imgur.com", "j.mp", "goo.gl"]
+skipurls = ["youtube.com", "youtu.be", "reddit.com", "spotify.com",
+            "steam.com", "imgur.com", "j.mp", "goo.gl"]
 
 
 def get_info(url):
