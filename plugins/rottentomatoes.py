@@ -1,4 +1,4 @@
-from util import http, hook
+from util import http, hook, web
 
 api_root = 'http://api.rottentomatoes.com/api/public/v1.0/'
 movie_search_url = api_root + 'movies.json'
@@ -33,4 +33,4 @@ def rt(inp, api_key=None):
 
     return u"%s - critics: \x02%s%%\x02 (%s\u2191%s\u2193)" \
         " audience: \x02%s%%\x02 - %s" % (title.strip(), str(critics_score).strip(), str(fresh)
-                                          .strip(), str(rotten).strip(), str(audience_score).strip(' '), url.strip(' '))
+                                          .strip(), str(rotten).strip(), str(audience_score).strip(' '), web.try_googl(url.strip(' ')))
