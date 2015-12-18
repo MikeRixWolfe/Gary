@@ -37,12 +37,7 @@ def get_help(bot, flag=None):
 @hook.command(autohelp=False, adminonly=True)
 def ahelp(inp, say=None, bot=None, input=None):
     """.ahelp [command] - Gives a list of commands or help for a command."""
-    if input.trigger == 'ahelp':
-        commands = get_help(bot, 'admin')
-    elif input.trigger == 'mhelp':
-        commands = get_help(bot, 'mod')
-    else:
-        commands = get_help(bot)
+    commands = get_help(bot, 'admin')
 
     if not inp:
         out = sorted([k for k,v in commands.iteritems() if v.__doc__])
