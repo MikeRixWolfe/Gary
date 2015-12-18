@@ -24,8 +24,8 @@ def log_link(db, server, chan, nick, user, link, slink, title):
 
 
 def get_linkdump(db, server, chan, period):
-    rows = db.execute("select nick, slink, title, time from links where server = lower(?) and chan = lower(?) and uts >= ?",
-        (server, chan, period)).fetchall()
+    rows = db.execute("select nick, slink, title, time from links where server = lower(?)"
+                      " and chan = lower(?) and uts >= ?", (server, chan, period)).fetchall()
     return rows or None
 
 
@@ -62,6 +62,8 @@ def readtitle(match, say=None, db=None, input=None):
     if domain not in skipurls:
         if (title or len(surl) < len(url)):
             say(surl + (u" - {}".format(title) if title else ""))
+    else:
+        print u">>> Link skipped: {}".format(domain)
 
 
 @hook.command
