@@ -35,8 +35,6 @@ def db_init(db):
                " action, msg, uts, primary key(time, server, chan, nick))")
     db.execute("create table if not exists seen(time, server, chan, nick, user,"
                " action, msg, uts, primary key(server, chan, nick))")
-    db.execute("create table if not exists links(time, server, chan, nick, user,"
-               " action, msg, uts, primary key(time, server, chan, nick))")
     db.execute("create index if not exists uts_idx on log(uts)")
     db.execute("create index if not exists msg_idx on log(msg)")
     db.execute("create index if not exists chan_idx on log(chan)")
@@ -55,14 +53,6 @@ def log_chat(db, server, chan, nick, user, host, action, msg):
 def log_seen(db, server, chan, nick, user, host, action, msg):
     mask = user.lower() + "@" + host.lower()
     db.execute("insert or replace into seen(time, server, chan, nick, user, action, msg, uts)"
-               " values(?, lower(?), lower(?), lower(?), lower(?), upper(?), ?, ?)",
-               (datetime.now(), server, chan, nick, mask, action, msg, time.time()))
-    db.commit()
-
-
-def log_link(db, server, chan, nick, user, host, action, msg):
-    mask = user.lower() + "@" + host.lower()
-    db.execute("insert into links(time, server, chan, nick, user, action, msg, uts)"
                " values(?, lower(?), lower(?), lower(?), lower(?), upper(?), ?, ?)",
                (datetime.now(), server, chan, nick, mask, action, msg, time.time()))
     db.commit()
@@ -131,9 +121,6 @@ def log(paraml, input=None, bot=None, db=None):
             input.user, input.host, input.command, input.msg)
         if input.command not in ('MODE'):
             log_seen(db, input.server, input.chan, input.nick,
-                input.user, input.host, input.command, input.msg)
-        if re.match('https?://(?:www\.)?([^/]+)/?\S*', input.msg):
-            log_link(db, input.server, input.chan, input.nick,
                 input.user, input.host, input.command, input.msg)
 
         print timestamp, input.chan, out.encode('ascii', 'ignore')

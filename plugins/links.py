@@ -1,11 +1,32 @@
+import time
 import re
 from datetime import datetime
 from util import hook, http, web
 
-html_re = r'https?://(?:www\.)?([^/]+)/?\S*'
+link_re = r'https?://(?:www\.)?([^/]+)/?\S*'
+domain_re = r'^.*?([^/\.]+\.[^/\.]+)$'
 
 skipurls = ["youtube.com", "youtu.be", "reddit.com", "spotify.com",
             "steam.com", "imgur.com", "j.mp", "goo.gl"]
+
+
+def db_init(db):
+    db.execute("create table if not exists links(time, server, chan, nick, user,"
+               " link, slink, title, uts, primary key(time, server, chan, nick))")
+    db.commit()
+
+
+def log_link(db, server, chan, nick, user, link, slink, title):
+    db.execute("insert into links(time, server, chan, nick, user, link, slink, title, uts)"
+               " values(?, lower(?), lower(?), lower(?), lower(?), ?, ?, ?, ?)",
+               (datetime.now(), server, chan, nick, user, link, slink, title, time.time()))
+    db.commit()
+
+
+def get_linkdump(db, server, chan, period):
+    rows = db.execute("select nick, slink, title, time from links where server = lower(?) and chan = lower(?) and uts >= ?",
+        (server, chan, period)).fetchall()
+    return rows or None
 
 
 def get_info(url):
@@ -19,53 +40,60 @@ def get_info(url):
         return web.try_googl(url), None
 
 
-@hook.regex(html_re, re.I)
-def readtitle(match, say=None):
-    if re.match(r'^.*?([^/\.]+\.[^/\.]+)$', match.group(1)).group(1) in skipurls:
-        print u">>> Link skipped: {}".format(match.group(1))
-        return
+@hook.singlethread
+@hook.regex(link_re, re.I)
+def log_links(match, say=None, db=None, input=None):
+    db_init(db)
+    url = match.group()
+    surl, title = get_info(url)
+    domain = re.match(domain_re, match.group(1)).group(1)
 
-    url, title = get_info(match.group())
-    if (title or len(url) < len(match.group())):
-        say(url + (u" - {}".format(title) if title else ""))
+    log_link(db, input.server, input.chan, input.nick,
+        input.user, url, surl, title or domain)
+
+
+@hook.regex(link_re, re.I)
+def readtitle(match, say=None, db=None, input=None):
+    db_init(db)
+    url = match.group()
+    surl, title = get_info(url)
+    domain = re.match(domain_re, match.group(1)).group(1)
+
+    if domain not in skipurls:
+        if (title or len(surl) < len(url)):
+            say(surl + (u" - {}".format(title) if title else ""))
 
 
 @hook.command
-def shorten(inp, chan='', say=None, db=None):
+def shorten(inp, chan='', server='', say=None, db=None):
     """.shorten <link|that> - Shortens a link, or the last link that was said."""
     if inp == 'that':
         try:
-            row = db.execute("select msg from links where chan = ? " \
-                "order by uts desc limit 1", (chan,)).fetchone()
-            url = re.search(html_re, row[0]).group()
+            inp = db.execute("select link from links where server = ? and" \
+                "chan = ? order by uts desc limit 1", (server, chan)).fetchone()[0]
         except:
             return "Unable to shorten last link."
-    else:
-        url = inp
 
-    url, title = get_info(url)
+    url, title = get_info(inp)
     say(url + (u" - {}".format(title) if title else ""))
 
 
-@hook.singlethread
 @hook.command(autohelp=False)
-def linkdump(inp, chan="", say="", db=None):
+def linkdump(inp, chan='', server='', say=None, db=None):
     """.linkdump - Gets today's links dumped in channel."""
-    say("Generating today's linkdump...")
     today = datetime.today()
     period = float(datetime(today.year, today.month, today.day).strftime('%s'))
-    rows = db.execute("select nick, msg, time from links where uts >= ? and chan = ? ",
-        (period, chan)).fetchall()
+    rows = get_linkdump(db, server, chan, period)
 
     if not rows:
         return "No links yet today (beginning with 'http')"
 
     links = []
     for row in rows:
-        who, stamp = row[0], re.search(r'(\d+\:\d+:\d+)', row[2]).group(0)
-        url, title = get_info(re.search(html_re, row[1]).group(0))
-        links.append(u"via {} [{}]: {}".format(who, stamp,
-            (url + (u" - {}".format(title) if title else ""))))
+        nick, slink, title, time = row
+        links.append(u"via {} [{}]: {}".format(nick,
+            re.search(r'(\d+\:\d+:\d+)', time).group(0),
+            (slink + (u" - {}".format(title) if title else ""))))
 
     say("Today's link dump: " + web.haste(u'\n'.join(links).encode('utf-8'), 'txt'))
 
