@@ -170,5 +170,5 @@ def unescape(s):
     return html.fromstring(s).text_content()
 
 def get_title(url, tag=".//title"):
-    return get_html(url).find(tag).text
+    return unescape(get_html(url).find(tag).text)
 
