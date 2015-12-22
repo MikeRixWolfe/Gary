@@ -1,6 +1,25 @@
 import datetime
 import time
-from util import hook, timesince, text
+from util import hook, timesince, text, web
+
+
+@hook.command(autohelp=False)
+def convo(inp, chan='', server='', say=None, db=None):
+    """.convo [# of lines] - Gets the last number of lines for the channel; defaults to 10."""
+    num = int(inp) if inp.isdigit() and 1 <= int(inp) <= 50 else 10
+    rows = db.execute("select time, nick, msg from log where server = ? "
+        " and chan = ? order by uts desc limit ?",
+        (server, chan, num)).fetchall()
+
+    if rows:
+        out = []
+        for row in reversed(rows):
+            xtime, xnick, xmsg = row
+            out.append(u"{} <{}> {}".format(xtime[:-7], xnick, xmsg))
+        say("The last {} lines of conversation: {}".format(num,
+            web.haste(u'\n'.join(out).encode('utf-8'), 'txt')))
+    else:
+        say("*Silence*")
 
 
 @hook.command
@@ -31,34 +50,11 @@ def first(inp, chan='', input=None, db=None, say=None):
         say("Never!")
 
 
-@hook.command(autohelp=False)
-def king(inp, input=None, db=None, say=None, bot=None):
-    """.king - Gets the user with the most used commands."""
-    query_string = "select nick, count(nick) as nick_occ from log where ("
-    for command in bot.commands.keys():
-        query_string += "msg like '." + command + "%' or "
-    query_string = query_string.strip('or ')
-    query_string = query_string + ") and nick != 'bears' "
-    query_string = query_string + \
-        "and chan = '%s' group by nick order by nick_occ desc limit 2;" % input.chan
-    rows = db.execute(query_string).fetchall()
-
-    if len(rows) == 2:
-        say("%s is the king of %s with %s commands. %s is the runner up with %s commands." %
-            (rows[0][0], input.conn.nick, rows[0][1], rows[1][0], rows[1][1]))
-    elif len(rows) == 1:
-        say("%s is the king of %s with %s commands." %
-            (rows[0][0], input.conn.nick, rows[0][1]))
-    else:
-        say("No one has used my commands yet in this channel :(")
-
-
 @hook.command
 def said(inp, chan='', input=None, db=None, say=None):
     """.said <phrase> - Finds users who has said a phrase."""
-    rows = db.execute(
-        "select distinct nick from log where msg like ? and chan = ? order by nick",
-        ('%' + inp.strip() + '%', chan)).fetchall()
+    rows = db.execute("select distinct nick from log where msg like ? "
+        "and chan = ? order by nick", ('%'+inp.strip()+'%', chan)).fetchall()
     rows = ([row[0] for row in rows] if rows else None)
 
     if rows:
@@ -75,13 +71,3 @@ def said(inp, chan='', input=None, db=None, say=None):
     else:
         say("No one!")
 
-
-#def userstats():
-
-#def dailylines():
-
-#def chanstats():
-
-#def dailystats():
-
-# def lines():
