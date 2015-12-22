@@ -58,7 +58,7 @@ def wordoftheday(inp, say=None, api_key=None):
 
 @hook.command('ud')
 def urban(inp, say=None):
-    """.ud/.urban <phrase> - Looks up <phrase> on urbandictionary.com."""
+    """.ud <phrase> - Looks up <phrase> on Urban Dictionary."""
     base_url = 'http://api.urbandictionary.com/v0'
     define_url = base_url + "/define"
 
