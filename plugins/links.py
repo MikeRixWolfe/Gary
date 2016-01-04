@@ -40,7 +40,6 @@ def get_info(url):
         return web.try_googl(url), None
 
 
-@hook.singlethread
 @hook.regex(link_re, re.I)
 def log_links(match, say=None, db=None, input=None):
     db_init(db)
@@ -60,7 +59,7 @@ def readtitle(match, say=None, db=None, input=None):
     domain = re.match(domain_re, match.group(1)).group(1)
 
     if domain not in skipurls:
-        if (title or len(surl) < len(url)):
+        if title or len(surl) < len(url):
             say(surl + (u" - {}".format(title) if title else ""))
     else:
         print u">>> Link skipped: {}".format(domain)

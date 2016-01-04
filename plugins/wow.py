@@ -67,7 +67,7 @@ def wow_get_class(class_id, colours=False):
         # Format their colours according to class colours.
         class_ids = {
             1: "\x0305Warrior\x0F", 2: "\x0313Paladin\x0F", 3: "\x0303Hunter\x0F", 4: "\x0308Rogue\x0F",
-            5: "Priest", 6: "\x0304Death Knight\x0F", 7: "\x0310Shaman\x0F", 8: "\x0311Mage\x0F",
+            5: "\x02Priest\x0F", 6: "\x0304Death Knight\x0F", 7: "\x0310Shaman\x0F", 8: "\x0311Mage\x0F",
             9: "\x0306Warlock\x0F", 10: "\x0309Monk\x0F", 11: "\x0307Druid\x0F"
         }
     else:
