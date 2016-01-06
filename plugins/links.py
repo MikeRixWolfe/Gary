@@ -23,9 +23,10 @@ def log_link(db, server, chan, nick, user, link, slink, title):
     db.commit()
 
 
-def get_linkdump(db, server, chan, period):
-    rows = db.execute("select nick, slink, title, time from links where server = lower(?)"
-                      " and chan = lower(?) and uts >= ?", (server, chan, period)).fetchall()
+def get_linkdump(db, server, chan, period, raw=False):
+    q = "select nick, {}, title, time from links".format('link' if raw else 'slink')
+    rows = db.execute(q + " where server = lower(?) and chan = lower(?) and uts >= ?",
+                      (server, chan, period)).fetchall()
     return rows or None
 
 
@@ -81,10 +82,10 @@ def shorten(inp, chan='', server='', say=None, db=None):
 
 @hook.command(autohelp=False)
 def linkdump(inp, chan='', server='', say=None, db=None):
-    """.linkdump - Gets today's links dumped in channel."""
+    """.linkdump [-l] - Gets today's links dumped in channel; -l for unshortened links."""
     today = datetime.today()
     period = float(datetime(today.year, today.month, today.day).strftime('%s'))
-    rows = get_linkdump(db, server, chan, period)
+    rows = get_linkdump(db, server, chan, period, (True if inp == '-l' else False))
 
     if not rows:
         return "No links yet today (beginning with 'http')"
