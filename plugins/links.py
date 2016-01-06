@@ -3,7 +3,7 @@ import re
 from datetime import datetime
 from util import hook, http, web
 
-link_re = r'https?://(?:www\.)?([^/]+)/?\S*'
+link_re = r'https?://(?:www\.)?([^ /]+)/?\S*'
 domain_re = r'^.*?([^/\.]+\.[^/\.]+)$'
 
 skipurls = ["youtube.com", "youtu.be", "reddit.com", "spotify.com",
