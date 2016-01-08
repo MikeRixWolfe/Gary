@@ -38,5 +38,5 @@ def cnam(inp, api_key=None):
     if data['data'].get('carrier', {}).get('name', None):
         out.append(u"Carrier: {}".format(data['data']['carrier']['name']))
 
-    return u" | ".join(out)
+    return u"; ".join(out)
 
