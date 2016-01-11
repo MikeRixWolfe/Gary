@@ -7,7 +7,7 @@ link_re = r'https?://(?:www\.)?([^ /]+)/?\S*'
 domain_re = r'^.*?([^/\.]+\.[^/\.]+)$'
 
 skipurls = ["youtube.com", "youtu.be", "reddit.com", "spotify.com",
-            "steam.com", "imgur.com", "j.mp", "goo.gl"]
+            "steampowered.com", "imgur.com", "j.mp", "goo.gl"]
 
 
 def db_init(db):
