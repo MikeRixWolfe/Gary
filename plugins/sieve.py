@@ -43,7 +43,7 @@ def sieve_suite(bot, input, func, kind, args):
 
     if kind in ("command"):
         if any(x in disabled for x in [func.__name__.lower(), input.trigger]):
-            if not is_admin(bot, input):
+            if not is_mod(bot, input) and not is_admin(bot, input):
                 return None
 
     # disable plugin
