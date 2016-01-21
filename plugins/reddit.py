@@ -52,18 +52,19 @@ def reddit(inp):
         return "Error: " + str(e)
     data = data["data"]["children"]
 
-    # get the requested/random post
-    if id_num is not None:
-        try:
-            item = data[id_num]["data"]
-        except IndexError:
-            length = len(data)
-            return (
-                "Invalid post number. Number must be between 1 and {}.".format(
-                    length)
-            )
-    else:
-        item = random.choice(data)["data"]
+    try:
+        # geit the requested/random post
+        if id_num is not None:
+            try:
+                item = data[id_num]["data"]
+            except IndexError:
+                length = len(data)
+                return ("Invalid post number. Number must " \
+                    "be between 1 and {}.".format(length))
+        else:
+            item = random.choice(data)["data"]
+    except:
+        return "I couldn't find any data for \x02{}\x0F.".format(inp)
 
     item["title"] = text.truncate_str(item["title"], 100)
     item["link"] = short_url.format(item["id"])

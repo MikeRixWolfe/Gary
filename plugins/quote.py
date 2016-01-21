@@ -12,9 +12,8 @@ def db_init(db):
 
 
 def add_quote(db, chan, nick, add_nick, msg):
-    db.execute(
-        "insert into quote (chan, nick, add_nick, msg, time) values(?,?,?,?,?)",
-        (chan, nick, add_nick, msg, time.time()))
+    db.execute("insert into quote (chan, nick, add_nick, msg, time)" \
+        " values(?,?,?,?,?)", (chan, nick, add_nick, msg, time.time()))
     db.commit()
 
 
@@ -24,28 +23,27 @@ def del_quote(key):
 
 
 def get_quotes_by_nick(db, chan, nick):
-    return db.execute(
-        "select key, time, nick, msg from quote where chan=? and lower(nick)=lower(?) order by time",
-        (chan, nick)).fetchall()
+    return db.execute("select key, time, nick, msg from quote where" \
+        " chan=? and lower(nick)=lower(?) order by time", (chan, nick)).fetchall()
 
 
 def get_quotes_by_chan(db, chan):
-    return db.execute(
-        "select key, time, nick, msg from quote where chan=? order by time",
-        (chan,)).fetchall()
+    return db.execute("select key, time, nick, msg from quote where" \
+        " chan=? order by time", (chan,)).fetchall()
 
 
 def get_quote_by_key(db, key):
     return db.execute("select key, time, nick, msg from quote where key=?",
-                      (key,)).fetchall()
+        (key,)).fetchall()
 
 
 def format_quote(q):
     key, ctime, nick, msg = q
-    return "Quote #%d: <%s> \"%s\" on %s" % (key, nick, msg,
-                                             time.strftime("%Y-%m-%d", time.gmtime(ctime)))
+    return "Quote #%d: <%s> \"%s\" at %s" % (key, nick, msg,
+        time.strftime("%H:%M on %m-%d-%Y", time.gmtime(ctime)))
 
 
+@hook.command('rq', autohelp=False)
 @hook.command(autohelp=False)
 def randomquote(inp, nick='', chan='', db=None, input=None):
     """.randomquote [nick] - Gets random quote by <nick> or from the current channel."""

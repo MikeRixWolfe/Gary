@@ -15,14 +15,17 @@ def define(inp, say=None, api_key=None):
     if not api_key:
         return "This command requires an API key from wordnik.com."
     word = inp.split(' ')[0]
-    url = API_URL + "word.json/{}/definitions".format(word)
+    url = API_URL + u"word.json/{}/definitions".format(word)
 
-    params = {
-        'api_key': api_key,
-        'limit': 1,
-        'useCanonical': 'false'
-    }
-    json = http.get_json(url, query_params=params)
+    try:
+        params = {
+            'api_key': api_key,
+            'limit': 1,
+            'useCanonical': 'false'
+        }
+        json = http.get_json(url, query_params=params)
+    except:
+        return "Wordnik API error; please try again in a few minutes."
 
     if json:
         data = json[0]
