@@ -3,11 +3,11 @@ import re
 from datetime import datetime
 from util import hook, http, web
 
-link_re = r'https?://(?:www\.)?([^ /]+)/?\S*'
+link_re = r'https?://(?:www\.)?([^: /]+)(?::\d+)?/?\S*'
 domain_re = r'^.*?([^/\.]+\.[^/\.]+)$'
 
 skipurls = ["youtube.com", "youtu.be", "reddit.com", "spotify.com",
-            "steampowered.com", "imgur.com", "j.mp", "goo.gl"]
+            "steampowered.com", "imgur.com", "j.mp", "goo.gl", "worf.co"]
 
 
 def db_init(db):
