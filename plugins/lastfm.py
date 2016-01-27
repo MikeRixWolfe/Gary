@@ -61,10 +61,7 @@ def toptrack(inp, say=None, api_key=None):
     if 'error' in response:
         return response["message"]
     if not response["toptracks"].get("track", None):
-        if period == "1month":
-            return "The 1month flag is currently broken in the LastFM API; a bug report has been filed."
-        else:
-            return "No recent tracks for user \x02{}\x0F found.".format(user)
+        return "No recent tracks for user \x02{}\x0F found.".format(user)
 
     say(u"\x02{}\x0F's \x02{}\x0F top track is \x02{name}\x0f by \x02{artist[name]}\x0f " \
         "with a total of \x02{playcount}\x0f plays".format(user, period, **response["toptracks"]["track"][0]))

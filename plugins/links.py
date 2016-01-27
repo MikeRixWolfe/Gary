@@ -42,7 +42,7 @@ def get_info(url):
 
 
 @hook.regex(link_re, re.I)
-def log_links(match, say=None, db=None, input=None):
+def readtitle(match, say=None, db=None, input=None):
     db_init(db)
     url = match.group()
     surl, title = get_info(url)
@@ -50,14 +50,6 @@ def log_links(match, say=None, db=None, input=None):
 
     log_link(db, input.server, input.chan, input.nick,
         input.user, url, surl, title or domain)
-
-
-@hook.regex(link_re, re.I)
-def readtitle(match, say=None, db=None, input=None):
-    db_init(db)
-    url = match.group()
-    surl, title = get_info(url)
-    domain = re.match(domain_re, match.group(1)).group(1)
 
     if domain not in skipurls:
         if title or len(surl) < len(url):
