@@ -73,7 +73,7 @@ def sieve_suite(bot, input, func, kind, args):
             return None
 
     # restricted
-    if input.chan in restricted:
+    if kind in ("command", "regex") and input.chan in restricted:
         if input.nick.lower() not in allowed:
             if not is_mod(bot, input) and not is_admin(bot, input):
                 return None
@@ -85,7 +85,7 @@ def sieve_suite(bot, input, func, kind, args):
             return None
 
     # mutes
-    if input.chan in muted:
+    if kind in ("command", "regex") and input.chan in muted:
         if not is_mod(bot, input) and not is_admin(bot, input):
             return None
 
