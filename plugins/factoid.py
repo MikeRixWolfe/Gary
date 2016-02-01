@@ -69,9 +69,9 @@ def forget(inp, chan='', say=None, db=None):
 @hook.command
 @hook.regex(r'^(.+)\?$')
 def factoid(inp, chan='', say=None, db=None):
-    "Gary: <word|(multi word)> is <data> - Sets <word|(multi word)> to <data>; \
-    no Gary, <word|(multi word)> is <new data> - Resets <word|(multi word)> to <new data>; \
-    Gary: <word|(multi word)> is also <additional data> - Adds <additional data> to <word|(multi word)>."
+    "Gary: <word|(multi word)> is <data> - Sets <word|(multi word)> to <data>; " \
+    "no Gary, <word|(multi word)> is <new data> - Resets <word|(multi word)> to <new data>; " \
+    "Gary: <word|(multi word)> is also <additional data> - Adds <additional data> to <word|(multi word)>."
     db_init(db)
     word = inp.group(1).strip()
     data = get_factoid(db, chan, word)
