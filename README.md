@@ -16,14 +16,11 @@
 * Multithreaded dispatch and the ability to connect to multiple networks at a time.
 * Easy plugin development with automatic reloading and a simple hooking API.
 * NickServ-based user authentication and per-function permissions with the ability to manage access to functions/plugins/the bot from in channel.
-* The ability to send/receive SMS messages and call other users from channel via Twilio.
 
 ## Requirements
 * Python 2.7.x
 * BeautifulSoup4
-* GitPython
 * lxml
-* twilio
 * yql
 
 ## Documentation
