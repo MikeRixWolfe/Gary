@@ -18,7 +18,7 @@ def stop(inp, nick=None, conn=None):
     os.kill(os.getpid(), signal.SIGTERM)
 
 
-@hook.command(autohelp=False, adminonly=True)
+@hook.command(autohelp=False, modonly=True)
 def restart(inp, nick=None, conn=None, bot=None):
     """.restart [reason] - Restarts the bot with [reason] as its quit message."""
     for botcon in bot.conns:
@@ -33,7 +33,7 @@ def restart(inp, nick=None, conn=None, bot=None):
     os.execv(sys.executable, args)
 
 
-@hook.command(adminonly=True)
+@hook.command(modonly=True)
 def join(inp, conn=None, notice=None):
     """.join <channel> - Joins <channel>."""
     notice("Attempting to join {}...".format(inp))
@@ -47,7 +47,7 @@ def connect(inp, conn=None, notice=None):
     conn.send("CONNECT " + inp)
 
 
-@hook.command(autohelp=False, adminonly=True)
+@hook.command(autohelp=False, modonly=True)
 def part(inp, conn=None, chan=None, notice=None):
     """.part [channel] - Leaves a channel. If [channel] is blank the bot will leave the channel the command was used in."""
     if inp:
@@ -58,7 +58,7 @@ def part(inp, conn=None, chan=None, notice=None):
     conn.send("PART " + target)
 
 
-@hook.command(autohelp=False, adminonly=True)
+@hook.command(autohelp=False, modonly=True)
 def cycle(inp, conn=None, chan=None, notice=None):
     """.cycle [channel] [delay=1] - Cycles a channel with a given delay. Channel and delay default to the current channel and 1 respectively."""
     if inp:

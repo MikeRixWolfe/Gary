@@ -13,8 +13,6 @@ def get_help(bot, flag=None):
                 if func in funcs:
                     if command == func.func_name:
                         funcs[func] = command
-                    else:
-                        print func, command
                 else:
                     funcs[func] = command
             elif flag == 'mod' and args.get('modonly'):
@@ -43,9 +41,6 @@ def ahelp(inp, say=None, bot=None, input=None):
         out = sorted([k for k,v in commands.iteritems() if v.__doc__])
         for out in text.chunk_str('Available commands: %s' % ' '.join(out)):
             say(out)
-        say("Tip: .ahelp <command> - Gets more info on that command; " \
-            "arguments in <chevrons> are required, and arguments in " \
-            "[brackets] are optional for any command.")
     else:
         if inp in commands:
             say(commands[inp].__doc__ or
@@ -63,9 +58,6 @@ def mhelp(inp, say=None, bot=None, input=None):
         out = sorted([k for k,v in commands.iteritems() if v.__doc__])
         for out in text.chunk_str('Available commands: %s' % ' '.join(out)):
             say(out)
-        say("Tip: .mhelp <command> - Gets more info on that command; " \
-            "arguments in <chevrons> are required, and arguments in " \
-            "[brackets] are optional for any command.")
     else:
         if inp in commands:
             say(commands[inp].__doc__ or

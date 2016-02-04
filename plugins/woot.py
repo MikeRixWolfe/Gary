@@ -54,7 +54,7 @@ def format_woot(w):
         if w['soldoutpercent'] != "0":
             price += " ({}% Gone!)".format(w['soldoutpercent'])
 
-    return "\x02{}\x0F - {} [{}]".format(w['product'], price, w['url'])
+    return "\x02{}\x0F - {} - {}".format(w['product'], price, w['url'])
 
 
 @hook.command(autohelp=False)
