@@ -1,3 +1,4 @@
+import re
 import datetime
 from util import hook
 
@@ -9,13 +10,12 @@ def db_init(db):
 
 
 def get_factoid(db, chan, word):
-    row = db.execute(
-        "select data from factoids where chan=? and word=lower(?)",
+    row = db.execute("select data from factoids where chan=? and word=lower(?)",
         (chan.lower(), word.lower())).fetchone()
     return (row[0] if row else None)
 
 
-@hook.regex(r'^(no\ )?(?:G|g)ary(?:\:\ |\,\ )([^\(].*?[^\)]|\(.*\))\ (?:is)\ (also\ )?(.+)')
+@hook.regex(r'^(no )?Gary(?::|, )([^\(].+?[^\)]|\(.+\)) is (also )?(.+)', re.I)
 def set_factoid(inp, nick='', chan='', say=None, db=None):
     db_init(db)
 

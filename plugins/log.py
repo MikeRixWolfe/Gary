@@ -124,3 +124,4 @@ def log(paraml, input=None, bot=None, db=None):
                 input.user, input.host, input.command, input.msg)
 
         print timestamp, input.chan, out.encode('ascii', 'ignore')
+
