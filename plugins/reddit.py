@@ -3,15 +3,15 @@ import random
 from util import hook, http, text, timesince, web
 from datetime import datetime
 
-base_url = "http://reddit.com/r/{}/.json"
-short_url = "http://redd.it/{}"
-reddit_re = (r'((?:www\.)?reddit\.com/[^ ]+)', re.I)
+base_url = "https?://reddit.com/r/{}/.json"
+short_url = "https?://redd.it/{}"
+reddit_re = (r'(https?://www\.reddit\.com/[^ ]+)', re.I)
 
 
 @hook.regex(*reddit_re)
 def reddit_url(match, say=None):
     try:
-        thread = http.get_html('http://'+match.group(0))
+        thread = http.get_html(match.group(0))
         title = thread.xpath('//title/text()')[0]
         try:
             upvotes = thread.xpath(
