@@ -4,6 +4,9 @@ import http
 import json
 import yql
 
+with open('config', 'r') as f:
+    api_key = json.loads(f.read())['api_keys']['google']['access']
+
 short_url = "https://www.googleapis.com/urlshortener/v1/url"
 paste_url = "http://hastebin.com"
 yql_env = "http://datatables.org/alltables.env"
@@ -23,13 +26,14 @@ class ShortenError(Exception):
 def googl(url):
     """ shortens a URL with the goo.gl API """
     postdata = {'longUrl': url}
-    headers = {'Content-Type':'application/json'}
+    headers = {'Content-Type': 'application/json'}
 
     try:
         request = http.get_json(
-            google_short_url, 
-            post_data=json.dumps(postdata), 
-            headers=headers, 
+            short_url,
+            key=api_key
+            post_data=json.dumps(postdata),
+            headers=headers,
             get_method="POST"
         )['id']
     except:
