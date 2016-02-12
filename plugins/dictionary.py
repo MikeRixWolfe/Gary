@@ -84,7 +84,10 @@ def urban(inp, say=None):
 def etymology(inp, say=None):
     """.etymology <word> - Retrieves the etymology of chosen word."""
     url = 'http://www.etymonline.com/index.php'
-    h = http.get_html(url, term=inp)
+    try:
+        h = http.get_html(url, term=inp)
+    except:
+        return "Error fetching etymology."
     etym = h.xpath('//dl')
 
     if not etym:
