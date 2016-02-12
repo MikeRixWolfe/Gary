@@ -1,10 +1,7 @@
 """ web.py - handy functions for web services """
 
 import http
-import urlnorm
 import json
-import urllib
-import urllib2
 import yql
 
 short_url = "https://www.googleapis.com/urlshortener/v1/url"
@@ -25,15 +22,18 @@ class ShortenError(Exception):
 
 def googl(url):
     """ shortens a URL with the goo.gl API """
-    postdata = {'longUrl':url}
+    postdata = {'longUrl': url}
     headers = {'Content-Type':'application/json'}
-    req = urllib2.Request(
-        short_url,
-        json.dumps(postdata),
-        headers
-    )
-    ret = urllib2.urlopen(req).read()
-    request = json.loads(ret)['id']
+
+    try:
+        request = http.get_json(
+            google_short_url, 
+            post_data=json.dumps(postdata), 
+            headers=headers, 
+            get_method="POST"
+        )['id']
+    except:
+        raise ShortenError("Error", "None returned")
 
     if not request.strip():
         raise ShortenError("Error", "None returned")
