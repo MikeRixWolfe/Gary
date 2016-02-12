@@ -4,6 +4,7 @@ import http
 import json
 import yql
 
+
 with open('config', 'r') as f:
     api_key = json.loads(f.read())['api_keys']['google']['access']
 
