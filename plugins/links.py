@@ -7,7 +7,8 @@ link_re = r'https?://(?:www\.)?([^: /]+)(?::\d+)?/?\S*'
 domain_re = r'^.*?([^/\.]+\.[^/\.]+)$'
 
 skipurls = ["youtube.com", "youtu.be", "reddit.com", "spotify.com",
-            "steampowered.com", "imgur.com", "j.mp", "goo.gl", "worf.co"]
+            "steampowered.com", "imgur.com", "j.mp", "goo.gl", "worf.co",
+            "bit.ly", "tinyurl.com"]
 
 
 def db_init(db):
@@ -52,8 +53,7 @@ def readtitle(match, say=None, db=None, input=None):
         input.user, url, surl, title or domain)
 
     if domain not in skipurls:
-        if title or len(surl) < len(url):
-            say(surl + (u" - {}".format(title) if title else ""))
+        say(surl + (u" - {}".format(title) if title else ""))
     else:
         print u">>> Link skipped: {}".format(domain)
 
