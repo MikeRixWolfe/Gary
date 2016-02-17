@@ -1,5 +1,3 @@
-import random
-from datetime import date, timedelta
 from util import hook, http, web
 
 
@@ -84,3 +82,4 @@ def stockhistory(inp, say=''):
           "Year L: $%(YearLow)s; Volume @ %(Volume)s " \
           "(Avg Daily Volume: %(AverageDailyVolume)s) " \
           "[%(LastTradeTime)s]" % quote)
+
