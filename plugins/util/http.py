@@ -17,8 +17,8 @@ from urllib2 import HTTPError, URLError
 from lxml import etree, html
 from bs4 import BeautifulSoup
 
-ua_gary = 'Gary/2.0 (http://github.com/michaelrixwolfe/gary)'
 
+ua_gary = 'Gary/2.0 (http://github.com/mikerixwolfe/gary)'
 ua_firefox = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.6) ' \
              'Gecko/20070725 Firefox/2.0.0.6'
 ua_internetexplorer = 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'
@@ -79,7 +79,6 @@ def open(url, query_params=None, headers=None, post_data=None,
         header = oauth_build_header(nonce, signature, timestamp, oauth_keys['consumer'], oauth_keys['access'])
         request.add_header('Authorization', header)
 
-
     if cookies:
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(jar))
     else:
@@ -111,11 +110,14 @@ def to_utf8(s):
 def quote_plus(s):
     return _quote_plus(to_utf8(s))
 
+
 def oauth_nonce():
     return ''.join([str(random.randint(0, 9)) for i in range(8)])
 
+
 def oauth_timestamp():
     return str(int(time.time()))
+
 
 def oauth_unsigned_request(nonce, timestamp, req, consumer, token):
     d = { 'oauth_consumer_key':consumer,
@@ -127,15 +129,14 @@ def oauth_unsigned_request(nonce, timestamp, req, consumer, token):
 
     k,v = string.split(req, "=")
     d[k] = v
-
     unsigned_req = ''
 
     for x in sorted(d, key=lambda key: key):
         unsigned_req += x + "=" + d[x] + "&"
 
     unsigned_req = quote(unsigned_req[:-1])
-
     return unsigned_req
+
 
 def oauth_build_header(nonce, signature, timestamp, consumer, token):
     d = { 'oauth_consumer_key':consumer,
@@ -153,6 +154,7 @@ def oauth_build_header(nonce, signature, timestamp, consumer, token):
 
     return header[:-1]
 
+
 def oauth_sign_request(method, url, params, unsigned_request, consumer_secret, token_secret):
     key = consumer_secret + "&" + token_secret
 
@@ -164,11 +166,12 @@ def oauth_sign_request(method, url, params, unsigned_request, consumer_secret, t
 
     return signature
 
+
 def unescape(s):
     if not s.strip():
         return s
     return html.fromstring(s).text_content()
 
+
 def get_title(url, tag=".//title"):
     return unescape(get_html(url).find(tag).text)
-
