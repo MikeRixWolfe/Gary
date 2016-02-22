@@ -3,6 +3,7 @@ from time import time
 from util import hook
 
 timeouts = {}
+timeouts_active = True
 
 
 def is_admin(bot, input):
@@ -21,6 +22,16 @@ def is_mod(bot, input):
         return True
     else:
         return False
+
+
+@hook.command(autohelp=False, modonly=True)
+def timeout(inp):
+    """.timeout - Toggles if command timeouts are active."""
+    global timeouts_active
+    timeouts_active = not timeouts_active
+    return "Command timeouts are now \x02{}abled\x0f.".format("en"
+        if timeouts_active else "dis")
+
 
 
 @hook.sieve
@@ -43,7 +54,7 @@ def sieve_suite(bot, input, func, kind, args):
 
     if kind in ("command"):
         if any(x in disabled for x in [func.__name__.lower(), input.trigger]):
-            if not is_mod(bot, input) and not is_admin(bot, input):
+            if not is_admin(bot, input):
                 return None
 
     # disable plugin
@@ -90,7 +101,7 @@ def sieve_suite(bot, input, func, kind, args):
             return None
 
     # rate limiting
-    if kind == "command" and input.chan[0] == '#':
+    if kind == "command" and input.chan[0] == '#' and timeouts_active:
         if not is_mod(bot, input) and not is_admin(bot, input):
             global timeouts
             limit = 3
