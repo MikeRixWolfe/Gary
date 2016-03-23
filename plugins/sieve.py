@@ -143,12 +143,12 @@ def sieve_suite(bot, input, func, kind, args):
                 timeouts[input.server][chan_cmd]['msgs'] = [msg for msg in
                     timeouts[input.server][chan_cmd]['msgs'] if time() - msg < 60 * 2]
 
-            if time() - timeouts[input.server][chan_cmd]['timeout'] < timeout * 60 * 2:
+            if time() - timeouts[input.server][chan_cmd]['timeout'] < timeout * 60:
                 return None
             else:
                 timeouts[input.server][chan_cmd]['timeout'] = 0
 
-            if len(timeouts[input.server][chan_cmd]['msgs']) > limit * 2:
+            if len(timeouts[input.server][chan_cmd]['msgs']) > limit:
                 timeouts[input.server][chan_cmd]['timeout'] = time()
                 input.say(".{} has been temporarily disabled to control spam. " \
                     "I will enable it again in {} minutes.".format(func.__name__.lower(), timeout))
