@@ -532,7 +532,7 @@ class dPuzzle:
         for i in ['rectus', 'proxime', 'malum']:
             num = res.count(i)
             if num > 0:
-                print num
+                print(num)
                 hint.append(nos[num] + ' ' + i)
         hint = ', '.join(hint) + '.'
         perc = (perc + 1) / 2
@@ -1373,7 +1373,7 @@ class Rpg:
 
     def godownstairs(self, input=None):
         if self.whereareyou != "stairs":
-            print "NO STAIRS BLARGH"
+            print("NO STAIRS BLARGH")
             return
         self.whereareyou = "start"
         self.dungeonlevel += 1
@@ -1740,7 +1740,7 @@ def rpgsell(inp, input=None):
     maxnum = [x.lower()
               for x in rpg.character.loot['items']].count(sell.lower())
     if len(oo) > 1:
-        print oo[1]
+        print(oo[1])
         if oo[1].lower() == 'all':
             num = maxnum
         else:

@@ -110,21 +110,21 @@ def reload(init=False):
                         bot.plugs[type] += [data]
 
                         if not init:
-                            print '### new plugin (type: %s) loaded:' % \
-                                    type, format_plug(data)
+                            print('### new plugin (type: %s) loaded: %s' % \
+                                    (type, format_plug(data)))
 
     if changed:
         bot.commands = {}
         for plug in bot.plugs['command']:
             name = plug[1]['name'].lower()
             if not re.match(r'^\w+$', name):
-                print '### ERROR: invalid command name "%s" (%s)' % (name,
-                  format_plug(plug))
+                print('### ERROR: invalid command name "%s" (%s)' % (name,
+                  format_plug(plug)))
                 continue
             if name in bot.commands:
-                print "### ERROR: command '%s' already registered (%s, %s)" % \
+                print("### ERROR: command '%s' already registered (%s, %s)" % \
                     (name, format_plug(bot.commands[name]),
-                     format_plug(plug))
+                     format_plug(plug)))
                 continue
             bot.commands[name] = plug
 
@@ -134,13 +134,13 @@ def reload(init=False):
                 bot.events[event].append((func, args))
 
     if init:
-        print '  plugin listing:'
+        print('  plugin listing:')
 
         if bot.commands:
             # hack to make commands with multiple aliases
             # print nicely
 
-            print '    command:'
+            print('    command:')
             commands = collections.defaultdict(list)
 
             for name, (func, args) in bot.commands.iteritems():
@@ -150,12 +150,12 @@ def reload(init=False):
                 names.sort(key=lambda x: (-len(x), x))  # long names first
                 out = ' ' * 6 + '%s:%s:%s' % sig
                 out += ' ' * (50 - len(out)) + ', '.join(names)
-                print out
+                print(out)
 
         for kind, plugs in sorted(bot.plugs.iteritems()):
             if kind == 'command':
                 continue
-            print '    %s:' % kind
+            print('    %s:' % kind)
             for plug in plugs:
-                print format_plug(plug, kind=kind, lpad=6)
-        print
+                print(format_plug(plug, kind=kind, lpad=6))
+        print('')

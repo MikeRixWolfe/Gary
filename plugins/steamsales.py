@@ -201,7 +201,7 @@ def saleloop(paraml, nick='', conn=None):
     mask = ["specials", "coming_soon", "top_sellers", "new_releases",
             "genres", "trailerslideshow", "status"]
     prev_sales = {}
-    print ">>> u'Beginning Steam sale check loop :{}'".format(paraml[0])
+    print(">>> u'Beginning Steam sale check loop :{}'".format(paraml[0]))
     while paraml[0] in conn.channels:
         try:
             time.sleep(1200)
@@ -209,7 +209,7 @@ def saleloop(paraml, nick='', conn=None):
             # Get data
             sales = get_sales(mask)
             if not sales:
-                print ">>> u'No Steam sales found :{}'".format(paraml[0])
+                print(">>> u'No Steam sales found :{}'".format(paraml[0]))
 
             # Handle restarts
             if not prev_sales:
@@ -224,5 +224,5 @@ def saleloop(paraml, nick='', conn=None):
                     for out in text.chunk_str(u"\x02New {}\x0F: {}".format(category, u"; ".join(items))):
                         conn.send(u"PRIVMSG {} :{}".format(paraml[0], out))
         except Exception as e:
-            print ">>> u'Steam saleloop error: {} :{}'".format(e, paraml[0])
-    print ">>> u'Ending Steam sale check loop :{}'".format(paraml[0])
+            print(">>> u'Steam saleloop error: {} :{}'".format(e, paraml[0]))
+    print(">>> u'Ending Steam sale check loop :{}'".format(paraml[0]))

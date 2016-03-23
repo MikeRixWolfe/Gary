@@ -12,7 +12,6 @@ def cnam(inp, api_key=None):
             auth_token=api_key["auth_token"],
             data="name,carrier,location,linetype,cnam")
     except Exception as e:
-        print e.msg
         return "EveryoneAPI error, please try again in a few minutes."
 
     out = [u"Caller ID info for {number}".format(**data)]

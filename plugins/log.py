@@ -123,5 +123,5 @@ def log(paraml, input=None, bot=None, db=None):
             log_seen(db, input.server, input.chan, input.nick,
                 input.user, input.host, input.command, input.msg)
 
-        print timestamp, input.chan, out.encode('ascii', 'ignore')
+        print("{} {} {}".format(timestamp, input.chan, out.encode('ascii', 'ignore')))
 

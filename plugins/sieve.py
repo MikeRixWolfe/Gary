@@ -25,8 +25,8 @@ def is_mod(bot, input):
 
 
 @hook.command(autohelp=False, modonly=True)
-def timeout(inp):
-    """.timeout - Toggles if command timeouts are active."""
+def cmdtimeout(inp):
+    """.cmdtimeout - Toggles if command timeouts are active."""
     global timeouts_active
     timeouts_active = not timeouts_active
     return "Command timeouts are now \x02{}abled\x0f.".format("en"
@@ -110,6 +110,7 @@ def sieve_suite(bot, input, func, kind, args):
             if timeouts.get(input.server, None) is None:
                 timeouts[input.server] = {}
 
+            # user timeouts
             if timeouts[input.server].get(input.user, None) is None:
                 timeouts[input.server][input.user] = {}
                 timeouts[input.server][input.user]['msgs'] = [time()]
@@ -129,6 +130,28 @@ def sieve_suite(bot, input, func, kind, args):
                 input.reply("You have been timed out for {} minutes " \
                     "for using commands too quickly. Feel free to PM me " \
                     "to explore my functions freely.".format(timeout))
+                return None
+
+            # command timeouts
+            chan_cmd = "{}_{}".format(input.chan, func.__name__.lower())
+            if timeouts[input.server].get(chan_cmd, None) is None:
+                timeouts[input.server][chan_cmd] = {}
+                timeouts[input.server][chan_cmd]['msgs'] = [time()]
+                timeouts[input.server][chan_cmd]['timeout'] = 0
+            else:
+                timeouts[input.server][chan_cmd]['msgs'].append(time())
+                timeouts[input.server][chan_cmd]['msgs'] = [msg for msg in
+                    timeouts[input.server][chan_cmd]['msgs'] if time() - msg < 60]
+
+            if time() - timeouts[input.server][chan_cmd]['timeout'] < timeout * 60:
+                return None
+            else:
+                timeouts[input.server][chan_cmd]['timeout'] = 0
+
+            if len(timeouts[input.server][chan_cmd]['msgs']) > limit:
+                timeouts[input.server][chan_cmd]['timeout'] = time()
+                input.say(".{} has been temporarily disabled to control spam. " \
+                    "Please try again in {} minutes.".format(func.__name__.lower(), timeout))
                 return None
 
     return input

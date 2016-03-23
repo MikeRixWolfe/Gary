@@ -86,7 +86,7 @@ class crlf_tcp(object):
     def send_loop(self):
         while True:
             line = self.oqueue.get().splitlines()[0][:500]
-            print ">>> %r" % line
+            print(">>> %r" % line)
             self.obuffer += line.encode('utf-8', 'replace') + '\r\n'
             while self.obuffer:
                 sent = self.socket.send(self.obuffer)

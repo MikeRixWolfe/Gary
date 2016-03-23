@@ -49,13 +49,16 @@ def readtitle(match, say=None, db=None, input=None):
     surl, title = get_info(url)
     domain = re.match(domain_re, match.group(1)).group(1)
 
-    log_link(db, input.server, input.chan, input.nick,
-        input.user, url, surl, title or domain)
+    try:
+        log_link(db, input.server, input.chan, input.nick,
+            input.user, url, surl, title or domain)
+    except Exception as e:
+        print(">>> u'Error logging link: {} :{}'".format(e, chan))
 
     if domain not in skipurls:
         say(surl + (u" - {}".format(title) if title else ""))
     else:
-        print u">>> Link skipped: {}".format(domain)
+        print(u">>> Link skipped: {}".format(domain))
 
 
 @hook.command

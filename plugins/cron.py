@@ -33,7 +33,7 @@ def cron(paraml, nick='', conn=None, db=None):
     if paraml[0] != '#geekboy' or nick != conn.nick:
         return
     time.sleep(1)  # Allow chan list time to update
-    print ">>> u'Beginning cron loop :{}'".format(paraml[0])
+    print(">>> u'Beginning cron loop :{}'".format(paraml[0]))
     db_init(db)
     while paraml[0] in conn.channels:
         try:
@@ -45,8 +45,8 @@ def cron(paraml, nick='', conn=None, db=None):
                     "%s: %s" % (row[1], row[0])))
             clean_db(db, datestamp)
         except Exception as e:
-            print ">>> u'Error running cron loop :{}'".format(e)
-    print ">>> u'Ending cron loop :{}'".format(paraml[0])
+            print(">>> u'Error running cron loop :{}'".format(e))
+    print(">>> u'Ending cron loop :{}'".format(paraml[0]))
 
 
 @hook.command()

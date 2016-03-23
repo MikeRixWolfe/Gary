@@ -77,8 +77,8 @@ def do_sieve(sieve, bot, input, func, type, args):
     try:
         return sieve(bot, input, func, type, args)
     except Exception:
-        print 'sieve error',
-        traceback.print_exc()
+        print('sieve error')
+        print(traceback.print_exc())
         return None
 
 

@@ -95,7 +95,7 @@ def wootloop(paraml, nick='', conn=None):
         return
     time.sleep(1)  # Allow chan list time to update
     prev_woots = {}
-    print ">>> u'Beginning Woot check loop :{}'".format(paraml[0])
+    print(">>> u'Beginning Woot check loop :{}'".format(paraml[0]))
     while paraml[0] in conn.channels:
         try:
             time.sleep(60)
@@ -103,7 +103,7 @@ def wootloop(paraml, nick='', conn=None):
             # Get data
             woots = get_woots(sites)
             if not woots:
-                print ">>> u'Error getting Woots :{}'".format(paraml[0])
+                print(">>> u'Error getting Woots :{}'".format(paraml[0]))
 
             # Handle restarts
             if not prev_woots:
@@ -118,5 +118,6 @@ def wootloop(paraml, nick='', conn=None):
             if out:
                 conn.send("PRIVMSG {} :{}".format(paraml[0], "; ".join(out)))
         except Exception as e:
-            print ">>> u'Woot saleloop error: {} :{}'".format(e, paraml[0])
-    print ">>> u'Ending Woot check loop :{}'".format(paraml[0])
+            print(">>> u'Woot saleloop error: {} :{}'".format(e, paraml[0]))
+    print(">>> u'Ending Woot check loop :{}'".format(paraml[0]))
+

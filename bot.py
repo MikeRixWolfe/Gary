@@ -18,7 +18,7 @@ bot = Bot()
 bot.vars = {}
 bot.start_time=time.time()
 
-print 'Loading plugins'
+print('Loading plugins')
 
 # bootstrap the reloader
 eval(compile(open(os.path.join('core', 'reload.py'), 'U').read(),
@@ -29,7 +29,7 @@ config()
 if not hasattr(bot, 'config'):
     exit()
 
-print 'Connecting to IRC'
+print('Connecting to IRC')
 
 bot.conns = {}
 
@@ -42,15 +42,15 @@ try:
         else:
             bot.conns[name] = IRC(conf['server'], conf['nick'], conf=conf,
                     port=conf.get('port', 6667), channels=conf['channels'])
-except Exception, e:
-    print 'ERROR: malformed config file', e
+except Exception as e:
+    print('ERROR: malformed config file', e)
     sys.exit()
 
 bot.persist_dir = os.path.abspath('persist')
 if not os.path.exists(bot.persist_dir):
     os.mkdir(bot.persist_dir)
 
-print 'Running main loop'
+print('Running main loop')
 
 while True:
     reload()  # these functions only do things
