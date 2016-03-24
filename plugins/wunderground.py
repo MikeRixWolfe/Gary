@@ -40,7 +40,7 @@ def weather(inp, say=None, api_key=None):
             cards[min(cards.keys(), key=lambda k: abs(k - float(weather['current_observation']['wind_degrees'])))])
 
         say("\x02{location[city]}, {location[state]}\x0F: {current_observation[temp_f]}*F " \
-            "with {current_observation[weather]}, wind chill {current_observation[windchill_f]}*F " \
+            "and {current_observation[weather]}, wind chill {current_observation[windchill_f]}*F " \
             "({current_observation[wind_mph]}MPH {}), humidity at {current_observation[relative_humidity]}.".format(direction, **weather))
     except:
         return "Error: unable to find weather data for location."
