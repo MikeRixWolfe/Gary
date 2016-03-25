@@ -17,7 +17,7 @@ from util import hook, http, web
 def wow_armory_data(link, api_key):
     """Sends the API request, and returns the data accordingly (in json if raw, nicely formatted if not)."""
     try:
-        data = http.get_json(link, fields='items', locale='en_US', api_key=api_key['consumer'])
+        data = http.get_json(link, fields='items', locale='en_US', apikey=api_key['consumer'])
     except Exception as e:
         return 'Unable to fetch information; does the realm or character exist?'
 
@@ -119,7 +119,7 @@ def wow_region_shortname(region):
 def armory(inp, api_key=None):
     """.armory/.wow <realm> <character name> [region = US] - Look up character and returns API data."""
     if not isinstance(api_key, dict) or any(key not in api_key for key in ('consumer', 'consumer_secret')):
-        return "error: api keys not set"
+        return "Error: API keys not set."
 
     # Splits the input, builds the API url, and returns the formatted data to user.
     splitinput = inp.lower().split()
@@ -155,7 +155,7 @@ def armory(inp, api_key=None):
     if not region_short:
         return 'The region \'{}\' does not exist.'.format(region)
 
-    link = "http://{0}.battle.net/api/wow/character/{1}/{2}".format(region, realm, char_name)
+    link = "https://{0}.api.battle.net/wow/character/{1}/{2}".format(region, realm, char_name)
 
     return wow_armory_data(link, api_key)
 

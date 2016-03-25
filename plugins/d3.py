@@ -1,15 +1,16 @@
 """
 Adapted from Cloudev/Cloudbot's wow armory lookup by Zarthus
 """
+
 import re
 
 from util import hook, http, web
 
 
-def armory_data(link, format=False):
+def armory_data(link, api_key, format=False):
     """Sends the API request, and returns the data accordingly (in json if raw, nicely formatted if not)."""
     try:
-        data = http.get_json(link)
+        data = http.get_json(link, locale='en_US', apikey=api_key['consumer'])
     except Exception as e:
         return 'Unable to fetch information; does the battle tag or character exist?'
 
@@ -97,10 +98,13 @@ def region_shortname(region):
         return False
 
 
+@hook.api_key('mashery')
 @hook.command('d3')
 @hook.command
-def diablo(inp):
+def diablo(inp, api_key=None):
     """.diablo <battle-tag> <character name> [region = US] - Look up character and returns API data."""
+    if not isinstance(api_key, dict) or any(key not in api_key for key in ('consumer', 'consumer_secret')):
+        return "Error: API keys not set."
 
     # Splits the input, builds the API url, and returns the formatted data to user.
     splitinput = inp.lower().split()
@@ -131,15 +135,15 @@ def diablo(inp):
     if not region_short:
         return 'The region \'{}\' does not exist.'.format(region)
 
-    career_link = "http://{0}.battle.net/api/d3/profile/{1}/".format(region, battle_tag)
+    career_link = "https://{0}.api.battle.net/d3/profile/{1}/".format(region, battle_tag)
 
     try:
-        career = armory_data(career_link)
+        career = armory_data(career_link, api_key)
         hero_id = [hero for hero in career['heroes'] if hero['name'].lower() == hero_name.lower()][0]['id']
     except:
         return 'Unable to fetch information; does the character exist?'
 
-    hero_link = "http://{0}.battle.net/api/d3/profile/{1}/hero/{2}".format(region, battle_tag, hero_id)
+    hero_link = "https://{0}.api.battle.net/d3/profile/{1}/hero/{2}".format(region, battle_tag, hero_id)
 
-    return armory_data(hero_link, True)
+    return armory_data(hero_link, api_key, True)
 
