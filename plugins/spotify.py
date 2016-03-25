@@ -41,20 +41,20 @@ def spotify(inp):
         kind, query = "track", " ".join(inp)
 
     try:
-        data = http.get_json("http://ws.spotify.com/search/1/{}.json".format(kind), q=query)
+        data = http.get_json("https://api.spotify.com/v1/search/", type=kind, q=query, limit=1)
     except Exception as e:
         return "Could not get {} information: {}".format(kind, e)
 
     try:
-        type, id = data[kind+"s"][0]["href"].split(":")[1:]
-    except IndexError:
+        type, id = data[kind+"s"]['items'][0]["uri"].split(":")[1:]
+    except IndexError as e:
         return "Could not find {}.".format(kind)
     url = sptfy(gateway.format(type, id))
 
-    if kind == 'artist':
-        return u"\x02{}\x02 - {}".format(data["artists"][0]["name"], url)
+    if kind == 'track':
+        return u"\x02{}\x02 by \x02{}\x02 - {}".format(data[kind+"s"]['items'][0]["name"], data[kind+"s"]['items'][0]["artists"][0]["name"], url)
     else:
-        return u"\x02{}\x02 by \x02{}\x02 - {}".format(data[kind+"s"][0]["name"], data[kind+"s"][0]["artists"][0]["name"], url)
+        return u"\x02{}\x02 - {}".format(data[kind+"s"]['items'][0]["name"], url)
 
 
 @hook.regex(*http_re)
@@ -64,19 +64,18 @@ def spotify_url(match, say=None):
     spotify_id = match.group(3)
     url = spuri.format(type, spotify_id)
     # no error catching here, if the API is down fail silently
-    try:
-        data = http.get_json("http://ws.spotify.com/lookup/1/.json", uri=url)
-    except:
-        pass
+    #try:
+    print url
+    data = http.get_json("https://api.spotify.com/v1/{}s/{}".format(type, spotify_id), format='json')
+    #except:
+    #    return
     if type == "track":
-        name = data["track"]["name"]
-        artist = data["track"]["artists"][0]["name"]
-        album = data["track"]["album"]["name"]
+        name = data["name"]
+        artist = data["artists"][0]["name"]
+        album = data["album"]["name"]
         say(u"{} - \x02{}\x02 by \x02{}\x02 on \x02{}\x02".format(
             sptfy(gateway.format(type, spotify_id)), name, artist, album))
-    elif type == "artist":
+    else:
         say(u"{} - \x02{}\x02".format(sptfy(gateway.format(type, spotify_id)),
-            data["artist"]["name"]))
-    elif type == "album":
-        say(u"{} - \x02{}\x02 by \x02{}\x02".format(sptfy(gateway.format(type, spotify_id)),
-            data["album"]["name"], data["album"]["artist"]))
+            data["name"]))
+

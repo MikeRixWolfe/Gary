@@ -3,8 +3,8 @@ import random
 from util import hook, http, text, timesince, web
 from datetime import datetime
 
-base_url = "https?://reddit.com/r/{}/.json"
-short_url = "https?://redd.it/{}"
+base_url = "https://reddit.com/r/{}/.json"
+short_url = "https://redd.it/{}"
 reddit_re = (r'(https?://(?:www\.)?reddit\.com/[^ ]+)', re.I)
 
 
