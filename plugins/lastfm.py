@@ -117,7 +117,7 @@ def lfmuser(inp, say=None, api_key=None):
     registered = (datetime.utcfromtimestamp(int(response['registered']['unixtime']) + .1) -
         (datetime.utcnow() - datetime.now())).strftime("%d %b %Y")
     say(u"\x02{name}\x0F has been a member since \x02{}\x0F and has " \
-    "\x02{playcount}\x0f scrobbles".format(registered, **response))
+    "\x02{playcount}\x0f scrobbles.".format(registered, **response))
 
 
 @hook.api_key('lastfm')

@@ -46,7 +46,7 @@ def get_soup(*args, **kwargs):
     return BeautifulSoup(get(*args, **kwargs), 'lxml')
 
 
-def open(url, query_params=None, headers=None, post_data=None,
+def open(url, query_params=None, headers=None, post_data=None, timeout=10,
          get_method=None, cookies=False, oauth=False, oauth_keys=None, **kwargs):
 
     if query_params is None:
@@ -83,7 +83,7 @@ def open(url, query_params=None, headers=None, post_data=None,
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(jar))
     else:
         opener = urllib2.build_opener()
-    return opener.open(request)
+    return opener.open(request, timeout=timeout)
 
 
 def prepare_url(url, queries):
