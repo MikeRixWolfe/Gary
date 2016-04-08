@@ -1,5 +1,5 @@
 import re
-from util import hook, http, web
+from util import hook, http
 
 formats = [
     "{traits[ip_address]} seems to be located in {city[names][en]}, {subdivisions[0][names][en]} in {country[names][en]}",
