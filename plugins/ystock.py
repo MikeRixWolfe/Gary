@@ -29,7 +29,7 @@ def get_stock_rest(inp, q='SELECT * FROM yahoo.finance.quotes WHERE symbol in ("
     return quote
 
 
-def get_stock_console(inp, q="SELECT * FROM yahoo.finance.quotes WHERE symbol=@symbol LIMIT 1"):
+def get_stock_console(inp, q="SELECT * FROM yahoo.finance.quotes WHERE symbol=@symbol"):
     try:
         query = web.query(q, {"symbol": inp})
         quote = query.one()
@@ -42,7 +42,7 @@ def get_stock_console(inp, q="SELECT * FROM yahoo.finance.quotes WHERE symbol=@s
 @hook.command
 def stock(inp, say=''):
     """.stock <symbol> - Gets stock information from Yahoo."""
-    quote = get_stock_console(inp) or get_stock_rest(inp) or get_stock_download(inp)
+    quote = get_stock_download(inp) or get_stock_console(inp) or get_stock_rest(inp)
 
     if not quote:
         return "Yahoo Fianance API error, please try again in a few minutes."
