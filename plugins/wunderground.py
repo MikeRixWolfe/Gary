@@ -31,7 +31,9 @@ def weather(inp, say=None, api_key=None):
         return "Error: API key not set."
 
     try:
-        weather = http.get_json(wunder_url.format(api_key, http.quote_plus(inp)))
+        weather = http.get_json(wunder_url.format(api_key, http.quote(inp)))
+        if weather.get('current_observation', None) is None and len(weather['response'].get('results', [])) > 0:
+            weather = http.get_json(wunder_url.format(api_key, weather['response']['results'][0]['zmw']))
     except:
         return "Weather Underground API error, please try again in a few minutes."
 
@@ -43,7 +45,11 @@ def weather(inp, say=None, api_key=None):
             "and {current_observation[weather]}, feels like {current_observation[feelslike_f]}*F, " \
             "wind at {current_observation[wind_mph]} MPH {}, humidity at {current_observation[relative_humidity]}.".format(direction, **weather))
     except:
-        return "Error: unable to find weather data for location."
+        try:
+            return "Ambiguous location, please try one of the following: {}".format(
+                ", ".join(["{} {}".format(i['city'], i['state']) for i in weather['response']['results']]))
+        except:
+            return "Error: unable to find weather data for location."
 
 
 @hook.api_key('wunder')
@@ -56,6 +62,8 @@ def forecast(inp, say=None, api_key=None):
 
     try:
         weather = http.get_json(wunder_url.format(api_key, http.quote_plus(inp)))
+        if weather.get('current_observation', None) is None and len(weather['response'].get('results', [])) > 0:
+            weather = http.get_json(wunder_url.format(api_key, weather['response']['results'][0]['zmw']))
     except:
         return "Weather Underground API error, please try again in a few minutes."
     try:
@@ -63,5 +71,9 @@ def forecast(inp, say=None, api_key=None):
             '; '.join(["\x02{date[weekday]}\x0F: L {low[fahrenheit]}*F, H {high[fahrenheit]}*F, {conditions}".format(**day)
             for day in weather['forecast']['simpleforecast']['forecastday']]))
     except:
-        return "Error: unable to find weather data for location."
+        try:
+            return "Ambiguous location, please try one of the following: {}".format(
+                ", ".join(["{} {}".format(i['city'], i['state']) for i in weather['response']['results']]))
+        except:
+            return "Error: unable to find weather data for location."
 
