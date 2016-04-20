@@ -35,10 +35,10 @@ def wow_armory_format(data, link):
         return data['reason']
 
     if 'name' in data:
-        niceurl = link.replace('/api/wow/', '/wow/en/') + '/simple'
+        niceurl = link.replace('api.battle.net', 'battle.net').replace('/api/wow/', '/wow/en/') + '/simple'
 
         try:
-            return '{0} is a level \x0307{1}(ilvl {8}/{9})\x0F {2} {3} on {4} with \x0307{5}\x0F achievement points and \x0307{6}' \
+            return u'{0} is a level \x0307{1}(ilvl {8}/{9})\x0F {2} {3} on {4} with \x0307{5}\x0F achievement points and \x0307{6}' \
                    '\x0F honourable kills. Armory Profile: {7}' \
                 .format(data['name'], data['level'], wow_get_gender(data['gender']), wow_get_class(data['class'], True),
                         data['realm'], data['achievementPoints'], data['totalHonorableKills'], web.try_googl(niceurl),
@@ -155,7 +155,7 @@ def armory(inp, api_key=None):
     if not region_short:
         return 'The region \'{}\' does not exist.'.format(region)
 
-    link = "https://{0}.api.battle.net/wow/character/{1}/{2}".format(region, realm, char_name)
+    link = u"https://{0}.api.battle.net/wow/character/{1}/{2}".format(region, realm, char_name)
 
     return wow_armory_data(link, api_key)
 

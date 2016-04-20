@@ -47,6 +47,9 @@ def sieve_suite(bot, input, func, kind, args):
     #if func.__name__.lower() == "log":
     #    return input
 
+    #if input.chan[0] != '#':
+    #    return None
+
     # disable function
     if kind in ("event", "regex"):
         if func.__name__.lower() in disabled:
