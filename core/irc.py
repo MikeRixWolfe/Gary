@@ -21,7 +21,7 @@ def censor(text):
     replacement = '[censored]'
     if 'censored' in bot.config:
         words = map(re.escape, bot.config['censored'])
-        regex = re.compile('(%s)' % "|".join(words))
+        regex = re.compile('(%s)' % "|".join(words), re.I)
         text = regex.sub(replacement, text)
     return text
 
