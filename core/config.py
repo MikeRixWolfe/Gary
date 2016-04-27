@@ -13,6 +13,7 @@ if not os.path.exists('config'):
           "admins": [
             "bears"
           ],
+          "allowed": [],
           "api_keys": {
             "domainr": "",
             "everyoneapi": {
@@ -24,23 +25,18 @@ if not os.path.exists('config'):
               "access": "",
               "cx": ""
             },
+            "imgur": {
+              "client_id": "",
+              "client_secret": ""
+            },
             "lastfm": "",
-            "lastfm_secret": "",
-            "mashery":
-            {
+            "mashery": {
               "consumer": "",
               "consumer_secret": ""
             },
-            "rdio_key": "",
-            "rdio_secret": "",
             "rottentomatoes": "",
             "steam_key": "",
             "tvdb": "",
-            "twilio": {
-              "account_sid": "",
-              "auth_token": "",
-              "number": ""
-          },
             "twitter": {
               "access": "",
               "access_secret": "",
@@ -49,7 +45,10 @@ if not os.path.exists('config'):
             },
             "wolframalpha": "",
             "wordnik": "",
+            "wunder": "",
             "yahoo": {
+              "access": "",
+              "access_secret": "",
               "consumer": "",
               "consumer_secret": ""
             }
@@ -60,46 +59,54 @@ if not os.path.exists('config'):
             "\\x01",
             "nigger"
           ],
+          "channels_only": false,
           "connections": {
-            "local": {
+            "localhost": {
               "channels": [
-                "#test"
+                #test
               ],
               "nick": "Gary",
-              "nickserv_password": "xxxx",
+              "nickserv_password": "",
+              "port": 6667,
               "realname": "Gary",
               "server": "localhost",
-              "user": "Gary"
+              "user": "Gary2"
             },
             "freenode": {
               "channels": [
-                "#test"
+                #test
               ],
               "nick": "Gary",
-              "nickserv_password": "xxxx",
-              "port": 8001,
+              "nickserv_password": "",
+              "port": 6667,
               "realname": "Gary",
               "server": "irc.freenode.net",
-              "user": "Gary"
+              "user": "Gary2"
             }
           },
-        "disabled": [
-            "beats",
-            "cypher",
-            "decypher",
-            "gibberish"
+          "disabled": [
+            "chatlog.py",
+            "cron.py",
+            "factoids.py",
+            "gex",
+            "gif.py",
+            "karma.py",
+            "shorten",
+            "slap",
+            "stockhistory",
+            "topartist",
+            "topfriend",
+            "toptrack",
+            "twitterloop",
+            "ud",
+            "wotd"
           ],
-          "sms": {
-            "private": [
-              "Gary"
-            ]
-          },
           "ignored": [],
-          "muted": [],
           "moded": [],
+          "muted": [],
           "rejoin": true,
           "restricted": [],
-          "allowed": []
+          "suggestions": true
         }''') + '\n')
 
 

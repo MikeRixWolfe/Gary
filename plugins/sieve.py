@@ -42,7 +42,7 @@ def sieve_suite(bot, input, func, kind, args):
     muted = bot.config.get('muted', [])
     restricted = bot.config.get('restricted', [])
     acl = bot.config.get('acls', {})
-    channels_only = bot.config.get('channels_only', True)
+    channels_only = bot.config.get('channels_only', False)
     nickserv_name = bot.config.get('nickserv_name', 'nickserv')
 
     # log everything
