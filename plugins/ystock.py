@@ -4,8 +4,8 @@ from util import hook, http, web
 def get_stock_download(inp):
     try:
         url = 'http://query.yahooapis.com/v1/public/yql?format=json'
-        q = "select * from csv where url='http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=nl1d1t1c1p2ohgv&e=.csv' " \
-            "and columns='Name,LastTradePriceOnly,Date,LastTradeTime,Change,ChangeinPercent,Open,DaysHigh,DaysLow,Volume'" % inp
+        q = "select * from csv where url='http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=nl1d1t1c1p2ohgvj5j6jkm4a2&e=.csv' " \
+            "and columns='Name,LastTradePriceOnly,Date,LastTradeTime,Change,ChangeinPercent,Open,DaysHigh,DaysLow,Volume,ChangeFromYearLow,PercentChangeFromYearLow,YearLow,YearHigh,TwoHundreddayMovingAverage,AverageDailyVolume'" % inp
         query = http.get_json(url, q = q).get('query', '')
         quote = query.get('results', '').get('row', '')
     except:
@@ -61,7 +61,7 @@ def stock(inp, say=''):
 @hook.command
 def stockhistory(inp, say=''):
     """.stockhisory <symbol> - Gets stock history information from Yahoo."""
-    quote = get_stock_console(inp) or get_stock_rest(inp)
+    quote = get_stock_download(inp) #or get_stock_console(inp) or get_stock_rest(inp)
 
     if not quote:
         return "Yahoo Fianance API error, please try again in a few minutes."
