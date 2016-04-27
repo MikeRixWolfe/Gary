@@ -4,12 +4,10 @@ from util import hook, http, web
 def get_stock_download(inp):
     try:
         url = 'http://query.yahooapis.com/v1/public/yql?format=json'
-        q = "select * from csv where url='http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=sl1d1t1c1ohgv&e=.csv' " \
-            "and columns='Name,LastTradePriceOnly,Date,LastTradeTime,Change,Open,DaysHigh,DaysLow,Volume'" % inp
+        q = "select * from csv where url='http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=nl1d1t1c1p2ohgv&e=.csv' " \
+            "and columns='Name,LastTradePriceOnly,Date,LastTradeTime,Change,ChangeinPercent,Open,DaysHigh,DaysLow,Volume'" % inp
         query = http.get_json(url, q = q).get('query', '')
         quote = query.get('results', '').get('row', '')
-        quote['PercentChange'] = "%.2f%%" % (float(quote['Change']) /
-            (abs(float(quote['Change'])) + float(quote['LastTradePriceOnly'])) * 100)
     except:
         return None
 
@@ -42,7 +40,7 @@ def get_stock_console(inp, q="SELECT * FROM yahoo.finance.quotes WHERE symbol=@s
 @hook.command
 def stock(inp, say=''):
     """.stock <symbol> - Gets stock information from Yahoo."""
-    quote = get_stock_download(inp) or get_stock_console(inp) or get_stock_rest(inp)
+    quote = get_stock_download(inp) #or get_stock_console(inp) or get_stock_rest(inp)
 
     if not quote:
         return "Yahoo Fianance API error, please try again in a few minutes."
@@ -55,7 +53,7 @@ def stock(inp, say=''):
         quote['Color'] = "3"
 
     say("%(Name)s - $%(LastTradePriceOnly)s " \
-          "\x03%(Color)s%(Change)s (%(PercentChange)s)\x03 " \
+          "\x03%(Color)s%(Change)s (%(ChangeinPercent)s)\x03 " \
           "H:$%(DaysHigh)s L:$%(DaysLow)s O:$%(Open)s " \
           "Volume:%(Volume)s [%(LastTradeTime)s]" % quote)
 
