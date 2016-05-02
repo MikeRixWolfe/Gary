@@ -43,13 +43,12 @@ def sieve_suite(bot, input, func, kind, args):
     restricted = bot.config.get('restricted', [])
     acl = bot.config.get('acls', {})
     channels_only = bot.config.get('channels_only', False)
-    nickserv_name = bot.config.get('nickserv_name', 'nickserv')
 
     # log everything
     #if func.__name__.lower() == "log":
     #    return input
 
-    if input.chan[0] != '#' and input.chan.lower() != nickserv_name and channels_only:
+    if kind == "command" and input.chan[0] != '#' and channels_only:
         if not is_mod(bot, input) and not is_admin(bot, input):
             return None
 
