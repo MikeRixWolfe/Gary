@@ -1,140 +1,88 @@
-from util import hook, text, web
-import hashlib
-
-# basic text tools
-
-# TODO: make this capitalize sentences correctly
-
-
-@hook.command("capitalise")
-@hook.command
-def capitalize(inp):
-#    """capitalize <string> - Capitalizes <string>."""
-    return inp.capitalize()
+import re
+import socket
+import subprocess
+import time
+from util import hook, http
 
 
-@hook.command
-def upper(inp):
-#    """upper <string> - Convert string to uppercase."""
-    return inp.upper()
+socket.setdefaulttimeout(10)  # global setting
 
 
-@hook.command
-def lower(inp):
-#    """lower <string> - Convert string to lowercase."""
-    return inp.lower()
-
-
-@hook.command
-def titlecase(inp):
-#    """title <string> - Convert string to title case."""
-    return inp.title()
-
-
-@hook.command
-def swapcase(inp):
-#    """swapcase <string> - Swaps the capitalization of <string>."""
-    return inp.swapcase()
-
-
-@hook.command
-def reverse(inp):
-#    """Enter a string and the bot will reverse it and print it out."""
-    return "%s" % (inp[::-1],)
-
-# encoding
-
-
-@hook.command
-def rot13(inp):
-    #"""rot13 <string> - Encode <string> with rot13."""
-    return inp.encode('rot13')
-
-
-@hook.command
-def base64(inp):
-#    """base64 <string> - Encode <string> with base64."""
-    return inp.encode('base64')
-
-
-@hook.command
-def unbase64(inp):
-#    """unbase64 <string> - Decode <string> with base64."""
-    return inp.decode('base64')
-
-
-@hook.command
-def checkbase64(inp):
+def get_version():
     try:
-        decoded = inp.decode('base64')
-        recoded = decoded.encode('base64').strip()
-        is_base64 = recoded == inp
+        stdout = subprocess.check_output(['git', 'log', '--format=%h'])
     except:
-        is_base64 = False
-
-    if is_base64:
-        return '"{}" is base64 encoded'.format(recoded)
+        revnumber = 0
+        shorthash = '????'
     else:
-        return '"{}" is not base64 encoded'.format(inp)
+        revs = stdout.splitlines()
+        revnumber = len(revs)
+        shorthash = revs[0]
+
+    http.ua_gary = 'Gary/r%d %s (http://github.com/MikeRixWolfe/gary)' \
+        % (revnumber, shorthash)
+
+    return shorthash, revnumber
 
 
-@hook.command
-def unescape(inp):
-#    """unescape <string> - Unescapes <string>."""
-    try:
-        return inp.decode('unicode-escape')
-    except Exception as e:
-        return "Error: {}".format(e)
+@hook.event('JOIN')
+def onjoin(paraml, nick=None, conn=None):
+    if nick == conn.nick and paraml[0] not in conn.channels:
+        conn.channels.append(paraml[0])
 
 
-@hook.command
-def escape(inp):
-#    """escape <string> - Escapes <string>."""
-    try:
-        return inp.encode('unicode-escape')
-    except Exception as e:
-        return "Error: {}".format(e)
-
-# length
+@hook.event('PART')
+def onpart(paraml, nick=None, conn=None):
+    if nick == conn.nick and paraml[0] in conn.channels:
+        conn.channels.remove(paraml[0])
 
 
-@hook.command
-def length(inp):
-#    """length <string> - gets the length of <string>"""
-    return "The length of that string is {} characters.".format(len(inp))
-
-# hashing
-
-
-@hook.command
-def md5(inp):
-#    "md5 <string> - Encode <string> with md5."
-    return hashlib.md5(inp).hexdigest()
+@hook.event('KICK')
+def onkick(paraml, conn=None, bot=None):
+    if paraml[1] == conn.nick and paraml[0].lower() in conn.channels:
+        if bot.config.get('rejoin', ''):
+            conn.join(paraml[0])
+        else:
+            conn.channels.remove(paraml[0])
 
 
-@hook.command
-def sha1(inp):
-#    "sha1 <string> - Encode <string> with sha1."
-    return hashlib.sha1(inp).hexdigest()
+@hook.event('INVITE', adminonly=True)
+def oninvite(paraml, conn=None):
+    conn.join(paraml[-1])
 
 
-@hook.command
-def sha256(inp):
-#    "sha256 <string> - Encode <string> with sha256."
-    return hashlib.sha256(inp).hexdigest()
+@hook.event('004')
+def onconnect(paraml, conn=None):
+    # wipe user list (useful for server restarts)
+    conn.users = {}
+
+    # identify to services
+    nickserv_password = conn.conf.get('nickserv_password', '')
+    nickserv_name = conn.conf.get('nickserv_name', 'nickserv')
+    nickserv_command = conn.conf.get('nickserv_command', 'IDENTIFY %s')
+    nickserv_ident = conn.conf.get('nickserv_ident_command', 'INFO %s')
+    if nickserv_password:
+        conn.msg(nickserv_name, nickserv_command % nickserv_password)
+        time.sleep(1)
+        conn.msg(nickserv_name, nickserv_ident % conn.nick)
+        time.sleep(1)
+
+    # set mode on self
+    mode = conn.conf.get('mode')
+    if mode:
+        conn.cmd('MODE', [conn.nick, mode])
+
+    # join channels
+    for channel in conn.channels:
+        conn.join(channel)
+        time.sleep(1)  # don't flood JOINs
+
+    # set user-agent
+    ident, rev = get_version()
 
 
-@hook.command
-def hash(inp):
-    """hash <string> - Returns hashes of <string>."""
-    return ', '.join(x + ": " + getattr(hashlib, x)(inp).hexdigest()
-                     for x in ['md5', 'sha1', 'sha256'])
-
-# novelty
-
-
-@hook.command
-def munge(inp):
-#    """munge <text> - Munges up <text>."""
-    return text.munge(inp)
-
+@hook.regex(r'^\x01VERSION\x01$')
+def ver(inp, notice=None):
+    ident, rev = get_version()
+    notice('\x01VERSION Gary r%d(%s) - http://github.com/MikeRixWolfe/'
+           'Gary/\x01' % (rev, ident))
