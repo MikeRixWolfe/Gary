@@ -48,7 +48,7 @@ def sieve_suite(bot, input, func, kind, args):
     #if func.__name__.lower() == "log":
     #    return input
 
-    if kind == "command" and input.chan[0] != '#' and channels_only:
+    if kind in ("command", "regex") and input.chan[0] != '#' and channels_only:
         if not is_mod(bot, input) and not is_admin(bot, input):
             return None
 
