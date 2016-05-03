@@ -38,11 +38,11 @@ def wow_armory_format(data, link):
         niceurl = link.replace('api.battle.net', 'battle.net').replace('/api/wow/', '/wow/en/') + '/simple'
 
         try:
-            return u'{0} is a level \x0307{1}(ilvl {8}/{9})\x0F {2} {3} on {4} with \x0307{5}\x0F achievement points and \x0307{6}' \
+            return u'{0} is a level \x0307{1}(ilvl {8}/{9})\x0F {2} {10} {3} on {4} with \x0307{5}\x0F achievement points and \x0307{6}' \
                    '\x0F honourable kills. Armory Profile: {7}' \
                 .format(data['name'], data['level'], wow_get_gender(data['gender']), wow_get_class(data['class'], True),
                         data['realm'], data['achievementPoints'], data['totalHonorableKills'], web.try_googl(niceurl),
-                        data['items']['averageItemLevelEquipped'], data['items']['averageItemLevel'])
+                        data['items']['averageItemLevelEquipped'], data['items']['averageItemLevel'], wow_get_race(data['race']))
         except Exception as e:
             return 'Unable to fetch information; does the realm or character exist?'
 
