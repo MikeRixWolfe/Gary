@@ -62,7 +62,7 @@ def wow_get_gender(gender_id):
 
 
 def wow_get_class(class_id, colours=False):
-    """Formats a class ID to a readable name, data from http://eu.battle.net/api/wow/data/character/classes"""
+    """Formats a class ID to a readable name, data from http://us.api.battle.net/wow/data/character/classes"""
     if colours:
         # Format their colours according to class colours.
         class_ids = {
@@ -84,11 +84,11 @@ def wow_get_class(class_id, colours=False):
 
 
 def wow_get_race(race_id):
-    """Formats a race ID to a readable race name, data from http://eu.battle.net/api/wow/data/character/races"""
+    """Formats a race ID to a readable race name, data from http://us.api.battle.net/wow/data/character/races"""
     race_ids = {
         1: "Human", 2: "Orc", 3: "Dwarf", 4: "Night Elf", 5: "Undead", 6: "Tauren", 7: "Gnome",
         8: "Troll", 9: "Goblin", 10: "Blood Elf", 11: "Draenei", 22: "Worgen",
-        24: "Pandaren (neutral)", 25: "Pandaren (alliance)", 26: "Pandaren (horde)"
+        24: "Pandaren (neutral)", 25: "Pandaren (Alliance)", 26: "Pandaren (Horde)"
     }
 
     if race_id in race_ids:

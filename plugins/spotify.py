@@ -57,8 +57,8 @@ def spotify(inp):
         return u"\x02{}\x02 - {}".format(data[kind+"s"]['items'][0]["name"], url)
 
 
+#@hook.regex(*spotify_re)
 @hook.regex(*http_re)
-@hook.regex(*spotify_re)
 def spotify_url(match, say=None):
     type = match.group(2)
     spotify_id = match.group(3)
