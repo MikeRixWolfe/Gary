@@ -18,7 +18,7 @@ from lxml import etree, html
 from bs4 import BeautifulSoup
 
 
-ua_gary = 'Gary/2.0 (http://github.com/mikerixwolfe/gary)'
+ua_bot = 'Gary/2.0'
 ua_firefox = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.6) ' \
              'Gecko/20070725 Firefox/2.0.0.6'
 ua_internetexplorer = 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'

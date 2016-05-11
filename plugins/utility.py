@@ -8,7 +8,7 @@ from util import hook, http
 socket.setdefaulttimeout(10)  # global setting
 
 
-def get_version():
+def get_version(nick):
     try:
         stdout = subprocess.check_output(['git', 'log', '--format=%h'])
     except:
@@ -19,8 +19,7 @@ def get_version():
         revnumber = len(revs)
         shorthash = revs[0]
 
-    http.ua_gary = 'Gary/r%d %s (http://github.com/MikeRixWolfe/gary)' \
-        % (revnumber, shorthash)
+    http.ua_bot = '{}/r{} ({})'.format(nick, revnumber, shorthash)
 
     return shorthash, revnumber
 
@@ -78,11 +77,10 @@ def onconnect(paraml, conn=None):
         time.sleep(1)  # don't flood JOINs
 
     # set user-agent
-    ident, rev = get_version()
+    ident, rev = get_version(conn.nick)
 
 
 @hook.regex(r'^\x01VERSION\x01$')
-def ver(inp, notice=None):
-    ident, rev = get_version()
-    notice('\x01VERSION Gary r%d(%s) - http://github.com/MikeRixWolfe/'
-           'Gary/\x01' % (rev, ident))
+def ver(inp, notice=None, conn=None):
+    ident, rev = get_version(conn.nick)
+    notice('\x01VERSION {} r{}({})\x01'.format(conn.nick, rev, ident))
