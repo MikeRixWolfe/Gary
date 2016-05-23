@@ -17,7 +17,7 @@ from util import hook, http, web
 def wow_armory_data(link, api_key):
     """Sends the API request, and returns the data accordingly (in json if raw, nicely formatted if not)."""
     try:
-        data = http.get_json(link, fields='items', locale='en_US', apikey=api_key['consumer'])
+        data = http.get_json(link, fields='items,titles,talents', locale='en_US', apikey=api_key['consumer'])
     except Exception as e:
         return 'Unable to fetch information; does the realm or character exist?'
 
@@ -37,16 +37,25 @@ def wow_armory_format(data, link):
     if 'name' in data:
         niceurl = link.replace('api.battle.net', 'battle.net').replace('/api/wow/', '/wow/en/') + '/simple'
 
-        try:
-            return u'{0} is a level \x0307{1}(ilvl {8}/{9})\x0F {2} {10} {3} on {4} with \x0307{5}\x0F achievement points and \x0307{6}' \
+        #try:
+        if True:
+            return u'\x0307{0}\x0F is a level \x0307{1}(ilvl {8}/{9})\x0F {2} {10} {3} on {4} with \x0307{5}\x0F achievement points and \x0307{6}' \
                    '\x0F honourable kills. Armory Profile: {7}' \
-                .format(data['name'], data['level'], wow_get_gender(data['gender']), wow_get_class(data['class'], True),
+                .format(wow_get_title(data), data['level'], wow_get_gender(data['gender']), wow_get_class(data, True),
                         data['realm'], data['achievementPoints'], data['totalHonorableKills'], web.try_googl(niceurl),
                         data['items']['averageItemLevelEquipped'], data['items']['averageItemLevel'], wow_get_race(data['race']))
-        except Exception as e:
-            return 'Unable to fetch information; does the realm or character exist?'
+        #except Exception as e:
+        #    return 'Unable to fetch information; does the realm or character exist?'
 
     return 'An unexpected error occured.'
+
+
+def wow_get_title(data):
+    """Gets the the active title"""
+    try:
+        return [title for title in data['titles'] if title.get('selected', False) == True][0]['name'] % data['name']
+    except:
+        return data['name']
 
 
 def wow_get_gender(gender_id):
@@ -61,24 +70,29 @@ def wow_get_gender(gender_id):
     return gender
 
 
-def wow_get_class(class_id, colours=False):
+def wow_get_class(data, colours=False):
     """Formats a class ID to a readable name, data from http://us.api.battle.net/wow/data/character/classes"""
+    try:
+        spec = [s for s in data['talents'] if s.get('selected', False) == True][0]['spec']['name']
+    except:
+        spec = " "
+
     if colours:
         # Format their colours according to class colours.
         class_ids = {
-            1: "\x0305Warrior\x0F", 2: "\x0313Paladin\x0F", 3: "\x0303Hunter\x0F", 4: "\x0308Rogue\x0F",
-            5: "\x02Priest\x0F", 6: "\x0304Death Knight\x0F", 7: "\x0310Shaman\x0F", 8: "\x0311Mage\x0F",
-            9: "\x0306Warlock\x0F", 10: "\x0309Monk\x0F", 11: "\x0307Druid\x0F"
+            1: "\x0305{} Warrior\x0F", 2: "\x0313{} Paladin\x0F", 3: "\x0303{} Hunter\x0F", 4: "\x0308{} Rogue\x0F",
+            5: "\x02{} Priest\x0F", 6: "\x0304{} Death Knight\x0F", 7: "\x0310{} Shaman\x0F", 8: "\x0311{} Mage\x0F",
+            9: "\x0306{} Warlock\x0F", 10: "\x0309{} Monk\x0F", 11: "\x0307{} Druid\x0F"
         }
     else:
         class_ids = {
-            1: "Warrior", 2: "Paladin", 3: "Hunter", 4: "Rogue", 5: "Priest",
-            6: "Death Knight", 7: "Shaman", 8: "Mage", 9: "Warlock", 10: "Monk",
-            11: "Druid"
+            1: "{} Warrior", 2: "{} Paladin", 3: "{} Hunter", 4: "{} Rogue", 5: "{} Priest",
+            6: "{} Death Knight", 7: "{} Shaman", 8: "{} Mage", 9: "{} Warlock", 10: "{} Monk",
+            11: "{} Druid"
         }
 
-    if class_id in class_ids:
-        return class_ids[class_id]
+    if data['class'] in class_ids:
+        return class_ids[data['class']].format(spec).replace('  ','')
     else:
         return 'unknown'
 
@@ -116,7 +130,7 @@ def wow_region_shortname(region):
 @hook.api_key('mashery')
 @hook.command('wow')
 @hook.command
-def armory(inp, api_key=None):
+def armory(inp, say=None, api_key=None):
     """.armory/.wow <realm> <character name> [region = US] - Look up character and returns API data."""
     if not isinstance(api_key, dict) or any(key not in api_key for key in ('consumer', 'consumer_secret')):
         return "Error: API keys not set."
@@ -157,6 +171,6 @@ def armory(inp, api_key=None):
 
     link = u"https://{0}.api.battle.net/wow/character/{1}/{2}".format(region, realm, char_name)
 
-    return wow_armory_data(link, api_key)
+    say(wow_armory_data(link, api_key))
 
 
