@@ -90,23 +90,6 @@ def topartist(inp, nick='', say=None, api_key=None):
 
 @hook.api_key('lastfm')
 @hook.command
-def topfriend(inp, say=None, api_key=None):
-    """.topfriend <user> - Gets a LastFM user's top friend."""
-    try:
-        friends = [friend["name"] for friend in http.get_json(api_url,
-            method="user.getfriends", api_key=api_key, user=inp)["friends"]["user"]]
-        scores = [http.get_json(api_url, method="tasteometer.compare",
-            api_key=api_key, type1="user", type2="user", value1=inp, value2=friend,
-            limit=1)["comparison"]["result"]["score"] for friend in friends]
-        friend, score = max(dict(zip(friends, scores)).iteritems(), key=lambda x: x[1])
-    except:
-        return "LastFM API Error, please try again in a few minutes."
-
-    say(u"\x02{}\x0F's top friend is \x02{}\x0F with a score of \x02{}\x0f".format(inp, friend, score))
-
-
-@hook.api_key('lastfm')
-@hook.command
 def lfmuser(inp, say=None, api_key=None):
     """.lfmuser <user> - Gets a LastFM user's data."""
     try:
@@ -167,3 +150,4 @@ def tags(inp, nick='', say=None, api_key=None):
     artist = response["artist"]["name"]
 
     say(u"Tags for \"\x02{}\x0f\": {}".format(artist, ", ".join(tags) or "None found"))
+
