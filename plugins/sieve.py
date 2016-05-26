@@ -3,7 +3,7 @@ from time import time
 from util import hook
 
 timeouts = {}
-timeouts_active = True
+timeouts_active = False
 
 
 def is_admin(bot, input):

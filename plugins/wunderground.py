@@ -63,11 +63,12 @@ def weather(inp, say=None, api_key=None):
             cards[min(cards.keys(), key=lambda k: abs(k - float(weather['current_observation']['wind_degrees'])))])
         alert = [a for a in alert['alerts'] if a['type'] in alerts.keys()]  # Get only alerts we care about
         alert = "\x02{description}\x0F until {expires}.".format(**alert[0]) if alert else ""
+        state = weather['location']['state'] or weather['location']['country_name']
 
-        say("\x02{location[city]}, {location[state]}\x0F: {current_observation[temp_f]}*F " \
+        say("\x02{location[city]}, {state}\x0F: {current_observation[temp_f]}*F " \
             "and {current_observation[weather]}, feels like {current_observation[feelslike_f]}*F, " \
-            "wind at {current_observation[wind_mph]} MPH {}, humidity at {current_observation[relative_humidity]}. " \
-            "{}".format(direction, alert, **weather))
+            "wind at {current_observation[wind_mph]} MPH {direction}, humidity at {current_observation[relative_humidity]}. " \
+            "{alert}".format(direction=direction, alert=alert, state=state, **weather))
     except:
         try:
             return "Ambiguous location, please try one of the following: {}".format(
@@ -92,7 +93,8 @@ def forecast(inp, say=None, api_key=None):
     except:
         return "Weather Underground API error, please try again in a few minutes."
     try:
-        say("\x02{location[city]}, {location[state]}\x0F: ".format(**weather) +
+        state = weather['location']['state'] or weather['location']['country_name']
+        say("\x02{location[city]}, {state}\x0F: ".format(state=state, **weather) +
             '; '.join(["\x02{date[weekday]}\x0F: L {low[fahrenheit]}*F, H {high[fahrenheit]}*F, {conditions}".format(**day)
             for day in weather['forecast']['simpleforecast']['forecastday']]))
     except:
@@ -119,7 +121,8 @@ def hourly(inp, say=None, api_key=None):
     except:
         return "Weather Underground API error, please try again in a few minutes."
     try:
-        say("\x02{location[city]}, {location[state]}\x0F: ".format(**weather) +
+        state = weather['location']['state'] or weather['location']['country_name']
+        say("\x02{location[city]}, {state}\x0F: ".format(state=state, **weather) +
             '; '.join(["\x02{FCTTIME[civil]}\x0F: {temp[english]}*F, {condition}".format(**day)
             for day in weather['hourly_forecast'][:12]]))
     except:
