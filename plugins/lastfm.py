@@ -126,7 +126,7 @@ def similar(inp, nick='', say=None, api_key=None):
     except:
         artists = ["None found"]
 
-    say(u"Artists similar to \"\x02{}\x0f\": {}".format(artist, u", ".join(artists)))
+    say(u"Artists similar to \"\x02{}\x0f\": {}".format(artist, u", ".join(artists) or "None found"))
 
 
 @hook.api_key('lastfm')
