@@ -22,6 +22,7 @@ def convo(inp, chan='', server='', say=None, db=None):
         say("*Silence*")
 
 
+@hook.command('l')
 @hook.command
 def last(inp, nick='', chan='', input=None, db=None, say=None):
     """.last <phrase> - Finds the last occurence of a phrase."""

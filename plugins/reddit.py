@@ -94,7 +94,7 @@ def ris(inp):
     item = None
     random.shuffle(data)
     for tempitem in data:
-        if tempitem["data"]["domain"] == "i.imgur.com":
+        if tempitem["data"]["domain"] in ("i.imgur.com", "i.redd.it"):
             item = tempitem["data"]
         if item:
             return u"{} - \x02{}\x02".format(item['url'], item['title'])

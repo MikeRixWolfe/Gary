@@ -26,7 +26,6 @@ def wow_armory_data(link, api_key):
 
 def wow_armory_format(data, link):
     """Format armory data into a human readable string"""
-
     if len(data) == 0:
         return 'Could not find any results.'
 
@@ -171,5 +170,4 @@ def armory(inp, say=None, api_key=None):
     link = u"https://{0}.api.battle.net/wow/character/{1}/{2}".format(region, realm, char_name)
 
     say(wow_armory_data(link, api_key))
-
 
