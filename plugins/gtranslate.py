@@ -20,7 +20,13 @@ def goog_trans(api_key, text, source, target):
     if source:
         params['source'] = source
 
-    parsed = http.get_json(url, query_params=params)
+    try:
+        parsed = http.get_json(url, query_params=params)
+    except Exception as e:
+        if e.code == 403:
+            return "The Translate API is disabled or has exceeded its quota."
+        else:
+            return e
 
     if parsed.get('error'):
         if parsed['error']['code'] == 403:
