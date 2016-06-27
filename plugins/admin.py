@@ -280,16 +280,14 @@ def unlock(inp, conn=None, chan=None, notice=None):
 
 @hook.command(adminonly=True)
 def say(inp, conn=None, chan=None):
-    """.say [channel] <message> - Makes the bot say <message> in [channel]. If [channel] is blank the bot will say the <message> in the channel
-    the command was used in."""
+    """.say [channel] <message> - Makes the bot say <message> in [channel]. If [channel] is blank the bot will say the <message> in the channel the command was used in."""
     target, msg = inp.split(' ', 1) if inp[0] == '#' else (chan, inp)
     conn.msg(target, msg)
 
 
 @hook.command(adminonly=True)
 def rsay(inp, conn=None, chan=None):
-    """.say [channel] <message> - Makes the bot say <message> in [channel]. If [channel] is blank the bot will
-    the command was used in."""
+    """.say [channel] <message> - Makes the bot say <message> in [channel]. If [channel] is blank the bot will the command was used in."""
     target, msg = inp.split(' ', 1) if inp[0] == '#' else (chan, inp)
     conn.msg(target, text.rainbow(msg))
 
@@ -337,3 +335,4 @@ def pm(inp, conn=None, chan=None):
         message = " ".join(inp[0:])
         out = "PRIVMSG {} :{}".format(chan, message)
     conn.send(out)
+
