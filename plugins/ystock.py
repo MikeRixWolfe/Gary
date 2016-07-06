@@ -6,7 +6,7 @@ def get_stock_download(inp):
         url = 'http://query.yahooapis.com/v1/public/yql?format=json'
         q = "select * from csv where url='http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=nl1d1t1c1p2ohgvj5j6jkm4a2d1&e=.csv' " \
             "and columns='Name,LastTradePriceOnly,Date,LastTradeTime,Change,ChangeinPercent,Open,DaysHigh,DaysLow,Volume,ChangeFromYearLow,PercentChangeFromYearLow,YearLow,YearHigh,TwoHundreddayMovingAverage,AverageDailyVolume,LastTradeDate'" % inp
-        query = http.get_json(url, q = q).get('query', '')
+        query = http.get_json(url, q=q).get('query', '')
         quote = query.get('results', '').get('row', '')
     except:
         return None
@@ -19,7 +19,7 @@ def get_stock_rest(inp, q='SELECT * FROM yahoo.finance.quotes WHERE symbol in ("
         url = 'http://query.yahooapis.com/v1/public/yql?' \
             'format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys'
         q = q % inp
-        query = http.get_json(url, q = q, timeout = 15).get('query', '')
+        query = http.get_json(url, q=q, timeout=15).get('query', '')
         quote = query.get('results', '').get('quote', '')
     except:
         return None
@@ -53,7 +53,7 @@ def stock(inp, say=''):
         quote['Color'] = "3"
 
     say("{Name} - ${LastTradePriceOnly} " \
-          "\x03{Color}{Change} ({ChangeinPercent})\x03 " \
+          "\x03{Color}{Change} ({ChangeinPercent})\x0F " \
           "H:${DaysHigh} L:${DaysLow} O:${Open} " \
           "Volume:{Volume} [{LastTradeTime} {LastTradeDate}]".format(**quote))
 
@@ -75,7 +75,7 @@ def stockhistory(inp, say=''):
         quote['ChangeFromYearLow'] = "+" + quote['ChangeFromYearLow']
 
     say("{Name} - ${LastTradePriceOnly} " \
-          "\x03{Color}{ChangeFromYearLow} ({PercentChangeFromYearLow})\x03 " \
+          "\x03{Color}{ChangeFromYearLow} ({PercentChangeFromYearLow})\x0F " \
           "Year H: ${YearHigh} Year Avg: ${TwoHundreddayMovingAverage} " \
           "Year L: ${YearLow}; Volume @ {Volume} " \
           "(Avg Daily Volume: {AverageDailyVolume}) " \
