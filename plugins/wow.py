@@ -17,7 +17,7 @@ from util import hook, http, web
 def wow_armory_data(link, api_key):
     """Sends the API request, and returns the data accordingly (in json if raw, nicely formatted if not)."""
     try:
-        data = http.get_json(link, fields='items,titles,talents', locale='en_US', apikey=api_key['consumer'])
+        data = http.get_json(link, fields='items,titles,talents,guild', locale='en_US', apikey=api_key['consumer'])
     except Exception as e:
         return 'Unable to fetch information; does the realm or character exist?'
 
@@ -34,16 +34,22 @@ def wow_armory_format(data, link):
         return data['reason']
 
     if 'name' in data:
-        niceurl = link.replace('api.battle.net', 'battle.net').replace('/api/wow/', '/wow/en/') + '/simple'
+        niceurl = link.replace('api.battle.net', 'battle.net').replace('/api/wow/', '/wow/en/').replace('\'', '') + '/simple'
 
-        try:
-            return u'\x0307{0}\x0F is a level \x0307{1}(ilvl {8}/{9})\x0F {2} {10} {3} on {4} with \x0307{5}\x0F achievement points and \x0307{6}' \
-                   '\x0F honourable kills. Armory Profile: {7}' \
-                .format(wow_get_title(data), data['level'], wow_get_gender(data['gender']), wow_get_class(data, True),
-                        data['realm'], data['achievementPoints'], data['totalHonorableKills'], web.try_googl(niceurl),
-                        data['items']['averageItemLevelEquipped'], data['items']['averageItemLevel'], wow_get_race(data['race']))
-        except:
-            return 'Unable to fetch information; does the realm or character exist?'
+    if 'guild' in data:
+        location = "in {} on {}".format(data['guild']['name'], data['realm'])
+    else:
+        location = "on {}".format(data['realm'])
+
+    try:
+        return u'\x0307{0}\x0F is a level \x0307{1}(ilvl {8}/{9})\x0F {2} {10} {3} {4} with ' \
+            '\x0307{5}\x0F achievement points and \x0307{6}\x0F honourable kills. Armory Profile: {7}' \
+            .format(wow_get_title(data), data['level'], wow_get_gender(data['gender']), wow_get_class(data, True),
+                    location, data['achievementPoints'], data['totalHonorableKills'], web.try_googl(niceurl),
+                    data['items']['averageItemLevelEquipped'], data['items']['averageItemLevel'],
+                    wow_get_race(data['race']))
+    except:
+        return 'Unable to fetch information; does the realm or character exist?'
 
     return 'An unexpected error occured.'
 
