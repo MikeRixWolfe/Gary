@@ -19,7 +19,7 @@ def wow_armory_data(link, api_key):
     try:
         data = http.get_json(link, fields='items,titles,talents,guild', locale='en_US', apikey=api_key['consumer'])
     except Exception as e:
-        return 'Unable to fetch information; does the realm or character exist?'
+        return 'Unable to fetch information; do the realm and character exist?'
 
     return wow_armory_format(data, link)
 
@@ -49,9 +49,7 @@ def wow_armory_format(data, link):
                     data['items']['averageItemLevelEquipped'], data['items']['averageItemLevel'],
                     wow_get_race(data['race']))
     except:
-        return 'Unable to fetch information; does the realm or character exist?'
-
-    return 'An unexpected error occured.'
+        return 'Unable to fetch information; do the realm and character exist?'
 
 
 def wow_get_title(data):
@@ -79,24 +77,24 @@ def wow_get_class(data, colours=False):
     try:
         spec = [s for s in data['talents'] if s.get('selected', False) == True][0]['spec']['name']
     except:
-        spec = " "
+        spec = ""
 
     if colours:
         # Format their colours according to class colours.
         class_ids = {
-            1: "\x0305{} Warrior\x0F", 2: "\x0313{} Paladin\x0F", 3: "\x0303{} Hunter\x0F", 4: "\x0308{} Rogue\x0F",
-            5: "\x02{} Priest\x0F", 6: "\x0304{} Death Knight\x0F", 7: "\x0310{} Shaman\x0F", 8: "\x0311{} Mage\x0F",
-            9: "\x0306{} Warlock\x0F", 10: "\x0309{} Monk\x0F", 11: "\x0307{} Druid\x0F"
+            1: "\x0304{} Warrior\x0F", 2: "\x0313{} Paladin\x0F", 3: "\x0309{} Hunter\x0F", 4: "\x0308{} Rogue\x0F",
+            5: "\x02{} Priest\x0F", 6: "\x0305{} Death Knight\x0F", 7: "\x0312{} Shaman\x0F", 8: "\x0311{} Mage\x0F",
+            9: "\x0306{} Warlock\x0F", 10: "\x0310{} Monk\x0F", 11: "\x0307{} Druid\x0F", 12: "\x0303{} Demon Hunter\x0F"
         }
     else:
         class_ids = {
             1: "{} Warrior", 2: "{} Paladin", 3: "{} Hunter", 4: "{} Rogue", 5: "{} Priest",
             6: "{} Death Knight", 7: "{} Shaman", 8: "{} Mage", 9: "{} Warlock", 10: "{} Monk",
-            11: "{} Druid"
+            11: "{} Druid", 12: "{} Demon Hunter"
         }
 
     if data['class'] in class_ids:
-        return class_ids[data['class']].format(spec).replace('  ','')
+        return class_ids[data['class']].format(spec).strip()
     else:
         return 'unknown'
 
