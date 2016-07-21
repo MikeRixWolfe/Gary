@@ -1,6 +1,7 @@
 from util import hook, http
 
 wunder_url = "http://api.wunderground.com/api/{}/{}/q/{}.json"
+alerts = ['HUR', 'TOR', 'TOW', 'WRN', 'SEW', 'WIN', 'FLO', 'WAT', 'WND', 'SVR', 'HEA', 'FOG', 'SPE', 'FIR', 'VOL', 'HWW']
 cards = {
     0: "N",
     22.5: "NNE",
@@ -19,24 +20,6 @@ cards = {
     315: "NW",
     337.5: "NNW",
     360: "N"
-}
-
-alerts = {
-    'HUR': 'Hurricane Local Statement',
-    'TOR': 'Tornado Warning',
-    'TOW': 'Tornado Watch',
-    'WRN': 'Severe Thunderstorm Warning',
-    'SEW': 'Severe Thunderstorm Watch',
-    'WIN': 'Winter Weather Advisory',
-    'FLO': 'Flood Warning',
-    'WAT': 'Flood Watch / Statement',
-    'WND': 'High Wind Advisory',
-    'SVR': 'Severe Weather Statement',
-    'HEA': 'Heat Advisory',
-    'FOG': 'Dense Fog Advisory',
-    'FIR': 'Fire Weather Advisory',
-    'VOL': 'Volcanic Activity Statement',
-    'HWW': 'Hurricane Wind Warning'
 }
 
 
@@ -61,7 +44,7 @@ def weather(inp, say=None, api_key=None):
     try:
         direction = cards.get(float(weather['current_observation']['wind_degrees']),
             cards[min(cards.keys(), key=lambda k: abs(k - float(weather['current_observation']['wind_degrees'])))])
-        alert = [a for a in alert['alerts'] if a['type'] in alerts.keys()]  # Get only alerts we care about
+        alert = [a for a in alert['alerts'] if a['type'] in alerts]  # Get only alerts we care about
         alert = " ".join(["\x02{description}\x0F until {expires}.".format(**a) for a in alert]) or ""
         state = weather['location']['state'] or weather['location']['country_name']
 
