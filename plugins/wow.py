@@ -49,7 +49,10 @@ def wow_armory_format(data, link):
                     data['items']['averageItemLevelEquipped'], data['items']['averageItemLevel'],
                     wow_get_race(data['race']))
     except:
-        return 'Unable to fetch information; do the realm and character exist?'
+        try:
+            return "Error: {}".format(data['reason'])
+        except:
+            return 'Unable to fetch information; do the realm and character exist?'
 
 
 def wow_get_title(data):

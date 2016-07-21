@@ -62,7 +62,7 @@ def weather(inp, say=None, api_key=None):
         direction = cards.get(float(weather['current_observation']['wind_degrees']),
             cards[min(cards.keys(), key=lambda k: abs(k - float(weather['current_observation']['wind_degrees'])))])
         alert = [a for a in alert['alerts'] if a['type'] in alerts.keys()]  # Get only alerts we care about
-        alert = "\x02{description}\x0F until {expires}.".format(**alert[0]) if alert else ""
+        alert = " ".join(["\x02{description}\x0F until {expires}.".format(**a) for a in alert]) or ""
         state = weather['location']['state'] or weather['location']['country_name']
 
         say("\x02{location[city]}, {state}\x0F: {current_observation[temp_f]}*F " \
