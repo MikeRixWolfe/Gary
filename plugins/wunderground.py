@@ -1,7 +1,7 @@
 from util import hook, http
 
 wunder_url = "http://api.wunderground.com/api/{}/{}/q/{}.json"
-alerts = ['HUR', 'TOR', 'TOW', 'WRN', 'SEW', 'WIN', 'FLO', 'WAT', 'WND', 'SVR', 'HEA', 'FOG', 'SPE', 'FIR', 'VOL', 'HWW']
+alerts = ['HUR', 'TOR', 'TOW', 'WRN', 'SEW', 'WIN', 'FLO', 'WAT', 'WND', 'SVR', 'HEA', 'FOG', 'FIR', 'VOL', 'HWW']
 cards = {
     0: "N",
     22.5: "NNE",
