@@ -80,7 +80,7 @@ def wow_get_class(data, colours=False):
     try:
         spec = [s for s in data['talents'] if s.get('selected', False) == True][0]['spec']['name']
     except:
-        spec = ""
+        spec = " "
 
     if colours:
         # Format their colours according to class colours.
@@ -97,7 +97,8 @@ def wow_get_class(data, colours=False):
         }
 
     if data['class'] in class_ids:
-        return class_ids[data['class']].format(spec).strip()
+        print [spec]
+        return class_ids[data['class']].format(spec).replace("  ", "")
     else:
         return 'unknown'
 
