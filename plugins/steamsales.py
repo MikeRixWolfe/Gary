@@ -1,7 +1,7 @@
 import time
 import json
 import os
-from util import hook, http, text
+from util import hook, http, text, web
 from collections import OrderedDict
 
 debug = False
@@ -88,7 +88,7 @@ def get_sales(mask):
                 # Bundles
                 if set(["id", "url"]).issubset(set(item.keys())):
                     if not item["final_price"] and not item["discounted"]:
-                        item["final_price"] = item["url"]
+                        item["final_price"] = web.try_googl(item["url"])
                         item["discounted"] = True
                 else:
                     # Midweek Madness, etc
