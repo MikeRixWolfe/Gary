@@ -97,7 +97,6 @@ def wow_get_class(data, colours=False):
         }
 
     if data['class'] in class_ids:
-        print [spec]
         return class_ids[data['class']].format(spec).replace("  ", "")
     else:
         return 'unknown'
