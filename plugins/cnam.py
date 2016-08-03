@@ -18,18 +18,31 @@ def cnam(inp, api_key=None):
 
     if data['data'].get('expanded_name', None) or data['data'].get('cnam', None):
         if data['data'].get('expanded_name', None):
-            out.append(u"Name: {}".format(' '.join([data['data'].get('expanded_name', {}).get('first', None), data['data'].get('expanded_name', {}).get('last', None)]).strip()))
+            names = [x for x in [data['data'].get('expanded_name', {}).get('first', None),
+                data['data'].get('expanded_name', {}).get('last', None)] if x != None]
+            if names:
+                out.append(u"Name: {}".format(' '.join(names).strip()))
         else:
-            out.append(u"Name: {}".format(data['data']['cnam']).strip())
+            if data['data']['cnam'].lower() != 'unknown':
+                out.append(u"Name: {}".format(data['data']['cnam']).strip())
 
-    if data.get('type', None) and data['data'].get('linetype', None):
-        out.append(u"Type: {}".format(', '.join([data.get('type', None), data['data'].get('linetype', None)])))
+    if data.get('type', None) or data['data'].get('linetype', None):
+        types = [x for x in [data.get('type', 'unknown'),
+            data['data'].get('linetype', 'unknown')] if x != 'unknown']
+        if types:
+            out.append(u"Type: {}".format(', '.join(types)))
 
-    if data['data'].get('location', {}).get('city', None) and data['data'].get('location', {}).get('state', None):
-        out.append(u"Location: {}".format(', '.join([data['data'].get('location', {}).get('city', None), data['data'].get('location', {}).get('state', None)])))
+    if data['data'].get('location', {}).get('city', None) or data['data'].get('location', {}).get('state', None):
+        locs = [x for x in [data['data'].get('location', {}).get('city', None),
+            data['data'].get('location', {}).get('state', None)] if x != None]
+        if locs:
+            out.append(u"Location: {}".format(', '.join(locs)))
 
     if data['data'].get('carrier', {}).get('name', None):
         out.append(u"Carrier: {}".format(data['data']['carrier']['name']))
 
-    return u"; ".join(out)
+    if out:
+        return u"; ".join(out)
+    else:
+        return "No caller ID info for {}".format(inp)
 
