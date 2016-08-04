@@ -10,21 +10,26 @@ youtube_re = (r'(?:youtube.*?(?:v=|/v/)|youtu\.be/|yooouuutuuube.*?id=)'
               '([-_a-z0-9]+)', re.I)
 
 
-@hook.api_key('google')
-@hook.regex(*youtube_re)
-def youtube_url(match, say=None, api_key=None):
+def get_youtube_info(video_id, api_key=None):
     params = {
-        "id": match.group(1),
+        "id": video_id,
         "key": api_key['access'],
-        "part": "snippet"
+        "part": "snippet,contentDetails"
     }
     result = http.get_json(video_url, query_params=params)
 
     if result.get('error') or not result.get('items') or len(result['items']) < 1:
-        return
+        return web.try_googl(short_url+video_id)
 
-    say(u'{} - \x02{title}\x02'.format(web.try_googl(short_url+ match.group(1)),
-        **result['items'][0]['snippet']))
+    playtime = result['items'][0]['contentDetails']['duration'].strip('PT').lower()
+    return u'{} - [{}] \x02{title}\x02'.format(web.try_googl(short_url+video_id),
+        playtime, **result['items'][0]['snippet'])
+
+
+@hook.api_key('google')
+@hook.regex(*youtube_re)
+def youtube_url(match, say=None, api_key=None):
+    say(get_youtube_info(match.group(1), api_key))
 
 
 @hook.api_key('google')
@@ -49,7 +54,5 @@ def youtube(inp, say=None, api_key=None):
     if result.get('error') or not result.get('items') or len(result['items']) < 1:
         return "None found."
 
-    video = result['items'][0]
-    say(u"{} - \x02{title}\x02".format(web.try_googl(short_url+video['id']['videoId']),
-        **video['snippet']))
+    say(get_youtube_info(result['items'][0]['id']['videoId'], api_key))
 
