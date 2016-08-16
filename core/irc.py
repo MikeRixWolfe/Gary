@@ -57,6 +57,7 @@ class crlf_tcp(object):
         if time.time() - last_timestamp > self.timeout:
             self.iqueue.put(StopIteration)
             self.socket.close()
+            print("Closing socket to {}".format(self.host))
             return True
         return False
 
@@ -152,31 +153,26 @@ class IRC(object):
 
     def parse_loop(self):
         while True:
-            try:
-                msg = self.conn.iqueue.get()
-                if msg == StopIteration:
-                    self.connect()
-                    continue
+            msg = self.conn.iqueue.get()
+            if msg == StopIteration:
+                self.connect()
+                continue
 
-                if msg.startswith(":"):  # has a prefix
-                    prefix, command, params = irc_prefix_rem(msg).groups()
-                else:
-                    prefix, command, params = irc_noprefix_rem(msg).groups()
-                nick, user, host = irc_netmask_rem(prefix).groups()
-                paramlist = irc_param_ref(params)
-                lastparam = ""
-                if paramlist:
-                    if paramlist[-1].startswith(':'):
-                        paramlist[-1] = paramlist[-1][1:]
-                    lastparam = paramlist[-1]
-                self.out.put([msg, prefix, command, params, nick, user, host,
-                        paramlist, lastparam])
-                if command == "PING":
-                    self.cmd("PONG", paramlist)
-            except socket.error as e:
-                print(">>> u'{} to {}, retrying in {} seconds...'".format(e,
-                    self.conn.host, self.conn.timeout))
-                time.sleep(self.conn.timeout)
+            if msg.startswith(":"):  # has a prefix
+                prefix, command, params = irc_prefix_rem(msg).groups()
+            else:
+                prefix, command, params = irc_noprefix_rem(msg).groups()
+            nick, user, host = irc_netmask_rem(prefix).groups()
+            paramlist = irc_param_ref(params)
+            lastparam = ""
+            if paramlist:
+                if paramlist[-1].startswith(':'):
+                    paramlist[-1] = paramlist[-1][1:]
+                lastparam = paramlist[-1]
+            self.out.put([msg, prefix, command, params, nick, user, host,
+                    paramlist, lastparam])
+            if command == "PING":
+                self.cmd("PONG", paramlist)
 
     def set_pass(self, password):
         if password:
