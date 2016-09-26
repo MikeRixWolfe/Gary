@@ -6,7 +6,7 @@ import re
 from util import hook, http, text, web
 
 
-steam_re = (r'.*?store.steampowered.com/(?:app|sub)/(\d*)', re.I)
+steam_re = (r'.*?store.steampowered.com/\w+/(\d*)', re.I)
 
 API_URL = "http://store.steampowered.com/api/appdetails/"
 STORE_URL = "http://store.steampowered.com/app/{}/"
