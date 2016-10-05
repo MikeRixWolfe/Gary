@@ -1,5 +1,3 @@
-import random
-import re
 import time
 from util import hook
 
@@ -16,9 +14,10 @@ def add_quote(db, chan, msg, nick):
     db.commit()
 
 
-def del_quote(key):
-    db.execute("delete from quote where key=?", (key,))
+def del_quote(db, key, chan):
+    update = db.execute("delete from quote where key=? and chan=?", (key,chan))
     db.commit()
+    return update
 
 
 def get_quote_by_chan(db, chan):
@@ -40,7 +39,7 @@ def format_quote(q):
 @hook.command('rq', autohelp=False)
 @hook.command(autohelp=False)
 def randomquote(inp, nick='', chan='', db=None, input=None):
-    """.randomquote - Gets a random quote by <nick> or from the current channel."""
+    """.randomquote - Gets a random quote."""
     db_init(db)
     quote = get_quote_by_chan(db, chan)
 
@@ -54,17 +53,29 @@ def randomquote(inp, nick='', chan='', db=None, input=None):
 def getquote(inp, nick='', chan='', db=None):
     """.getquote <n> - Gets the <n>th quote."""
     db_init(db)
+    quote = get_quote_by_key(db, inp, chan)
 
-    try:
-        quote = get_quote_by_key(db, inp, chan)
+    if quote:
         return format_quote(quote)
-    except:
-        return "That doesn't seem to exist."
+    else:
+        return "Quote #{} was not found.".format(inp)
+
+
+@hook.command(modonly=True)
+def delquote(inp, chan='', db=None):
+    """.delquote <n> - Deletes the <n>th quote."""
+    db_init(db)
+    quote = del_quote(db, inp, chan)
+
+    if quote.rowcount > 0:
+        return "Quote #{} deleted.".format(inp)
+    else:
+        return "Quote #{} was not found.".format(inp)
 
 
 @hook.command
 def quote(inp, nick='', chan='', db=None):
-    """.quote <msg> - Adds quote."""
+    """.quote <msg> - Adds a quote."""
     db_init(db)
 
     if inp:
