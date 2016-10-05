@@ -34,7 +34,7 @@ def get_quote_by_key(db, key, chan):
 def format_quote(q):
     key, msg, nick, ctime = q
     return 'Quote #{}: "{}" by {} at {}'.format(key, msg, nick,
-        time.strftime("%H:%M on %m-%d-%Y", time.gmtime(ctime)))
+        time.strftime("%H:%M on %m-%d-%Y", time.localtime(ctime)))
 
 
 @hook.command('rq', autohelp=False)
