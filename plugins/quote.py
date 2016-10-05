@@ -1,19 +1,18 @@
 import random
 import re
 import time
-
 from util import hook
 
 
 def db_init(db):
     db.execute("create table if not exists quote"
-               "(key INTEGER PRIMARY KEY, chan, nick, add_nick, msg, time real)")
+               "(key INTEGER PRIMARY KEY, chan, msg, nick, time real)")
     db.commit()
 
 
-def add_quote(db, chan, nick, add_nick, msg):
-    db.execute("insert into quote (chan, nick, add_nick, msg, time)" \
-        " values(?,?,?,?,?)", (chan, nick, add_nick, msg, time.time()))
+def add_quote(db, chan, msg, nick):
+    db.execute("insert into quote (chan, msg, nick, time)" \
+        " values(?,?,?,?)", (chan, msg, nick, time.time()))
     db.commit()
 
 
@@ -22,72 +21,58 @@ def del_quote(key):
     db.commit()
 
 
-def get_quotes_by_nick(db, chan, nick):
-    return db.execute("select key, time, nick, msg from quote where" \
-        " chan=? and lower(nick)=lower(?) order by time", (chan, nick)).fetchall()
+def get_quote_by_chan(db, chan):
+    return db.execute("select key, msg, nick, time from quote where" \
+        " chan=? order by random() limit 1", (chan,)).fetchone()
 
 
-def get_quotes_by_chan(db, chan):
-    return db.execute("select key, time, nick, msg from quote where" \
-        " chan=? order by time", (chan,)).fetchall()
-
-
-def get_quote_by_key(db, key):
-    return db.execute("select key, time, nick, msg from quote where key=?",
-        (key,)).fetchall()
+def get_quote_by_key(db, key, chan):
+    return db.execute("select key, msg, nick, time from quote where " \
+        "key=? and chan=?", (key, chan)).fetchone()
 
 
 def format_quote(q):
-    key, ctime, nick, msg = q
-    return "Quote #%d: <%s> \"%s\" at %s" % (key, nick, msg,
+    key, msg, nick, ctime = q
+    return 'Quote #{}: "{}" by {} at {}'.format(key, msg, nick,
         time.strftime("%H:%M on %m-%d-%Y", time.gmtime(ctime)))
 
 
 @hook.command('rq', autohelp=False)
 @hook.command(autohelp=False)
 def randomquote(inp, nick='', chan='', db=None, input=None):
-    """.randomquote [nick] - Gets random quote by <nick> or from the current channel."""
+    """.randomquote - Gets a random quote by <nick> or from the current channel."""
     db_init(db)
-    if inp == "":
-        quotes = get_quotes_by_chan(db, chan)
+    quote = get_quote_by_chan(db, chan)
+
+    if quote:
+        return format_quote(quote)
     else:
-        quotes = get_quotes_by_nick(db, chan, inp.strip(' '))
-
-    n_quotes = len(quotes)
-
-    if not n_quotes:
-        return "No quotes found"
-
-    num = random.randint(1, n_quotes)
-    selected_quote = quotes[num - 1]
-    return format_quote(selected_quote)
+        return "No quotes found for this channel."
 
 
 @hook.command
 def getquote(inp, nick='', chan='', db=None):
-    """.getquote <n> - gets <n>th quote."""
+    """.getquote <n> - Gets the <n>th quote."""
     db_init(db)
-    if inp.strip().isdigit():
-        num = int(inp.strip())
-        quote = get_quote_by_key(db, num)
-    else:
-        return "Non integer input!"
-    if quote:
-        return format_quote(quote[0])
-    else:
-        return "That doesn't seem to exist"
+
+    try:
+        quote = get_quote_by_key(db, inp, chan)
+        return format_quote(quote)
+    except:
+        return "That doesn't seem to exist."
 
 
 @hook.command
 def quote(inp, nick='', chan='', db=None):
-    """.quote <nick> <msg> - Adds quote."""
+    """.quote <msg> - Adds quote."""
     db_init(db)
-    quoted_nick = inp.split(' ', 1)[0].strip('<> ')
-    msg = inp.split(' ', 1)[1].strip(' ')
 
-    try:
-        add_quote(db, chan, quoted_nick, nick, msg)
-        db.commit()
-    except db.IntegrityError:
-        return "Error in adding quote."
-    return "Quote added."
+    if inp:
+        try:
+            add_quote(db, chan, inp, nick)
+        except db.IntegrityError:
+            return "Error in adding quote."
+        return "Quote added."
+    else:
+        return "Check your input and try again."
+
