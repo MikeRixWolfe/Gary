@@ -109,9 +109,9 @@ def log(paraml, input=None, bot=None, db=None):
         if input.command == 'PRIVMSG' and input.msg.count('\x01') >= 2:
             input.msg = irc_color_re.sub('',
                 input.msg.split('\x01', 2)[1].split(' ', 1)[1])
-            input.msg = "* {} {}".format(input.nick, input.msg)
+            input.msg = u"* {} {}".format(input.nick, input.msg)
         if input.command == 'KICK':
-            input.msg = "{} [{}]".format(paraml[1], input.msg)
+            input.msg = u"{} [{}]".format(paraml[1], input.msg)
         if input.command == 'MODE':
             input.msg = ' '.join(paraml[1:])
         if input.command == 'JOIN':
