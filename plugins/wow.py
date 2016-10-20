@@ -164,7 +164,7 @@ def armory(inp, say=None, api_key=None):
         return 'The character name is not a valid name. Character names can only contain letters, special characters,' \
                ' and be 18 characters long.'
 
-    if not re.match(r"^[a-z' _-]{3,32}$", realm):
+    if not re.match(r"^[a-z0-9'_-]{3,32}$", realm):
         # Realm names can have spaces in them, use dashes for this.
         return 'The realm name is not a valid name. Realm names can only contain letters, dashes, and apostrophes, up' \
                ' to 32 characters'
