@@ -66,7 +66,10 @@ def format_data(app_id, show_url=True):
 def steam_url(match, say=None):
     app_id = match.group(1)
     try:
-        say(format_data(app_id, show_url=False))
+        if app_id:
+            say(format_data(app_id, show_url=False))
+        else:
+            raise Exception
     except:
         say("{} - Steam".format(web.try_googl(match.group(0))))
 
