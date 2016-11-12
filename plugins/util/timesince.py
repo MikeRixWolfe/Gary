@@ -30,7 +30,7 @@ import calendar
 import datetime
 
 
-def timesince(d, now=None, reversed=False):
+def timesince(d, now=None):
     """
     Takes two datetime objects and returns the time between d and now
     as a nicely formatted string, e.g. "10 minutes".  If d occurs after now,
@@ -106,5 +106,5 @@ def timeuntil(d, now=None):
     """
     if not now:
         now = datetime.datetime.now()
-    return timesince(now, d, True)
+    return timesince(now, d)
 
