@@ -1,9 +1,9 @@
-from util import hook, text
 import os
 import sys
 import re
 import time
 import signal
+from util import hook, timesince, text
 
 
 @hook.command("quit", autohelp=False, adminonly=True)
@@ -48,12 +48,22 @@ def connect(inp, conn=None, notice=None):
 
 
 @hook.command(autohelp=False, modonly=True)
-def part(inp, conn=None, chan=None, notice=None):
-    """.part [channel] - Leaves a channel. If [channel] is blank the bot will leave the channel the command was used in."""
+def part(inp, say=None, conn=None, chan=None, notice=None):
+    """.part [channel] [delay=1] - Leaves a channel with a given delay. Channel and delay default to the current channel and 1 respectively."""
     if inp:
-        target = inp
+        if len(inp.split(' ', 1)) == 2:
+            target, delay = inp.split(' ', 1)
+        else:
+            if inp.isdigit():
+                target, delay = chan, int(inp)
+            else:
+                target, delay = inp, None
     else:
-        target = chan
+        target, delay = chan, None
+
+    if delay:
+        say("Parting channel in {}".format(timesince.timeuntil(time.time() + delay)))
+        time.sleep(delay)
     notice("Attempting to leave {}...".format(target))
     conn.send("PART " + target)
 

@@ -26,10 +26,11 @@
 #(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import calendar
 import datetime
 
 
-def timesince(d, now=None):
+def timesince(d, now=None, reversed=False):
     """
     Takes two datetime objects and returns the time between d and now
     as a nicely formatted string, e.g. "10 minutes".  If d occurs after now,
@@ -54,6 +55,8 @@ def timesince(d, now=None):
     # Convert int or float (unix epoch) to datetime.datetime for comparison
     if isinstance(d, int) or isinstance(d, float):
         d = datetime.datetime.fromtimestamp(d)
+    if isinstance(now, int) or isinstance(now, float):
+        now = datetime.datetime.fromtimestamp(now)
 
     # Convert datetime.date to datetime.datetime for comparison.
     if not isinstance(d, datetime.datetime):
@@ -64,12 +67,16 @@ def timesince(d, now=None):
     if not now:
         now = datetime.datetime.now()
 
-    # ignore microsecond part of 'd' since we removed it from 'now'
     delta = now - (d - datetime.timedelta(0, 0, d.microsecond))
+
+    # Deal with leapyears by subtracing the number of leapdays
+    delta -= datetime.timedelta(calendar.leapdays(d.year, now.year))
+
+    # ignore microsecond part of 'd' since we removed it from 'now'
     since = delta.days * 24 * 60 * 60 + delta.seconds
     if since <= 0:
         # d is in the future compared to now, stop processing.
-        return u'0 ' + 'minutes'
+        return '0 minutes'
     for i, (seconds, name) in enumerate(chunks):
         count = since // seconds
         if count != 0:
@@ -99,4 +106,5 @@ def timeuntil(d, now=None):
     """
     if not now:
         now = datetime.datetime.now()
-    return timesince(now, d)
+    return timesince(now, d, True)
+
