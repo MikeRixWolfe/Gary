@@ -62,7 +62,7 @@ def part(inp, say=None, conn=None, chan=None, notice=None):
         target, delay = chan, None
 
     if delay:
-        say("Parting channel in {}".format(timesince.timeuntil(time.time() + delay)))
+        say("Parting channel in {}...".format(timesince.timeuntil(time.time() + delay)))
         time.sleep(delay)
     notice("Attempting to leave {}...".format(target))
     conn.send("PART " + target)
