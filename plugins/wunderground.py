@@ -82,7 +82,6 @@ def forecast(inp, say=None, api_key=None):
             for day in weather['forecast']['simpleforecast']['forecastday']]))
     except:
         try:
-            print weather['response'].keys()
             return "Ambiguous location, please try one of the following: {}".format(
                 ", ".join(["{} {}".format(i['city'], i['state']) for i in weather['response']['results']]))
         except:
