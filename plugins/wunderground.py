@@ -69,7 +69,7 @@ def forecast(inp, say=None, api_key=None):
         return "Error: API key not set."
 
     try:
-        weather = http.get_json(wunder_url.format(api_key, 'forecast/geolookup/conditions', http.quote_plus(inp)))
+        weather = http.get_json(wunder_url.format(api_key, 'forecast/geolookup/conditions', http.quote(inp)))
         if weather.get('current_observation', None) is None and len(weather['response'].get('results', [])) > 0:
             weather = http.get_json(wunder_url.format(api_key,
                 'forecast/geolookup/conditions', 'zmw:' + weather['response']['results'][0]['zmw']))
@@ -82,6 +82,7 @@ def forecast(inp, say=None, api_key=None):
             for day in weather['forecast']['simpleforecast']['forecastday']]))
     except:
         try:
+            print weather['response'].keys()
             return "Ambiguous location, please try one of the following: {}".format(
                 ", ".join(["{} {}".format(i['city'], i['state']) for i in weather['response']['results']]))
         except:
@@ -97,7 +98,7 @@ def hourly(inp, say=None, api_key=None):
         return "Error: API key not set."
 
     try:
-        weather = http.get_json(wunder_url.format(api_key, 'hourly/geolookup/conditions', http.quote_plus(inp)))
+        weather = http.get_json(wunder_url.format(api_key, 'hourly/geolookup/conditions', http.quote(inp)))
         if weather.get('hourly_forecast', None) is None and len(weather['response'].get('results', [])) > 0:
             weather = http.get_json(wunder_url.format(api_key,
                 'hourly/geolookup/conditions', 'zmw:' + weather['response']['results'][0]['zmw']))
