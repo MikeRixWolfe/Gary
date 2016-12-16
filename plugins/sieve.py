@@ -102,7 +102,10 @@ def sieve_suite(bot, input, func, kind, args):
 
     # mutes
     if kind in ("command", "regex") and input.chan in muted:
-        if not is_mod(bot, input) and not is_admin(bot, input):
+        if kind == "command":
+            if not is_mod(bot, input) and not is_admin(bot, input):
+                return None
+        else:
             return None
 
     # rate limiting

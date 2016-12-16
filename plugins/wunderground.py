@@ -31,6 +31,8 @@ def weather(inp, say=None, api_key=None):
     if api_key is None:
         return "Error: API key not set."
 
+    if inp == "chicago": inp = "chicago il"
+
     try:
         weather = http.get_json(wunder_url.format(api_key, 'forecast/geolookup/conditions', http.quote(inp)))
         alert = http.get_json(wunder_url.format(api_key, 'alerts', http.quote(inp)))
@@ -68,6 +70,8 @@ def forecast(inp, say=None, api_key=None):
     if api_key is None:
         return "Error: API key not set."
 
+    if inp == "chicago": inp = "chicago il"
+
     try:
         weather = http.get_json(wunder_url.format(api_key, 'forecast/geolookup/conditions', http.quote(inp)))
         if weather.get('current_observation', None) is None and len(weather['response'].get('results', [])) > 0:
@@ -95,6 +99,8 @@ def hourly(inp, say=None, api_key=None):
     """.h[ourly] <zip code|location> - Gets the 12 hour weather forecast."""
     if api_key is None:
         return "Error: API key not set."
+
+    if inp == "chicago": inp = "chicago il"
 
     try:
         weather = http.get_json(wunder_url.format(api_key, 'hourly/geolookup/conditions', http.quote(inp)))
