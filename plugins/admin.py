@@ -168,7 +168,7 @@ def ban(inp, conn=None, chan=None, notice=None):
     mode_cmd("+b", "ban", inp, chan, conn, notice)
 
 
-@hook.command(adminonly=True)
+@hook.command(modonly=True)
 def unban(inp, conn=None, chan=None, notice=None):
     """.unban [channel] <user> - Makes the bot unban <user> in [channel]. If [channel] is blank the bot will unban <user> in the channel the command was used in."""
     mode_cmd("-b", "unban", inp, chan, conn, notice)
