@@ -264,14 +264,14 @@ def remove(inp, chan=None, conn=None):
     conn.send(out)
 
 
-@hook.command(modonly=True, autohelp=False)
-def mute(inp, conn=None, chan=None, notice=None):
+@hook.command(adminonly=True, autohelp=False)
+def mutechan(inp, conn=None, chan=None, notice=None):
     """.mute [channel] - Makes the bot mute a channel. If [channel] is blank the bot will mute the channel the command was used in."""
     mode_cmd_no_target("+m", "mute", inp, chan, conn, notice)
 
 
 @hook.command(adminonly=True, autohelp=False)
-def unmute(inp, conn=None, chan=None, notice=None):
+def unmutechan(inp, conn=None, chan=None, notice=None):
     """.mute [channel] - Makes the bot mute a channel. If [channel] is blank the bot will mute the channel the command was used in."""
     mode_cmd_no_target("-m", "unmute", inp, chan, conn, notice)
 
