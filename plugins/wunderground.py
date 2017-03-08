@@ -52,8 +52,9 @@ def weather(inp, say=None, api_key=None):
 
         say("\x02{location[city]}, {state}\x0F: {current_observation[temp_f]}*F " \
             "and {current_observation[weather]}, feels like {current_observation[feelslike_f]}*F, " \
-            "wind at {current_observation[wind_mph]} MPH {direction}, humidity at {current_observation[relative_humidity]}. " \
-            "{alert}".format(direction=direction, alert=alert, state=state, **weather))
+            "wind at {current_observation[wind_mph]} ({current_observation[wind_gust_mph]} gust) MPH {direction}, " \
+            "humidity at {current_observation[relative_humidity]}. {alert}".format(direction=direction,
+            alert=alert, state=state, **weather))
     except:
         try:
             return "Ambiguous location, please try one of the following: {}".format(
