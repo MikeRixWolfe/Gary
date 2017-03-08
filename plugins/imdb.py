@@ -1,4 +1,4 @@
-from util import hook, http
+from util import hook, http, web
 
 
 @hook.command
@@ -22,8 +22,8 @@ def imdb(inp):
         if content['Runtime'] != 'N/A':
             out += ' \x02%(Runtime)s\x02.'
         if content['imdbRating'] != 'N/A' and content['imdbVotes'] != 'N/A':
-            out += ' \x02%(imdbRating)s/10\x02 with \x02%(imdbVotes)s\x02 votes.'
-        out += ' %(URL)s'
+            out += ' \x02%(imdbRating)s/10\x02 with \x02%(imdbVotes)s\x02 votes. '
+        out += web.try_googl('%(URL)s' % content)
         return out % content
     else:
         return 'Unknown error.'
