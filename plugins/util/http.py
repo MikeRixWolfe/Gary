@@ -127,8 +127,7 @@ def oauth_unsigned_request(nonce, timestamp, req, consumer, token):
           'oauth_token':token,
           'oauth_version':'1.0' }
 
-    k,v = string.split(req, "=")
-    d[k] = v
+    d.update(dict(urlparse.parse_qsl(req)))
     unsigned_req = ''
 
     for x in sorted(d, key=lambda key: key):

@@ -35,12 +35,15 @@ def twitter(inp, api_key=None):
 
         if re.match(r'^#', inp):
             doing_search = True
-            request_url = "https://api.twitter.com/1.1/search/tweets.json?q=%s" % quote(inp)
+            request_url = "https://api.twitter.com/1.1/search/tweets.json"
+            params = {'q': quote(inp)}
+
         else:
-            request_url = "https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=%s" % inp
+            request_url = "https://api.twitter.com/1.1/statuses/user_timeline.json"
+            params = {'screen_name': inp, 'exclude_replies': True, 'include_rts': False}
 
     try:
-        tweet = http.get_json(request_url, oauth=True, oauth_keys=api_key)
+        tweet = http.get_json(request_url, query_params=params, oauth=True, oauth_keys=api_key)
     except http.HTTPError as e:
         errors = {400: 'bad request (ratelimited?)',
                   401: 'unauthorized (private)',
