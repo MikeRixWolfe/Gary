@@ -63,8 +63,6 @@ def nickserv_tracking(paraml, nick=None, input=None, conn=None):
             if input.command == 'KICK':
                 nick = paraml[1].lower()
             conn.users.pop(nick, None)
-            if input.command == 'NICK':
-                conn.msg(nickserv_name, nickserv_info % paraml[0])
 
 
 @hook.event('NOTICE')
