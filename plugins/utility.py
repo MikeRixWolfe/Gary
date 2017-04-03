@@ -59,7 +59,7 @@ def onconnect(paraml, conn=None):
     nickserv_password = conn.conf.get('nickserv_password', '')
     nickserv_name = conn.conf.get('nickserv_name', 'nickserv')
     nickserv_command = conn.conf.get('nickserv_command', 'IDENTIFY %s')
-    nickserv_ident = conn.conf.get('nickserv_ident_command', 'INFO %s')
+    nickserv_ident = conn.conf.get('nickserv_ident_command', 'STATUS %s')
     if nickserv_password:
         conn.msg(nickserv_name, nickserv_command % nickserv_password)
         time.sleep(1)
