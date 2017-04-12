@@ -96,12 +96,18 @@ class crlf_tcp(object):
 
 class crlf_ssl_tcp(crlf_tcp):
     "Handles ssl tcp connetions that consist of utf-8 lines ending with crlf"
-    def __init__(self, host, port, ignore_cert_errors, timeout=360):
+    def __init__(self, host, port, ignore_cert_errors, ssl_cafile, timeout=360):
         self.ignore_cert_errors = ignore_cert_errors
+        self.ssl_cafile = ssl_cafile
         crlf_tcp.__init__(self, host, port, timeout)
 
     def create_socket(self):
-        return wrap_socket(crlf_tcp.create_socket(self), server_side=False,
+        if self.ssl_cafile:
+            return wrap_socket(crlf_tcp.create_socket(self), server_side=False,
+                cert_reqs=CERT_NONE if self.ignore_cert_errors else
+                CERT_REQUIRED, ca_certs=self.ssl_cafile)
+        else:
+            return wrap_socket(crlf_tcp.create_socket(self), server_side=False,
                 cert_reqs=CERT_NONE if self.ignore_cert_errors else
                 CERT_REQUIRED)
 
@@ -201,9 +207,10 @@ class IRC(object):
 
 class SSLIRC(IRC):
     def __init__(self, server, nick, port=6667, channels=[], conf={},
-                 ignore_certificate_errors=True):
+                 ignore_certificate_errors=True, ssl_cafile=None):
         self.ignore_cert_errors = ignore_certificate_errors
+        self.ssl_cafile = ssl_cafile
         IRC.__init__(self, server, nick, port, channels, conf)
 
     def create_connection(self):
-        return crlf_ssl_tcp(self.server, self.port, self.ignore_cert_errors)
+        return crlf_ssl_tcp(self.server, self.port, self.ignore_cert_errors, self.ssl_cafile)

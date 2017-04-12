@@ -38,7 +38,8 @@ try:
         if conf.get('ssl'):
             bot.conns[name] = SSLIRC(conf['server'], conf['nick'], conf=conf,
                     port=conf.get('port', 6667), channels=conf['channels'],
-                    ignore_certificate_errors=conf.get('ignore_cert', True))
+                    ignore_certificate_errors=conf.get('ignore_cert', True),
+                    ssl_cafile=conf.get('ssl_cafile', None))
         else:
             bot.conns[name] = IRC(conf['server'], conf['nick'], conf=conf,
                     port=conf.get('port', 6667), channels=conf['channels'])
