@@ -51,7 +51,7 @@ def security_tracking(paraml, bot=None, chan=None, conn=None, input=None, nick=N
         if len(timeouts[nick]['msgs']) >= chat_limit and not chat_limit_lockdown_active \
                 and bot.start_time > 600:
             conn.send("MODE {} +i".format(chan))
-            conn.send("KICK {} {} :{}".format(chan, nick, "No spamming."))
+            conn.send("KICK {} {} :{}".format(chan, nick, "Automated kick - No spamming please."))
             chat_limit_lockdown_active = True
             say("There have been an abnormally large number of lines in the " \
                 "past few seconds, as such I have set the channel mode to " \

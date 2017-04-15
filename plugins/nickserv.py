@@ -63,9 +63,18 @@ def nickserv_tracking(paraml, nick=None, input=None, conn=None):
 def noticed(paraml, chan='', conn=None):
     if paraml[0] == conn.nick and \
             chan.lower() == conn.conf.get('nickserv_name', 'nickserv'):
-            if paraml[1].split()[0] == 'STATUS':
-                if paraml[1].split()[2] == '3':
-                    conn.users[str(paraml[1].split()[1]).lower()] = True
-                else:
-                    conn.users[str(paraml[1].split()[1]).lower()] = False
+            if conn.conf.get('service_style') == 'anope':
+                if paraml[1].split()[0] == 'STATUS':
+                    if paraml[1].split()[2] == '3':
+                        conn.users[str(paraml[1].split()[1]).lower()] = True
+                    else:
+                        conn.users[str(paraml[1].split()[1]).lower()] = False
+            elif conn.conf.get('service_style') == 'hybserv':
+                if "Nickname:" in paraml[1]:
+                    if "ONLINE" in paraml[1]:
+                        conn.users[str(paraml[1].split()[1]).lower()] = True
+                    else:
+                        conn.users[str(paraml[1].split()[1]).lower()] = False
+                elif "not registered" in paraml[1] or "is private" in paraml[1]:
+                    conn.users[str(paraml[1].split()[2]).lower()[2:-2]] = False
 
