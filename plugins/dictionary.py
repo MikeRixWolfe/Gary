@@ -60,7 +60,6 @@ def wordoftheday(inp, say=None, api_key=None):
 
 
 @hook.command('ud')
-@hook.command
 def urban(inp, say=None):
     """.ud <phrase> - Looks up <phrase> on Urban Dictionary."""
     base_url = 'http://api.urbandictionary.com/v0'

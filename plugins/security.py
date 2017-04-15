@@ -5,8 +5,8 @@ joins = []
 timeouts = {}
 join_limit_lockdown_active = False
 chat_limit_lockdown_active = False
-join_limit_chans = ['#geekperson']
-chat_limit_chans = ['#geekperson']
+join_limit_chans = ['#geekboy']
+chat_limit_chans = ['#geekboy']
 
 
 @hook.event('*')

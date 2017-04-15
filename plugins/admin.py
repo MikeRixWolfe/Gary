@@ -108,7 +108,6 @@ def nick(inp, notice=None, conn=None):
 
     nickserv_password = conn.conf.get('nickserv_password', '')
     nickserv_name = conn.conf.get('nickserv_name', 'nickserv')
-    nickserv_reg = conn.conf.get('nickserv_reg_command', 'REGISTER %s AUTOREGISTERED')
     nickserv_rec = conn.conf.get('nickserv_rec_command', ' RECOVER %s %s')
     nickserv_command = conn.conf.get('nickserv_ident_command', 'IDENTIFY %s')
     nickserv_info = conn.conf.get('nickserv_info_command', 'STATUS %s')
@@ -118,8 +117,6 @@ def nick(inp, notice=None, conn=None):
         time.sleep(1)
     conn.set_nick(inp)
     if nickserv_password:
-        conn.msg(nickserv_name, nickserv_reg % nickserv_password)
-        time.sleep(1)
         conn.msg(nickserv_name, nickserv_command % nickserv_password)
         time.sleep(1)
         conn.msg(nickserv_name, nickserv_info % inp)
