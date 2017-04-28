@@ -26,7 +26,7 @@ def custom_get(query, key, is_image=None, num=1):
 def googleimage(inp, api_key=None):
     """.gis <query> - Returns a random image from the first 10 Google Image results for <query>."""
     try:
-        parsed = custom_get(inp, api_key, is_image=True, num=10)
+        parsed = custom_get(inp, api_key, is_image=True, num=1)
     except Exception as e:
         return "Error: {}".format(e)
     if 'items' not in parsed:

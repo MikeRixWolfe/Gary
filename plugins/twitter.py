@@ -88,7 +88,7 @@ def twitter(inp, api_key=None):
 def twitterloop(paraml, nick='', conn=None, bot=None, api_key=None):
     """twitter rss checking loop"""
     server = "%s:%s" % (conn.server, conn.port)
-    if paraml[0] != "#vidya" or nick != conn.nick:
+    if paraml[0] != "#geekboy" or nick != conn.nick:
         return
     time.sleep(1)  # Allow chan list time to update
     api_key = bot.config.get('api_keys', None).get('twitter', None)
@@ -97,7 +97,7 @@ def twitterloop(paraml, nick='', conn=None, bot=None, api_key=None):
             print("Twitter RSS Loop Error: API keys not set.")
             return
 
-    accounts = ["igndeals", "cheapsharkdeals", "videogamedeals"]
+    accounts = ["blizzardcs"]
     prev_tweets = {}
     print(">>> u'Beginning Twitter RSS loop :{}'".format(paraml[0]))
     while paraml[0] in conn.channels:
