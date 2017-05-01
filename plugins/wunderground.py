@@ -50,10 +50,10 @@ def weather(inp, say=None, api_key=None):
         alert = " ".join(["\x02{description}\x0F until {expires}.".format(**a) for a in alert]) or ""
         state = weather['location']['state'] or weather['location']['country_name']
 
-        say("\x02{location[city]}, {state}\x0F: {current_observation[temp_f]}*F " \
-            "and {current_observation[weather]}, feels like {current_observation[feelslike_f]}*F, " \
-            "wind at {current_observation[wind_mph]} ({current_observation[wind_gust_mph]} gust) MPH {direction}, " \
-            "humidity at {current_observation[relative_humidity]}. {alert}".format(direction=direction,
+        say(u"\x02{location[city]}, {state}\x0F: {current_observation[temp_f]}\u00b0F " \
+            u"and {current_observation[weather]}, feels like {current_observation[feelslike_f]}\u00b0F, " \
+            u"wind at {current_observation[wind_mph]} ({current_observation[wind_gust_mph]} gust) MPH {direction}, " \
+            u"humidity at {current_observation[relative_humidity]}. {alert}".format(direction=direction,
             alert=alert, state=state, **weather))
     except:
         try:
@@ -82,8 +82,8 @@ def forecast(inp, say=None, api_key=None):
         return "Weather Underground API error, please try again in a few minutes."
     try:
         state = weather['location']['state'] or weather['location']['country_name']
-        say("\x02{location[city]}, {state}\x0F: ".format(state=state, **weather) +
-            '; '.join(["\x02{date[weekday]}\x0F: L {low[fahrenheit]}*F, H {high[fahrenheit]}*F, {conditions}".format(**day)
+        say(u"\x02{location[city]}, {state}\x0F: ".format(state=state, **weather) +
+            u"; ".join([u"\x02{date[weekday]}\x0F: L {low[fahrenheit]}\u00b0F, H {high[fahrenheit]}\u00b0F, {conditions}".format(**day)
             for day in weather['forecast']['simpleforecast']['forecastday']]))
     except:
         try:
@@ -112,8 +112,8 @@ def hourly(inp, say=None, api_key=None):
         return "Weather Underground API error, please try again in a few minutes."
     try:
         state = weather['location']['state'] or weather['location']['country_name']
-        say("\x02{location[city]}, {state}\x0F: ".format(state=state, **weather) +
-            '; '.join(["\x02{FCTTIME[civil]}\x0F: {temp[english]}*F, {condition}".format(**day)
+        say(u"\x02{location[city]}, {state}\x0F: ".format(state=state, **weather) +
+            u"; ".join([u"\x02{FCTTIME[civil]}\x0F: {temp[english]}\u00b0F, {condition}".format(**day)
             for day in weather['hourly_forecast'][:12]]))
     except:
         try:
