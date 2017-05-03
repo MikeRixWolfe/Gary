@@ -58,9 +58,11 @@ def config_del(items, name, config):
     json.dump(config, open('config', 'w'), sort_keys=True, indent=2)
 
     if new:
-        out = "{} is no longer {}. ".format(', '.join(new), name)
+        verb = "are" if len(new) > 1 else "is"
+        out = "{} {} no longer {}. ".format(', '.join(new), verb, name)
     if skips:
-        out += "{} was not {}.".format(', '.join(skips), name)
+        verb = "were" if len(skips) > 1 else "was"
+        out += "{} {} not {}.".format(', '.join(skips), verb, name)
 
     return out
 
@@ -70,7 +72,7 @@ def config_list(name, config):
     return "{}: {}".format(text.capitalize_first(name), ", ".join(section))
 
 
-@hook.command(autohelp=False)
+@hook.command(autohelp=False, modonly=True)
 def disabled(inp, say=None, bot=None):
     """.disabled - Lists disabled commands/plugins."""
     say(config_list("disabled", bot.config))
@@ -100,7 +102,7 @@ def uncensor(inp, say=None, bot=None):
     say(config_del(inp, "censored", bot.config))
 
 
-@hook.command(autohelp=False)
+@hook.command(autohelp=False, modonly=True)
 def ignored(inp, say=None, bot=None):
     """.ignored - Lists ignored channel/user/host."""
     say(config_list("ignored", bot.config))
@@ -132,7 +134,7 @@ def unmute(inp, chan=None, say=None, bot=None):
     say(":D <3")
 
 
-@hook.command(autohelp=False)
+@hook.command(autohelp=False, modonly=True)
 def restricted(inp, say=None, bot=None):
     """.restricted - Lists channels in restricted mode."""
     say(config_list("restricted", bot.config))
@@ -170,7 +172,7 @@ def demod(inp, say=None, bot=None):
     say(config_del(inp, "moded", bot.config))
 
 
-@hook.command(autohelp=False)
+@hook.command(autohelp=False, modonly=True)
 def allowed(inp, say=None, bot=None):
     """.allowed - Lists users allowed to interact with the bot in restricted channels."""
     say(config_list("allowed", bot.config))
