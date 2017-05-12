@@ -4,15 +4,10 @@ from util import hook
 r = "\x02\x0305"  # red
 g = "\x02\x0303"  # green
 y = "\x02\x0308"  # yellow
-answers = [g + "As I see it, yes",
-           g + "It is certain",
+answers = [g + "It is certain",
            g + "It is decidedly so",
-           g + "Most likely",
-           g + "Outlook good",
            g + "Signs point to yes",
            g + "Without a doubt",
-           g + "Yes",
-           g + "Yes, definitely",
            g + "You may rely on it",
            y + "Reply hazy, try again",
            y + "Ask again later",
