@@ -76,8 +76,8 @@ def stockhistory(inp, say=''):
 
     say("{Name} - ${LastTradePriceOnly} " \
           "\x03{Color}{ChangeFromYearLow} ({PercentChangeFromYearLow})\x0F " \
-          "Year H: ${YearHigh} Year Avg: ${TwoHundreddayMovingAverage} " \
-          "Year L: ${YearLow}; Volume @ {Volume} " \
-          "(Avg Daily Volume: {AverageDailyVolume}) " \
+          "YearH:${YearHigh} YearAvg:${TwoHundreddayMovingAverage} " \
+          "YearL:${YearLow}; Volume:{Volume} " \
+          "(Avg Daily Volume:{AverageDailyVolume}) " \
           "[{LastTradeTime} {LastTradeDate}]".format(**quote))
 
