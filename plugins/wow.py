@@ -9,15 +9,17 @@ Commands:
 armory, armory: Request data from the armory API and format it into something human readable.
 """
 
+import json
 import re
-
+from collections import OrderedDict
 from util import hook, http, web
 
 
 def wow_armory_data(link, api_key):
     """Sends the API request, and returns the data accordingly (in json if raw, nicely formatted if not)."""
     try:
-        data = http.get_json(link, fields='items,titles,talents,guild', locale='en_US', apikey=api_key['consumer'])
+        data = http.get(link, fields='items,titles,talents,guild,progression', locale='en_US', apikey=api_key['consumer'])
+        data = json.loads(data, object_pairs_hook=OrderedDict)
     except Exception as e:
         return 'Unable to fetch information; do the realm and character exist?'
 
@@ -43,16 +45,34 @@ def wow_armory_format(data, link):
 
     try:
         return u'\x0307{0}\x0F is a level \x0307{1}(ilvl {8}/{9})\x0F {2} {10} {3} {4} with ' \
-            '\x0307{5}\x0F achievement points and \x0307{6}\x0F honourable kills. Armory Profile: {7}' \
-            .format(wow_get_title(data), data['level'], wow_get_gender(data['gender']), wow_get_class(data, True),
+            '\x0307{5}\x0F achievement points, \x0307{6}\x0F honorable kills, and is ' \
+            '\x0307{11}\x0F in {12}. Armory Profile: {7}'.format(wow_get_title(data),
+                    data['level'], wow_get_gender(data['gender']), wow_get_class(data, True),
                     location, data['achievementPoints'], data['totalHonorableKills'], web.try_googl(niceurl),
                     data['items']['averageItemLevelEquipped'], data['items']['averageItemLevel'],
-                    wow_get_race(data['race']))
+                    wow_get_race(data['race']), wow_get_progression(data), data['progression']['raids'][-1]['name'])
     except:
         try:
             return "Error: {}".format(data['reason'])
         except:
             return 'Unable to fetch information; do the realm and character exist?'
+
+
+def wow_get_progression(data):
+    """Gets the active progression"""
+    try:
+        raid = data['progression']['raids'][-1]
+
+        raid_difficulties = {'lfr': 0, 'normal': 1, 'heroic': 2, 'mythic': 3}
+        active_progression = [k for k, v in raid.iteritems() if k in raid_difficulties.keys() and v > 0]
+        highest_progression = max({k:v for k,v in raid_difficulties.iteritems() if k in active_progression}.iteritems(), key=lambda x: x[1])[0]
+        highest_progression_kills = len([x for x in raid['bosses'] if x[highest_progression+'Kills'] > 0])
+        highest_progression_bosses = len(raid['bosses'])
+
+        raid_difficulty_output_format = {'lfr': 'LFR', 'normal': 'N', 'heroic': 'H', 'mythic': 'M'}
+        return"{}/{}{}".format(highest_progression_kills, highest_progression_bosses, raid_difficulty_output_format[highest_progression])
+    except:
+        return "0/0LFR"
 
 
 def wow_get_title(data):
