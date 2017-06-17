@@ -44,13 +44,19 @@ def wow_armory_format(data, link):
         location = "on {}".format(data['realm'])
 
     try:
+        progression = 'is \x0307{}\x0F in {}'.format(*wow_get_progression(data))
+    except:
+        progression = 'has no progression data'
+
+
+    try:
         return u'\x0307{0}\x0F is a level \x0307{1}(ilvl {8}/{9})\x0F {2} {10} {3} {4} with ' \
-            '\x0307{5}\x0F achievement points, \x0307{6}\x0F honorable kills, and is ' \
-            '\x0307{11}\x0F in {12}. Armory Profile: {7}'.format(wow_get_title(data),
-                    data['level'], wow_get_gender(data['gender']), wow_get_class(data, True),
-                    location, data['achievementPoints'], data['totalHonorableKills'], web.try_googl(niceurl),
+            '\x0307{5}\x0F achievement points, \x0307{6}\x0F honorable kills, and {11}. ' \
+            'Armory Profile: {7}'.format(wow_get_title(data), data['level'], wow_get_gender(data['gender']),
+                    wow_get_class(data, True), location, data['achievementPoints'],
+                    data['totalHonorableKills'], web.try_googl(niceurl),
                     data['items']['averageItemLevelEquipped'], data['items']['averageItemLevel'],
-                    wow_get_race(data['race']), wow_get_progression(data), data['progression']['raids'][-1]['name'])
+                    wow_get_race(data['race']), progression)
     except:
         try:
             return "Error: {}".format(data['reason'])
@@ -58,21 +64,28 @@ def wow_armory_format(data, link):
             return 'Unable to fetch information; do the realm and character exist?'
 
 
-def wow_get_progression(data):
+def wow_get_progression(data, raid_index = -1):
     """Gets the active progression"""
     try:
-        raid = data['progression']['raids'][-1]
+        raid = data['progression']['raids'][raid_index]
 
         raid_difficulties = {'lfr': 0, 'normal': 1, 'heroic': 2, 'mythic': 3}
         active_progression = [k for k, v in raid.iteritems() if k in raid_difficulties.keys() and v > 0]
-        highest_progression = max({k:v for k,v in raid_difficulties.iteritems() if k in active_progression}.iteritems(), key=lambda x: x[1])[0]
+        highest_progression = max({k:v for k,v in raid_difficulties.iteritems()
+                                   if k in active_progression}.iteritems(), key=lambda x: x[1])[0]
         highest_progression_kills = len([x for x in raid['bosses'] if x[highest_progression+'Kills'] > 0])
         highest_progression_bosses = len(raid['bosses'])
 
         raid_difficulty_output_format = {'lfr': 'LFR', 'normal': 'N', 'heroic': 'H', 'mythic': 'M'}
-        return"{}/{}{}".format(highest_progression_kills, highest_progression_bosses, raid_difficulty_output_format[highest_progression])
+        progression = "{}/{}{}".format(highest_progression_kills, highest_progression_bosses,
+                                       raid_difficulty_output_format[highest_progression])
     except:
-        return "0/0LFR"
+        progression = "0/0LFR"
+
+    if progression == "0/0LFR":
+        return wow_get_progression(data, raid_index - 1)
+    else:
+        return progression, raid['name']
 
 
 def wow_get_title(data):
