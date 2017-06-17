@@ -8,7 +8,7 @@ domain_re = r'^.*?([^/\.]+\.[^/\.]+)$'
 
 skipurls = ["youtube.com", "youtu.be", "reddit.com", "spotify.com",
             "steampowered.com", "imgur.com", "j.mp", "goo.gl", "worf.co",
-            "is.gd", "bit.ly", "tinyurl.com", "twitter.com"]
+            "is.gd", "bit.ly", "tinyurl.com", "twitter.com", "imdb.com"]
 
 
 def db_init(db):
