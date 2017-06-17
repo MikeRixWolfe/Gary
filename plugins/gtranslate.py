@@ -115,6 +115,7 @@ lang_pairs = [
     ("ja jp jpn", "Japanese"),
     ("ka", "Georgian"),
     ("ko", "Korean"),
+    ("la", "Latin"),
     ("lt", "Lithuanian"),
     ("lv", "Latvian"),
     ("mk", "Macedonian"),
