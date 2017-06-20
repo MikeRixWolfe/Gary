@@ -3,7 +3,7 @@ import re
 import time
 from time import strptime, strftime
 from urllib import quote
-from util import hook, http
+from util import hook, http, web
 
 twitter_re = (r'.*?twitter.com/(.+?)/status/([0-9]+)', re.I)
 
@@ -87,12 +87,11 @@ def twitter(inp, api_key=None):
 @hook.api_key('twitter')
 @hook.regex(*twitter_re)
 def twitter_url(match, say=None, api_key=None):
-
     try:
         request_url = 'https://api.twitter.com/1.1/statuses/show.json'
         params = {'id': match.group(2)}
         tweet = http.get_json(request_url, query_params=params, oauth=True, oauth_keys=api_key)
-        say('{} on Twitter: "{}"'.format(tweet['user']['name'], tweet['text']))
+        say(u'{} on Twitter: "{}"'.format(tweet['user']['name'], tweet['text']))
     except:
         say("{} - Twitter".format(web.try_googl(match.group(0))))
 
