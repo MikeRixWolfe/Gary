@@ -70,6 +70,11 @@ def get_sales(mask):
         else:
             data["featured"]["items"].append(item)
 
+    # Check for no data
+    if sum([len(c_data.get('items', {})) for category, c_data in
+            data.iteritems() if isinstance(c_data, dict)]) == 0:
+        return {}, False
+
     # Mask Data
     data = {k: v for k, v in data.items() if isinstance(v, dict)
         and k not in mask}
@@ -128,7 +133,7 @@ def get_sales(mask):
         log_sales_data(sales, "sales")
 
     # Return usable data
-    return sales
+    return sales, True
 
 
 def format_sale_item(item):
@@ -169,11 +174,13 @@ def steamsales(inp, say='', chan=''):
 
     # Get Sales
     mask += [option for option in options.values() if option not in inp]
-    sales = get_sales(mask)
+    sales, flag = get_sales(mask)
 
     # If sales not returned
-    if not sales:
+    if not sales and not flag:
         return "Steam Store API error, please try again in a few minutes."
+    elif not sales and flag:
+        return "No sales found."
 
     # Prepare sales
     for k, v in options.items():
@@ -207,7 +214,7 @@ def saleloop(paraml, nick='', conn=None):
             time.sleep(1200)
 
             # Get data
-            sales = get_sales(mask)
+            sales, flag = get_sales(mask)
             if not sales:
                 print(">>> u'No Steam sales found :{}'".format(paraml[0]))
 
