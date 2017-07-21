@@ -38,7 +38,8 @@ def get_info(url):
         title = http.get_title(url)
         title = u' '.join(re.sub(u'\r|\n', u' ', title).split()).strip('| ')
         return web.try_googl(url), title or None
-    except:
+    except Exception as e:
+        print e
         return web.try_googl(url), None
 
 

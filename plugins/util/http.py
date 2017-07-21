@@ -17,6 +17,7 @@ from urllib2 import HTTPError, URLError
 from lxml import etree, html
 from bs4 import BeautifulSoup
 
+from HTMLParser import HTMLParser
 
 ua_bot = 'Gary/2.0'
 ua_firefox = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.6) ' \
@@ -24,6 +25,7 @@ ua_firefox = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.6) ' \
 ua_internetexplorer = 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'
 
 jar = cookielib.CookieJar()
+h = HTMLParser()
 
 
 def get(*args, **kwargs):
@@ -166,11 +168,6 @@ def oauth_sign_request(method, url, params, unsigned_request, consumer_secret, t
     return signature
 
 
-def unescape(s):
-    if not s.strip():
-        return s
-    return html.fromstring(s).text_content()
+def get_title(url, tag="title"):
+    return h.unescape(get_soup(url).find(tag).text)
 
-
-def get_title(url, tag=".//title"):
-    return unescape(get_html(url).find(tag).text)

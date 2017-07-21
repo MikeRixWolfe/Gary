@@ -13,7 +13,7 @@ paren_re = re.compile('\s*\(.*\)$')
 
 
 @hook.command
-def wiki(inp):
+def wiki(inp, say=None):
     """.w/.wiki <phrase> - Gets first sentence of Wikipedia article on <phrase>."""
 
     x = http.get_xml(search_url, search=inp)
@@ -46,4 +46,4 @@ def wiki(inp):
     if len(desc) > 300:
         desc = desc[:300] + '...'
 
-    return u'%s - %s' % (web.try_googl(http.quote(url, ':/')), desc)
+    say(u'%s - %s' % (web.try_googl(http.quote(url, ':/')), desc))

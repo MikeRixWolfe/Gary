@@ -74,7 +74,7 @@ def twitter(inp, api_key=None):
         except IndexError:
             return 'Error: not that many tweets found'
 
-    text = http.unescape(tweet["text"])
+    text = http.h.unescape(tweet["text"])
     screen_name = tweet["user"]["screen_name"]
     time = tweet["created_at"]
 
