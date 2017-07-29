@@ -28,10 +28,10 @@ def armory_format(data, link):
         return data['reason']
 
     if 'name' in data:
-        niceurl = link.replace('/api/d3/', '/d3/en/')
+        niceurl = link.replace('//us.api', '//us')
 
         try:
-            return '{0} is a level \x0307{1}({2})\x0F {3} {4} with \x0307{5}\x0F elite kills ' \
+            return '\x0307{0}\x0F is a level \x0307{1}({2})\x0F {3} {4} with \x0307{5}\x0F elite kills ' \
                     'and dealing \x0307{6}\x0F damage. Armory Profile: {7}'.format(data['name'],
                     data['level'], data['paragonLevel'], get_gender(data['gender']),
                     get_class(data['class'], True), data['kills']['elites'], data['stats']['damage'],
@@ -64,7 +64,8 @@ def get_class(class_id, colours=True):
             "crusader": "\x0308Crusader\x0F",
             "wizard": "\x0302Wizard\x0F",
             "monk": "\x02Monk\x0F",
-            "demon-hunter": "\x0306Demon Hunter\x0F"
+            "demon-hunter": "\x0306Demon Hunter\x0F",
+            "necromancer": "\x0312Necromancer\x0F"
         }
     else:
         class_ids = {
