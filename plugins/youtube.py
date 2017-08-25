@@ -22,7 +22,7 @@ def get_youtube_info(video_id, api_key=None):
         return web.try_googl(short_url+video_id)
 
     playtime = result['items'][0]['contentDetails']['duration'].strip('PT').lower()
-    return u'{} - [{}] \x02{title}\x02'.format(web.try_googl(short_url+video_id),
+    return u'{} - [{}] \x02{title}\x02 - \x02{channelTitle}\x02'.format(web.try_googl(short_url+video_id),
         playtime, **result['items'][0]['snippet'])
 
 
