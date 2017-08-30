@@ -4,7 +4,7 @@ from datetime import datetime
 from util import hook, http, web
 
 link_re = r'https?://(?:www\.)?([^: /]+)(?::\d+)?/?\S*'
-domain_re = r'^.*?([^/\.]+\.[^/\.]+)$'
+domain_re = r'^.*?([^/\.]+(?:\.[^/\.]+)?)$'
 
 skipurls = ["youtube.com", "youtu.be", "reddit.com", "spotify.com", "noxd.co",
             "steampowered.com", "imgur.com", "j.mp", "goo.gl", "worf.co",
@@ -39,7 +39,7 @@ def get_info(url):
         title = u' '.join(re.sub(u'\r|\n', u' ', title).split()).strip('| ')
         return web.try_googl(url), title or None
     except Exception as e:
-        print e
+        #print(e)
         return web.try_googl(url), None
 
 
