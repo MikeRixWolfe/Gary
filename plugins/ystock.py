@@ -47,15 +47,18 @@ def stock(inp, say=''):
     if quote.get('Volume', None) in (None, 'N/A', '0', 0):
         return "Unknown ticker symbol '%s'" % inp
 
-    if float(quote['Change']) < 0:
-        quote['Color'] = "5"
-    else:
-        quote['Color'] = "3"
+    try:
+        if float(quote['Change']) < 0:
+            quote['Color'] = "5"
+        else:
+            quote['Color'] = "3"
 
-    say("{Name} - ${LastTradePriceOnly} " \
-          "\x03{Color}{Change} ({ChangeinPercent})\x0F " \
-          "H:${DaysHigh} L:${DaysLow} O:${Open} " \
-          "Volume:{Volume} [{LastTradeTime} {LastTradeDate}]".format(**quote))
+        say("{Name} - ${LastTradePriceOnly} " \
+            "\x03{Color}{Change} ({ChangeinPercent})\x0F " \
+            "H:${DaysHigh} L:${DaysLow} O:${Open} " \
+            "Volume:{Volume} [{LastTradeTime} {LastTradeDate}]".format(**quote))
+    except:
+        say("Error parsing return data, please try again later.")
 
 
 @hook.command
@@ -68,16 +71,19 @@ def stockhistory(inp, say=''):
     if quote.get('Volume', None) in (None, 'N/A', '0', 0):
         return "Unknown ticker symbol '%s'" % inp
 
-    if float(quote['ChangeFromYearLow']) < 0:
-        quote['Color'] = "5"
-    else:
-        quote['Color'] = "3"
-        quote['ChangeFromYearLow'] = "+" + quote['ChangeFromYearLow']
+    try:
+        if float(quote['ChangeFromYearLow']) < 0:
+            quote['Color'] = "5"
+        else:
+            quote['Color'] = "3"
+            quote['ChangeFromYearLow'] = "+" + quote['ChangeFromYearLow']
 
-    say("{Name} - ${LastTradePriceOnly} " \
-          "\x03{Color}{ChangeFromYearLow} ({PercentChangeFromYearLow})\x0F " \
-          "YearH:${YearHigh} YearAvg:${TwoHundreddayMovingAverage} " \
-          "YearL:${YearLow}; Volume:{Volume} " \
-          "(Avg Daily Volume:{AverageDailyVolume}) " \
-          "[{LastTradeTime} {LastTradeDate}]".format(**quote))
+        say("{Name} - ${LastTradePriceOnly} " \
+            "\x03{Color}{ChangeFromYearLow} ({PercentChangeFromYearLow})\x0F " \
+            "YearH:${YearHigh} YearAvg:${TwoHundreddayMovingAverage} " \
+            "YearL:${YearLow}; Volume:{Volume} " \
+            "(Avg Daily Volume:{AverageDailyVolume}) " \
+            "[{LastTradeTime} {LastTradeDate}]".format(**quote))
+    except:
+        say("Error parsing return data, please try again later.")
 
