@@ -1,3 +1,4 @@
+import mimetypes
 import time
 import re
 from datetime import datetime
@@ -34,12 +35,17 @@ def get_linkdump(db, server, chan, period, raw=False):
 def get_info(url):
     if not url.startswith('//') and '://' not in url:
         url = 'http://' + url
+
     try:
+        mimetype, encoding = mimetypes.guess_type(url)
+        if mimetype.startswith('image'):
+            return web.try_googl(url), None
+
         title = http.get_title(url)
         title = u' '.join(re.sub(u'\r|\n', u' ', title).split()).strip('| ')
+
         return web.try_googl(url), title or None
     except Exception as e:
-        #print(e)
         return web.try_googl(url), None
 
 
