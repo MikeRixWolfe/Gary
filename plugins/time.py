@@ -5,7 +5,7 @@ api_url = 'http://api.wolframalpha.com/v2/query?format=plaintext'
 
 
 @hook.command("time")
-def time_command(inp, bot=None):
+def time_command(inp, say=None, bot=None):
     """.time <area> - Gets the time in <area>."""
     query = "current time in {}".format(inp)
 
@@ -29,7 +29,7 @@ def time_command(inp, bot=None):
             place = text.capitalize_first(" ".join(request.xpath("//pod[@" \
                 "title='Input interpretation']/subpod/plaintext/text()")).split('|')[0])
             place = place.replace("Current Time In", "").strip()
-        return u"\x02{}\x02 - {}".format(place, time)
+        say(u"\x02{}\x02 - {}".format(place, time))
     else:
         return "Could not get the time for '{}'.".format(inp)
 

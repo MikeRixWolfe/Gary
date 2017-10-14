@@ -38,7 +38,7 @@ def get_info(url):
 
     try:
         mimetype, encoding = mimetypes.guess_type(url)
-        if mimetype and mimetype.startswith('image'):
+        if mimetype and any(mimetype.startswith(t) for t in ['video', 'image']):
             return web.try_googl(url), None
 
         title = http.get_title(url)
