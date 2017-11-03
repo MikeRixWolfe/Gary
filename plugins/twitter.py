@@ -9,7 +9,7 @@ twitter_re = (r'.*?twitter.com/(.+?)/status/([0-9]+)', re.I)
 
 @hook.api_key('twitter')
 @hook.command
-def twitter(inp, api_key=None):
+def twitter(inp, say=None, api_key=None):
     """.twitter <user>/<user> <n>/<id>/#<search>/#<search> <n> - Get <user>'s last/<n>th tweet/get tweet <id>/do <search>/get <n>th <search> result."""
     if not isinstance(api_key, dict) or any(key not in api_key for key in
                                             ('consumer', 'consumer_secret', 'access', 'access_secret')):
@@ -81,7 +81,7 @@ def twitter(inp, api_key=None):
     time = strftime('%Y-%m-%d %H:%M:%S',
                     strptime(time, '%a %b %d %H:%M:%S +0000 %Y'))
 
-    return "%s: %s [%s]" % (screen_name, text, time)
+    say("%s: %s [%s]" % (screen_name, text, time))
 
 
 @hook.api_key('twitter')

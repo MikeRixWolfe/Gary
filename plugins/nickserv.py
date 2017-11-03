@@ -66,16 +66,24 @@ def noticed(paraml, chan='', conn=None):
             chan.lower() == conn.conf.get('nickserv_name', 'nickserv'):
             if conn.conf.get('service_style') == 'anope':
                 if paraml[1].split()[0] == 'STATUS':
+                    user = [str(paraml[1].split()[1]).lower()
                     if paraml[1].split()[2] == '3':
-                        conn.users[str(paraml[1].split()[1]).lower()] = True
+                        conn.users[user] = True
+                        print(">> {} identified.".format(user))
                     else:
-                        conn.users[str(paraml[1].split()[1]).lower()] = False
+                        conn.users[user] = False
+                        print(">> {} not identified.".format(user))
             elif conn.conf.get('service_style') == 'hybserv':
                 if "Nickname:" in paraml[1]:
                     if "ONLINE" in paraml[1]:
-                        conn.users[str(paraml[1].split()[1]).lower()] = True
+                        user = str(paraml[1].split()[1]).lower()
+                        conn.users[user] = True
+                        print(">> {} identified.".format(user))
                     else:
-                        conn.users[str(paraml[1].split()[1]).lower()] = False
+                        conn.users[user] = False
+                        print(">> {} not identified.".format(user))
                 elif "not registered" in paraml[1] or "is private" in paraml[1]:
-                    conn.users[str(paraml[1].split()[2]).lower()[2:-2]] = False
+                    user = str(paraml[1].split()[2]).lower()[2:-2]
+                    conn.users[user] = False
+                    print(">> {} not identified.".format(user))
 
