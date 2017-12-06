@@ -74,7 +74,7 @@ def twitter(inp, say=None, api_key=None):
         except IndexError:
             return 'Error: not that many tweets found'
 
-    text = http.h.unescape(tweet["text"])
+    text = http.h.unescape(tweet["text"].replace('\n', ' '))
     screen_name = tweet["user"]["screen_name"]
     time = tweet["created_at"]
 
@@ -91,7 +91,7 @@ def twitter_url(match, say=None, api_key=None):
         request_url = 'https://api.twitter.com/1.1/statuses/show.json'
         params = {'id': match.group(2)}
         tweet = http.get_json(request_url, query_params=params, oauth=True, oauth_keys=api_key)
-        say(u'{} on Twitter: "{}"'.format(tweet['user']['name'], tweet['text']))
+        say(u'{} on Twitter: "{}"'.format(tweet['user']['name'], tweet['text'].replace('\n', ' ')))
     except:
         say("{} - Twitter".format(web.try_googl(match.group(0))))
 
