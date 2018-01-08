@@ -38,6 +38,23 @@ def statusreset(inp, conn=None):
     return "Done."
 
 
+@hook.command()
+def reauth(inp, conn=None):
+    # wipe user list (useful for server restarts)
+    conn.users = {}
+
+    # identify to services
+    nickserv_password = conn.conf.get('nickserv_password', '')
+    nickserv_name = conn.conf.get('nickserv_name', 'nickserv')
+    nickserv_command = conn.conf.get('nickserv_command', 'IDENTIFY %s')
+    nickserv_info = conn.conf.get('nickserv_info_command', 'STATUS %s')
+    if nickserv_password:
+        conn.msg(nickserv_name, nickserv_command % nickserv_password)
+        sleep(1)
+        conn.msg(nickserv_name, nickserv_info % conn.nick)
+        sleep(1)
+
+
 @hook.singlethread
 @hook.event('*')
 def nickserv_tracking(paraml, nick=None, input=None, conn=None):
@@ -66,7 +83,7 @@ def noticed(paraml, chan='', conn=None):
             chan.lower() == conn.conf.get('nickserv_name', 'nickserv'):
             if conn.conf.get('service_style') == 'anope':
                 if paraml[1].split()[0] == 'STATUS':
-                    user = [str(paraml[1].split()[1]).lower()
+                    user = str(paraml[1].split()[1]).lower()
                     if paraml[1].split()[2] == '3':
                         conn.users[user] = True
                         print(">> {} identified.".format(user))
