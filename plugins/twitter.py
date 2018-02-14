@@ -41,7 +41,7 @@ def twitter(inp, say=None, api_key=None):
 
         else:
             request_url = "https://api.twitter.com/1.1/statuses/user_timeline.json"
-            params = {'screen_name': inp, 'exclude_replies': True, 'include_rts': False}
+            params = {'screen_name': inp, 'exclude_replies': True, 'include_rts': False, 'tweet_mode': 'extended'}
 
     try:
         tweet = http.get_json(request_url, query_params=params, oauth=True, oauth_keys=api_key)
@@ -74,7 +74,7 @@ def twitter(inp, say=None, api_key=None):
         except IndexError:
             return 'Error: not that many tweets found'
 
-    text = http.h.unescape(tweet["text"].replace('\n', ' '))
+    text = http.h.unescape(tweet["full_text"].replace('\n', '\t'))
     screen_name = tweet["user"]["screen_name"]
     time = tweet["created_at"]
 
@@ -89,9 +89,9 @@ def twitter(inp, say=None, api_key=None):
 def twitter_url(match, say=None, api_key=None):
     try:
         request_url = 'https://api.twitter.com/1.1/statuses/show.json'
-        params = {'id': match.group(2)}
+        params = {'id': match.group(2), 'tweet_mode': 'extended'}
         tweet = http.get_json(request_url, query_params=params, oauth=True, oauth_keys=api_key)
-        say(u'{} on Twitter: "{}"'.format(tweet['user']['name'], tweet['text'].replace('\n', ' ')))
+        say(u'{} on Twitter: "{}"'.format(tweet['user']['name'], tweet['full_text'].replace('\n', '\t')))
     except:
         say("{} - Twitter".format(web.try_googl(match.group(0))))
 

@@ -1,3 +1,2 @@
 BeautifulSoup4==4.3.2
 lxml==3.4.0
-yql==0.7.7

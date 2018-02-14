@@ -59,7 +59,7 @@ def reauth(inp, conn=None):
 @hook.event('*')
 def nickserv_tracking(paraml, nick=None, input=None, conn=None):
     sleep(1)
-    if input.command in ('QUIT', 'NICK', 'JOIN', 'PART', 'PRIVMSG', 'KICK') and \
+    if input.command in ('QUIT', 'NICK', 'PART', 'PRIVMSG', 'KICK') and \
             conn.users.get(conn.nick.lower(), False):
         nick = nick.lower()
         nickserv_name = conn.conf.get('nickserv_name', 'nickserv')

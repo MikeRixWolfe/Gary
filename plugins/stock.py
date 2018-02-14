@@ -1,11 +1,10 @@
 import requests
-import simplejson
 from util import hook
 
 
 @hook.command
-def iexstock(inp, say=''):
-    """.iexstock <symbol> - Gets stock information from IEX."""
+def stock(inp, say=''):
+    """.stock <symbol> - Gets stock information from IEX."""
     # https://iextrading.com/developer/docs/#quote
     quote = requests.get('https://api.iextrading.com/1.0/stock/{}/quote'.format(inp))
 

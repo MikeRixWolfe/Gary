@@ -21,7 +21,6 @@
 * Python 2.7.x
 * BeautifulSoup4
 * lxml
-* yql
 
 ## Documentation
 * [Installation](https://github.com/MikeRixWolfe/Gary/wiki/Installation)
