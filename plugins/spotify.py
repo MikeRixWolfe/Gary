@@ -1,4 +1,5 @@
 import re
+import requests
 from urllib import urlencode
 
 from util import hook, http, web
@@ -31,9 +32,14 @@ def sptfy(inp, sptfy=False):
         return web.try_googl(inp)
 
 
+@hook.api_key('spotify')
 @hook.command
-def spotify(inp):
+def spotify(inp, api_key=None):
     """.spotify [-track|-artist|-album] <search term> - Search for specified media via Spotify; defaults to track."""
+    if not isinstance(api_key, dict) or any(key not in api_key for key in
+                                            ('client_id', 'client_secret')):
+        return "error: api keys not set"
+
     inp = inp.split(' ')
     if len(inp) > 1 and inp[0] in ['-track', '-artist', '-album']:
         kind, query = inp.pop(0)[1:], " ".join(inp)
@@ -41,7 +47,17 @@ def spotify(inp):
         kind, query = "track", " ".join(inp)
 
     try:
-        data = http.get_json("https://api.spotify.com/v1/search/", type=kind, q=query, limit=1)
+        # https://stackoverflow.com/questions/30557409/python-spotify-api-post-call
+        access_token = requests.post('https://accounts.spotify.com/api/token',
+                                     auth=(api_key['client_id'], api_key['client_secret']),
+                                     data={'grant_type': 'client_credentials'}).json()['access_token']
+    except Exception as e:
+        return "Could not get access token: {}".format(e)
+
+
+    try:
+        data = http.get_json("https://api.spotify.com/v1/search/", type=kind, q=query, limit=1,
+                             headers={'Authorization': 'Bearer ' + access_token})
     except Exception as e:
         return "Could not get {} information: {}".format(kind, e)
 
