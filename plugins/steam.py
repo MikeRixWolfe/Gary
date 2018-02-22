@@ -67,7 +67,7 @@ def steam_url(match, say=None):
     app_id = match.group(1)
     try:
         if app_id:
-            say(format_data(app_id, show_url=False))
+            say(format_data(app_id))
         else:
             raise Exception
     except:

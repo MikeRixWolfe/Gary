@@ -74,14 +74,21 @@ def twitter(inp, say=None, api_key=None):
         except IndexError:
             return 'Error: not that many tweets found'
 
-    text = http.h.unescape(tweet["full_text"].replace('\n', '\t'))
+    text = http.h.unescape(tweet["full_text"])
     screen_name = tweet["user"]["screen_name"]
     time = tweet["created_at"]
 
     time = strftime('%Y-%m-%d %H:%M:%S',
                     strptime(time, '%a %b %d %H:%M:%S +0000 %Y'))
 
-    say("%s: %s [%s]" % (screen_name, text, time))
+    if 1 < tweet['full_text'].count('\n') < 4:
+        tweet['full_text'] = re.sub(r'(.*?)(https:\/\/t.co\/.*)', r'\1\n\2', tweet['full_text'])
+        say(u'{} on Twitter:'.format(screen_name))
+        for line in text.split('\n'):
+            if len(line.strip()) > 0:
+                say(u'   '.format(line))
+    else:
+        say("%s: %s [%s]" % (screen_name, text.replace('\n', ' | '), time))
 
 
 @hook.api_key('twitter')
@@ -91,7 +98,14 @@ def twitter_url(match, say=None, api_key=None):
         request_url = 'https://api.twitter.com/1.1/statuses/show.json'
         params = {'id': match.group(2), 'tweet_mode': 'extended'}
         tweet = http.get_json(request_url, query_params=params, oauth=True, oauth_keys=api_key)
-        say(u'{} on Twitter: "{}"'.format(tweet['user']['name'], tweet['full_text'].replace('\n', '\t')))
+        if 1 < tweet['full_text'].count('\n') < 4:
+            tweet['full_text'] = re.sub(r'(.*?)(https:\/\/t.co\/.*)', r'\1\n\2', tweet['full_text'])
+            say(u'{} on Twitter:'.format(tweet['user']['name']))
+            for line in tweet['full_text'].split('\n'):
+                if len(line.strip()) > 0:
+                    say(u'   {}'.format(line))
+        else:
+            say(u'{} on Twitter: "{}"'.format(tweet['user']['name'], tweet['full_text'].replace('\n', ' | ')))
     except:
         say("{} - Twitter".format(web.try_googl(match.group(0))))
 
