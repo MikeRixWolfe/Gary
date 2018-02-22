@@ -140,7 +140,8 @@ def wow_get_race(race_id):
     race_ids = {
         1: "Human", 2: "Orc", 3: "Dwarf", 4: "Night Elf", 5: "Undead", 6: "Tauren", 7: "Gnome",
         8: "Troll", 9: "Goblin", 10: "Blood Elf", 11: "Draenei", 22: "Worgen",
-        24: "Pandaren (neutral)", 25: "Pandaren (Alliance)", 26: "Pandaren (Horde)"
+        24: "Pandaren (neutral)", 25: "Pandaren (Alliance)", 26: "Pandaren (Horde)",
+        27: "Nightborne", 28: "Highmountain Tauren", 29: "Void Elf", 30: "Lightforged Draenei"
     }
 
     if race_id in race_ids:
@@ -179,8 +180,8 @@ def armory(inp, say=None, api_key=None):
     if len(splitinput) < 2:
         return 'armory [realm] [character name] [region = US] - Look up character and returns API data.'
 
-    realm = splitinput[0].replace('_', '-')
-    char_name = splitinput[1]
+    realm = splitinput[1].replace('_', '-')
+    char_name = splitinput[0]
 
     # Sets the default region to EU if none specified.
     if len(splitinput) < 3:
