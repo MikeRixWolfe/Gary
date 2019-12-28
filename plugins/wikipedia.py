@@ -15,7 +15,6 @@ paren_re = re.compile('\s*\(.*\)$')
 @hook.command
 def wiki(inp, say=None):
     """.w/.wiki <phrase> - Gets first sentence of Wikipedia article on <phrase>."""
-
     x = http.get_xml(search_url, search=inp)
 
     ns = '{http://opensearch.org/searchsuggest2}'
@@ -31,7 +30,10 @@ def wiki(inp, say=None):
         return [item.find(ns + x).text for x in
                 ('Text', 'Description', 'Url')]
 
-    title, desc, url = extract(items[0])
+    try:
+        title, desc, url = extract(items[0])
+    except:
+        return "Couldn't parse Wikipedia, please try again later."
 
     if 'may refer to' in desc:
         title, desc, url = extract(items[1])
@@ -46,4 +48,5 @@ def wiki(inp, say=None):
     if len(desc) > 300:
         desc = desc[:300] + '...'
 
-    say(u'%s - %s' % (web.try_googl(http.quote(url, ':/')), desc))
+    say(u'%s - %s' % (web.try_googl(url), desc))
+

@@ -207,7 +207,7 @@ def deop(inp, conn=None, chan=None, notice=None):
     mode_cmd("-o", "deop", inp, chan, conn, notice)
 
 
-@hook.command(adminonly=True)
+#@hook.command(adminonly=True)
 def topic(inp, conn=None, chan=None):
     """.topic [channel] <topic> - Change the topic of a channel."""
     split = inp.split(" ")

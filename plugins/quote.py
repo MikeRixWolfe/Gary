@@ -1,71 +1,96 @@
 import time
-from util import hook
+from util import hook, text
 
 
 def db_init(db):
-    db.execute("create table if not exists quote"
-               "(key INTEGER PRIMARY KEY, chan, msg, nick, time real)")
+    db.execute("create table if not exists quotes"
+               "(id INTEGER PRIMARY KEY, quote TEXT, nick TEXT, active INTEGER, uts REAL)")
     db.commit()
 
 
-def add_quote(db, chan, msg, nick):
-    db.execute("insert into quote (chan, msg, nick, time)" \
-        " values(?,?,?,?)", (chan, msg, nick, time.time()))
+def add_quote(db, quote, nick):
+    db.execute("insert into quotes (quote, nick, active, uts)" \
+        " values(?,?,?,?)", (quote, nick, 1, time.time()))
     db.commit()
 
 
-def del_quote(db, key, chan):
-    update = db.execute("delete from quote where key=? and chan=?", (key,chan))
+def del_quote(db, id):
+    update = db.execute("update quotes set active=0 where id=? and active=1", (id,))
     db.commit()
     return update
 
 
-def get_quote_by_chan(db, chan):
-    return db.execute("select key, msg, nick, time from quote where" \
-        " chan=? order by random() limit 1", (chan,)).fetchone()
+def restore_quote(db, id):
+    update = db.execute("update quotes set active=1 where id=? and active=0", (id,))
+    db.commit()
+    return update
 
 
-def get_quote_by_key(db, key, chan):
-    return db.execute("select key, msg, nick, time from quote where " \
-        "key=? and chan=?", (key, chan)).fetchone()
+def search_quote(db, text):
+    text = '%{}%'.format(text)
+    ids = db.execute("select id from quotes where quote like ? and active=1", (text,)).fetchall()
+    return ids
+
+
+def get_random_quote(db):
+    return db.execute("select id, quote, nick, uts from quotes" \
+        " where active=1 order by random() limit 1").fetchone()
+
+
+def get_quote_by_id(db, id):
+    return db.execute("select id, quote, nick, uts from quotes where" \
+        " id=? and active=1", (id,)).fetchone()
 
 
 def format_quote(q):
-    key, msg, nick, ctime = q
-    return 'Quote #{}: "{}" by {} at {}'.format(key, msg, nick,
-        time.strftime("%H:%M on %m-%d-%Y", time.localtime(ctime)))
+    id, quote, nick, uts = q
+    return 'Quote #{}: "{}" set by {} in {}'.format(id, quote, nick,
+        time.strftime("%B %Y", time.localtime(uts)))
 
 
 @hook.command('rq', autohelp=False)
 @hook.command(autohelp=False)
-def randomquote(inp, nick='', chan='', db=None, input=None):
+def randomquote(inp, say=None, db=None, input=None):
     """.randomquote - Gets a random quote."""
     db_init(db)
-    quote = get_quote_by_chan(db, chan)
+    quote = get_random_quote(db)
 
     if quote:
-        return format_quote(quote)
+        say(format_quote(quote))
     else:
-        return "No quotes found for this channel."
+        return "No quotes found."
 
 
 @hook.command
-def getquote(inp, nick='', chan='', db=None):
+def getquote(inp, say=None, db=None):
     """.getquote <n> - Gets the <n>th quote."""
     db_init(db)
-    quote = get_quote_by_key(db, inp, chan)
+    quote = get_quote_by_id(db, inp)
 
     if quote:
-        return format_quote(quote)
+        say(format_quote(quote))
     else:
         return "Quote #{} was not found.".format(inp)
 
 
-@hook.command(modonly=True)
+@hook.command
+def searchquote(inp, say=None, db=None):
+    """.searchquote <text> - Returns IDs for quotes matching <text>."""
+    db_init(db)
+    ids = search_quote(db, inp)
+
+    if quote:
+        say(text.truncate_str("Quotes: {}".format(
+            ', '.join([str(id[0]) for id in ids])), 350))
+    else:
+        return "None found."
+
+
+@hook.command
 def delquote(inp, chan='', db=None):
     """.delquote <n> - Deletes the <n>th quote."""
     db_init(db)
-    quote = del_quote(db, inp, chan)
+    quote = del_quote(db, inp)
 
     if quote.rowcount > 0:
         return "Quote #{} deleted.".format(inp)
@@ -74,16 +99,28 @@ def delquote(inp, chan='', db=None):
 
 
 @hook.command
-def quote(inp, nick='', chan='', db=None):
+def restorequote(inp, chan='', db=None):
+    """.restorequote <n> - Restores the <n>th quote."""
+    db_init(db)
+    quote = restore_quote(db, inp)
+
+    if quote.rowcount > 0:
+        return "Quote #{} restored.".format(inp)
+    else:
+        return "Quote #{} was not found.".format(inp)
+
+
+@hook.command
+def quote(inp, nick='', chan='', say=None, db=None):
     """.quote <msg> - Adds a quote."""
     db_init(db)
 
     if inp:
         try:
-            add_quote(db, chan, inp, nick)
+            add_quote(db, inp, nick)
         except db.IntegrityError:
             return "Error in adding quote."
-        return "Quote added."
+        say("Quote added.")
     else:
         return "Check your input and try again."
 

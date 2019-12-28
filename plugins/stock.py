@@ -1,19 +1,28 @@
 import requests
-from util import hook
+from util import hook, web
+
+url = 'https://www.alphavantage.co/query'
 
 
-@hook.command
-def stock(inp, say=''):
-    """.stock <symbol> - Gets stock information from IEX."""
-    # https://iextrading.com/developer/docs/#quote
-    quote = requests.get('https://api.iextrading.com/1.0/stock/{}/quote'.format(inp))
+def tryParse(value):
+    try:
+        return float(value.strip('%'))
+    except ValueError:
+        return value
 
-    if quote.status_code == 404:
+
+@hook.api_key('alphavantage')
+@hook.command()
+def stock(inp, api_key=None):
+    params = {'function': 'GLOBAL_QUOTE', 'apikey': api_key, 'symbol': inp}
+    quote = requests.get(url, params=params).json()
+
+    if not quote.get("Global Quote"):
         return "Unknown ticker symbol '{}'".format(inp)
-    elif quote.status_code != 200:
-        return "IEX Trading API error, please try again in a few minutes."
 
-    quote = quote.json()
+    quote = {k.split(' ')[-1]:tryParse(v) for k,v in quote['Global Quote'].items()}
+
+    quote['url'] = web.try_googl(inp)
 
     try:
         if float(quote['change']) < 0:
@@ -21,10 +30,10 @@ def stock(inp, say=''):
         else:
             quote['color'] = "3"
 
-        say("{companyName} - ${latestPrice:.2f} " \
-            "\x03{color}{change:+.2f} ({changePercent:.2%})\x0F " \
+        return "{symbol} - ${price:.2f} " \
+            "\x03{color}{change:+.2f} ({percent:.2f}%)\x0F " \
             "H:${high:.2f} L:${low:.2f} O:${open:.2f} " \
-            "Volume:{latestVolume} [{latestTime}]".format(**quote))
+            "Volume:{volume} - {url}".format(**quote)
     except:
-        say("Error parsing return data, please try again later.")
+        return "Error parsing return data, please try again later."
 

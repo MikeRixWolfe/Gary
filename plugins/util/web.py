@@ -1,18 +1,13 @@
-""" web.py - handy functions for web services """
-
-import http
 import json
-import yql
+import requests
 
 
 with open('config', 'r') as f:
-    api_key = json.loads(f.read())['api_keys']['google']['access']
+    api_key = json.loads(f.read())['api_keys']['noxd']
 
-short_url = "https://www.googleapis.com/urlshortener/v1/url"
-paste_url = "http://hastebin.com"
-yql_env = "http://datatables.org/alltables.env"
-
-YQL = yql.Public()
+short_url = "https://noxd.co"
+paste_url = "https://hastebin.com"
+#paste_url = "http://hasteb.in"
 
 
 class ShortenError(Exception):
@@ -26,24 +21,15 @@ class ShortenError(Exception):
 
 def googl(url):
     """ shortens a URL with the goo.gl API """
-    postdata = {'longUrl': url}
-    headers = {'Content-Type': 'application/json'}
+    postdata = {'api_key': api_key, 'link': url}
+
 
     try:
-        request = http.get_json(
-            short_url,
-            key=api_key,
-            post_data=json.dumps(postdata),
-            headers=headers,
-            get_method="POST"
-        )['id']
+        request = requests.post(short_url, data=postdata).json()
     except:
         raise ShortenError("Error", "None returned")
 
-    if not request.strip():
-        raise ShortenError("Error", "None returned")
-    else:
-        return request
+    return "{}/{}".format(short_url, request['Id'])
 
 
 def try_googl(url):
@@ -56,11 +42,6 @@ def try_googl(url):
 
 def haste(text, ext='txt'):
     """ pastes text to a hastebin server """
-    page = http.get(paste_url + "/documents", post_data=text)
-    data = json.loads(page)
+    data = requests.post(paste_url + "/documents", data=text).json()
     return ("%s/%s.%s" % (paste_url, data['key'], ext))
 
-
-def query(query, params={}):
-    """ runs a YQL query and returns the results """
-    return YQL.execute(query, params, env=yql_env)

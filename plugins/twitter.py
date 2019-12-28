@@ -74,21 +74,15 @@ def twitter(inp, say=None, api_key=None):
         except IndexError:
             return 'Error: not that many tweets found'
 
-    text = http.h.unescape(tweet["full_text"])
-    screen_name = tweet["user"]["screen_name"]
-    time = tweet["created_at"]
-
-    time = strftime('%Y-%m-%d %H:%M:%S',
-                    strptime(time, '%a %b %d %H:%M:%S +0000 %Y'))
-
     if 1 < tweet['full_text'].count('\n') < 4:
         tweet['full_text'] = re.sub(r'(.*?)(https:\/\/t.co\/.*)', r'\1\n\2', tweet['full_text'])
-        say(u'{} on Twitter:'.format(screen_name))
+        say(u'{} ({}) on Twitter:'.format(tweet['user']['name'], tweet['user']['screen_name']))
         for line in text.split('\n'):
             if len(line.strip()) > 0:
                 say(u'   '.format(line))
     else:
-        say("%s: %s [%s]" % (screen_name, text.replace('\n', ' | '), time))
+        time = strftime('%Y-%m-%d %H:%M:%S', strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y'))
+        say(u'{} on Twitter: "{}" [{}]'.format(tweet['user']['name'], tweet['full_text'].replace('\n', ' | '), time))
 
 
 @hook.api_key('twitter')
@@ -100,7 +94,7 @@ def twitter_url(match, say=None, api_key=None):
         tweet = http.get_json(request_url, query_params=params, oauth=True, oauth_keys=api_key)
         if 1 < tweet['full_text'].count('\n') < 4:
             tweet['full_text'] = re.sub(r'(.*?)(https:\/\/t.co\/.*)', r'\1\n\2', tweet['full_text'])
-            say(u'{} on Twitter:'.format(tweet['user']['name']))
+            say(u'{} ({}) on Twitter:'.format(tweet['user']['name'], tweet['user']['screen_name']))
             for line in tweet['full_text'].split('\n'):
                 if len(line.strip()) > 0:
                     say(u'   {}'.format(line))

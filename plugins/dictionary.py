@@ -83,12 +83,13 @@ def urban(inp, say=None):
 @hook.command
 def etymology(inp, say=None):
     """.etymology <word> - Retrieves the etymology of chosen word."""
-    url = 'http://www.etymonline.com/index.php'
+    url = 'http://www.etymonline.com/search'
     try:
-        h = http.get_html(url, term=inp)
+        params = {'q': inp}
+        h = http.get_html(url, query_params=params)
     except:
         return "Error fetching etymology."
-    etym = h.xpath('//dl')
+    etym = h.xpath('//section')
 
     if not etym:
         return 'No etymology found for ' + inp

@@ -129,11 +129,18 @@ def dispatch(input, kind, func, args, autohelp=False):
         return
 
     if hasattr(func, '_apikey'):
-        key = bot.config.get('api_keys', {}).get(func._apikey, None)
-        if key is None:
-            input.reply('error: missing api key')
-            return
-        input.api_key = key
+        keys = {}
+        for _key in func._apikey.split(','):
+            key = bot.config.get('api_keys', {}).get(_key, None)
+            if key is None:
+                input.reply('error: missing api key')
+                return
+            keys[_key] = key
+
+        if len(keys) == 1:
+            input.api_key = keys[keys.keys()[0]]
+        else:
+            input.api_key = keys
 
     if func._thread:
         bot.threads[func].put(input)

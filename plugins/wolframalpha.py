@@ -11,38 +11,18 @@ def wa(inp, api_key=None):
     url = 'http://api.wolframalpha.com/v2/query?format=plaintext'
 
     try:
-        result = http.get_xml(url, input=inp, appid=api_key)
+        params = { 'input': http.quote(inp), 'appid': api_key, 'output': 'json' }
+        result = http.get_json(url, query_params=params)
     except:
-        return "WolframAlpha query timed out for '%s'" % inp
+        return "WolframAlpha API error, please try again in a few minutes."
 
-    pod_texts = []
-    for pod in result.xpath("//pod"):
-        title = pod.attrib['title']
-        if pod.attrib['id'] == 'Input':
-            continue
+    if result['queryresult']['success'] == False:
+        return "WolframAlpha query failed."
 
-        results = []
-        for subpod in pod.xpath('subpod/plaintext/text()'):
-            subpod = subpod.strip().replace('\\n', '; ')
-            subpod = re.sub(r'\s+', ' ', subpod)
-            if subpod:
-                results.append(subpod)
-        if results:
-            pod_texts.append(title + ': ' + ';'.join(results))
+    data = sorted([pod for pod in result['queryresult']['pods'] if pod['title'] != 'Input interpretation'], key= lambda x: x['position'])
 
-    ret = '. '.join(pod_texts)
+    if len(data) == 0:
+        return "No results."
 
-    if not pod_texts:
-        return 'No results'
+    return text.truncate_str(data[0]['subpods'][0]['plaintext'], 230)
 
-    ret = re.sub(r'\\(.)', r'\1', ret)
-
-    def unicode_sub(match):
-        return unichr(int(match.group(1), 16))
-
-    ret = re.sub(r'\\:([0-9a-z]{4})', unicode_sub, ret)
-
-    if not ret:
-        return 'No results'
-
-    return text.truncate_str(ret.split('. ')[0].strip("Result: "), 230)

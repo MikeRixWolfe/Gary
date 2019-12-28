@@ -2,10 +2,10 @@ import re
 from util import hook, http
 
 formats = [
-    "{traits[ip_address]} seems to be located in {city[names][en]}, {subdivisions[0][names][en]} in {country[names][en]}",
-    "{traits[ip_address]} seems to be located in {city[names][en]} in {country[names][en]}",
-    "{traits[ip_address]} seems to be located in {subdivisions[0][names][en]} in {country[names][en]}",
-    "{traits[ip_address]} seems to be located in {country[names][en]}",
+    "{ip} seems to be located in {city}, {region_name} in {country_name}",
+    "{ip} seems to be located in {city} in {country_name}",
+    "{ip} seems to be located in {region_name} in {country_name}",
+    "{ip} seems to be located in {country_name}",
     "Unable to locate geolocation information for the given location"
 ]
 
@@ -22,13 +22,14 @@ def fformat(args):
     return max(dict(match()).iteritems(), key=lambda x: (x[1], len(x[0])))[0]
 
 
+@hook.api_key('ipapi')
 @hook.command
-def geoip(inp):
+def geoip(inp, api_key=None):
     """.geoip <IP address> - Gets the location of an IP address."""
-    url = "http://geoip.nekudo.com/api/%s/full" % (http.quote(inp.encode('utf8'), safe=''))
+    url = "http://api.ipapi.com/%s" % (http.quote(inp.encode('utf8'), safe=''))
 
     try:
-        data = http.get_json(url)
+        data = http.get_json(url, access_key=api_key)
     except:
         return "I couldn't find %s" % inp
 
