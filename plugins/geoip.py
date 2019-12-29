@@ -25,7 +25,7 @@ def fformat(args):
 @hook.api_key('ipapi')
 @hook.command
 def geoip(inp, api_key=None):
-    """.geoip <IP address> - Gets the location of an IP address."""
+    """geoip <IP address> - Gets the location of an IP address."""
     url = "http://api.ipapi.com/%s" % (http.quote(inp.encode('utf8'), safe=''))
 
     try:

@@ -1,5 +1,4 @@
-import requests
-from util import hook, web
+from util import hook, http, web
 
 url = 'https://www.alphavantage.co/query'
 
@@ -14,8 +13,9 @@ def tryParse(value):
 @hook.api_key('alphavantage')
 @hook.command()
 def stock(inp, api_key=None):
+    """stock <symbol> - Looks up stock information"""
     params = {'function': 'GLOBAL_QUOTE', 'apikey': api_key, 'symbol': inp}
-    quote = requests.get(url, params=params).json()
+    quote = http.get_json(url, query_params=params)
 
     if not quote.get("Global Quote"):
         return "Unknown ticker symbol '{}'".format(inp)

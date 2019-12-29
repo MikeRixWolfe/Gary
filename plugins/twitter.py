@@ -10,7 +10,7 @@ twitter_re = (r'.*?twitter.com/(.+?)/status/([0-9]+)', re.I)
 @hook.api_key('twitter')
 @hook.command
 def twitter(inp, say=None, api_key=None):
-    """.twitter <user>/<user> <n>/<id>/#<search>/#<search> <n> - Get <user>'s last/<n>th tweet/get tweet <id>/do <search>/get <n>th <search> result."""
+    """twitter <user>/<user> <n>/<id>/#<search>/#<search> <n> - Get <user>'s last/<n>th tweet/get tweet <id>/do <search>/get <n>th <search> result."""
     if not isinstance(api_key, dict) or any(key not in api_key for key in
                                             ('consumer', 'consumer_secret', 'access', 'access_secret')):
         return "error: api keys not set"
@@ -103,37 +103,3 @@ def twitter_url(match, say=None, api_key=None):
     except:
         say("{} - Twitter".format(web.try_googl(match.group(0))))
 
-
-@hook.singlethread
-@hook.event('JOIN')
-def twitterloop(paraml, nick='', conn=None, bot=None, api_key=None):
-    """twitter rss checking loop"""
-    server = "%s:%s" % (conn.server, conn.port)
-    if paraml[0] != "#geekboy" or nick != conn.nick:
-        return
-    time.sleep(1)  # Allow chan list time to update
-    api_key = bot.config.get('api_keys', None).get('twitter', None)
-    if not isinstance(api_key, dict) or any(key not in api_key for key in
-        ('consumer', 'consumer_secret', 'access', 'access_secret')):
-            print("Twitter RSS Loop Error: API keys not set.")
-            return
-
-    accounts = ["blizzardcs"]
-    prev_tweets = {}
-    print(">>> u'Beginning Twitter RSS loop :{}'".format(paraml[0]))
-    while paraml[0] in conn.channels:
-        time.sleep(60)
-        for account in accounts:
-            try:
-                tweet = twitter(account, api_key)
-            except Exception as e:
-                print(">>> u'Error in Twitter RSS loop :{}'".format(e))
-            # if not unchanged, empty, error, or @ reply
-            if prev_tweets.get(account, None) != tweet and \
-                    tweet is not None and tweet[:5] != "error" \
-                    and "@" not in tweet.split(":", 1)[1].strip()[:2]:
-                # handle restarts
-                if prev_tweets.get(account, None) is not None:
-                    conn.send("PRIVMSG {} :{}".format(paraml[0], tweet))
-                prev_tweets[account] = tweet
-    print(">>> u'Ending Twitter RSS loop :{}'".format(paraml[0]))

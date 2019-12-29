@@ -45,7 +45,7 @@ def karma_edit(inp, chan='', nick='', say=None, db=None):
 
 @hook.command
 def karma(inp, chan='', say=None, db=None, input=None):
-    """.karma <word> - Returns karma of <word>; <word>(++|--) increments or decrements karma of <word>."""
+    """karma <word> - Returns karma of <word>; <word>(++|--) increments or decrements karma of <word>."""
     db_init(db)
 
     if re.match(r'\(.*\)', inp):
@@ -62,7 +62,7 @@ def karma(inp, chan='', say=None, db=None, input=None):
 
 @hook.command(adminonly=True)
 def setkarma(inp, chan='', db=None):
-    """.setkarma <word> <value> - Sets karma value."""
+    """setkarma <word> <value> - Sets karma value."""
     db_init(db)
 
     try:

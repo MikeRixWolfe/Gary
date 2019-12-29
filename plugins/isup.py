@@ -4,7 +4,7 @@ from util import hook, http
 
 @hook.command
 def isup(inp):
-    """.isup <site> - Checks if a site is up or not."""
+    """isup <site> - Checks if a site is up or not."""
     url = 'http://' + inp if '://' not in inp else inp
 
     try:

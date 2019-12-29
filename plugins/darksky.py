@@ -20,7 +20,7 @@ def geocode(inp, api_key):
 @hook.command('w')
 @hook.command
 def weather(inp, say=None, api_key=None):
-    """.w[eather] <zip code|location> - Gets the current weather conditions."""
+    """w[eather] <zip code|location> - Gets the current weather conditions."""
     if api_key is None:
         return "Error: API key not set."
 
@@ -51,7 +51,7 @@ def weather(inp, say=None, api_key=None):
 @hook.command('f')
 @hook.command
 def forecast(inp, say=None, api_key=None):
-    """.f[orecast] <zip code|location> - Gets the weather forecast."""
+    """f[orecast] <zip code|location> - Gets the weather forecast."""
     if api_key is None:
         return "Error: API key not set."
 
@@ -79,7 +79,7 @@ def forecast(inp, say=None, api_key=None):
 @hook.command('h')
 @hook.command
 def hourly(inp, say=None, api_key=None):
-    """.h[ourly] <zip code|location> - Gets the 12 hour weather forecast."""
+    """h[ourly] <zip code|location> - Gets the 12 hour weather forecast."""
     if api_key is None:
         return "Error: API key not set."
 

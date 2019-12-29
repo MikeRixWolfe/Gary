@@ -24,7 +24,7 @@ def custom_get(query, key, is_image=None, num=1):
 @hook.api_key('google')
 @hook.command('gis')
 def googleimage(inp, api_key=None):
-    """.gis <query> - Returns a random image from the first 10 Google Image results for <query>."""
+    """gis <query> - Returns a random image from the first 10 Google Image results for <query>."""
     try:
         parsed = custom_get(inp, api_key, is_image=True, num=1)
     except Exception as e:
@@ -39,7 +39,7 @@ def googleimage(inp, api_key=None):
 @hook.command('g')
 @hook.command
 def google(inp, api_key=None):
-    """.g[oogle] <query> - Returns first Google search result for <query>."""
+    """g[oogle] <query> - Returns first Google search result for <query>."""
     try:
         parsed = custom_get(inp, api_key)
     except Exception as e:
@@ -55,13 +55,13 @@ def google(inp, api_key=None):
 
 @hook.command
 def map(inp):
-    """.map <place>|<origin to destination> - Gets a Map of place or route from Google Maps."""
+    """map <place>|<origin to destination> - Gets a Map of place or route from Google Maps."""
     return web.try_googl("https://www.google.com/maps/?q={}".format(http.quote_plus(inp)))
 
 
 @hook.command
 def lmgtfy(inp, say=''):
-    """.lmgtfy <query> - Posts a Google link for the specified phrase."""
+    """lmgtfy <query> - Posts a Google link for the specified phrase."""
     say("{} - Let me Google that for you".format(
         web.try_googl("http://lmgtfy.com/?q={}".format(http.quote_plus(inp)))))
 

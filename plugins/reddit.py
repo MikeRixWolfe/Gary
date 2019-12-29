@@ -32,7 +32,7 @@ def reddit_url(match, say=None):
 
 @hook.command
 def reddit(inp):
-    """.reddit <subreddit> [n] - Gets a random post from <subreddit>, or gets the [n]th post in the subreddit."""
+    """reddit <subreddit> [n] - Gets a random post from <subreddit>, or gets the [n]th post in the subreddit."""
 
     # clean and split the input
     parts = inp.lower().strip().split()
@@ -84,7 +84,7 @@ def reddit(inp):
 
 @hook.command
 def ris(inp):
-    """.ris <subreddit> - Reddit image search for random imgur link from subreddit."""
+    """ris <subreddit> - Reddit image search for random imgur link from subreddit."""
     inp = inp.split(' ')[0]
     try:
         data = http.get_json("http://reddit.com/r/%s/.json" % inp)

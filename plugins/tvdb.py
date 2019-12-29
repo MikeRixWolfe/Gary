@@ -81,7 +81,7 @@ def get_episode_info(episode):
 @hook.api_key('tvdb')
 @hook.command
 def tvnext(inp, api_key=None):
-    """.tvnext <series> - Get the next episode of <series>."""
+    """tvnext <series> - Get the next episode of <series>."""
     episodes = get_episodes_for_series(inp, api_key)
 
     if episodes["error"]:
@@ -127,7 +127,7 @@ def tvnext(inp, api_key=None):
 @hook.api_key('tvdb')
 @hook.command
 def tvlast(inp, api_key=None):
-    """.tvlast <series> - Gets the most recently aired episode of <series>."""
+    """tvlast <series> - Gets the most recently aired episode of <series>."""
     episodes = get_episodes_for_series(inp, api_key)
 
     if episodes["error"]:

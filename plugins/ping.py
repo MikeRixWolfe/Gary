@@ -4,7 +4,7 @@ from util import hook
 
 @hook.command
 def ping(inp):
-    """.ping - Pings an IP address or domain."""
+    """ping - Pings an IP address or domain."""
     try:
         out = check_output(["ping", "-c", "1", inp.split()[0]])
     except Exception as e:

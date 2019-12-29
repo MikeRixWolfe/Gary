@@ -149,7 +149,7 @@ def format_sale_item(item):
 
 @hook.command()
 def steamsales(inp, say='', chan=''):
-    ".steamsales <space seperated options> - Check Steam for specified sales; " \
+    "steamsales <space seperated options> - Check Steam for specified sales; " \
     "Displays special event deals on top of chosen deals. " \
     "Options: daily flash featured specials top_sellers all"
 
@@ -197,39 +197,3 @@ def steamsales(inp, say='', chan=''):
         else:
             say(u"\x02{}\x0F: {}".format(category, u"None found"))
 
-
-@hook.singlethread
-@hook.event('JOIN')
-def saleloop(paraml, nick='', conn=None):
-    # If specified chan or not running; alter for multi-channel
-    if paraml[0] != '#vidya' or nick != conn.nick:
-        return
-    time.sleep(1)  # Allow chan list time to update
-    mask = ["specials", "coming_soon", "top_sellers", "new_releases",
-            "genres", "trailerslideshow", "status"]
-    prev_sales = {}
-    print(">>> u'Beginning Steam sale check loop :{}'".format(paraml[0]))
-    while paraml[0] in conn.channels:
-        try:
-            time.sleep(1200)
-
-            # Get data
-            sales, flag = get_sales(mask)
-            if not sales:
-                print(">>> u'No Steam sales found :{}'".format(paraml[0]))
-
-            # Handle restarts
-            if not prev_sales:
-                prev_sales = sales
-
-            # Output appropriate data
-            for category in sales:
-                items = [format_sale_item(item) for item in sales[category]
-                    if item not in prev_sales.get(category, [])]
-                if len(items):
-                    prev_sales[category] = sales[category]  # Update prev
-                    for out in text.chunk_str(u"\x02New {}\x0F: {}".format(category, u"; ".join(items))):
-                        conn.send(u"PRIVMSG {} :{}".format(paraml[0], out))
-        except Exception as e:
-            print(">>> u'Steam saleloop error: {} :{}'".format(e, paraml[0]))
-    print(">>> u'Ending Steam sale check loop :{}'".format(paraml[0]))

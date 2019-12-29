@@ -23,6 +23,6 @@ answers = [g + "It is certain",
 
 @hook.command("8ball")
 def eightball(inp, nick='', say=None):
-    """.8ball <question> - Ask the 8ball a question."""
+    """8ball <question> - Ask the 8ball a question."""
     return random.choice(answers)
 

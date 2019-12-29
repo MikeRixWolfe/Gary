@@ -4,7 +4,7 @@ from util import hook, http
 @hook.api_key('everyoneapi')
 @hook.command
 def cnam(inp, api_key=None):
-    """.cnam <10 digit number> - Get CNAM information for a number via EveryoneAPI."""
+    """cnam <10 digit number> - Get CNAM information for a number via EveryoneAPI."""
     url = 'https://api.everyoneapi.com/v1/phone/{}'.format(inp)
 
     try:

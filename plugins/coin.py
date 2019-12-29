@@ -4,8 +4,7 @@ import random
 
 @hook.command(autohelp=False)
 def coin(inp, me=None):
-    """.coin [amount] - Flips [amount] of coins."""
-
+    """coin [amount] - Flips [amount] of coins."""
     if inp:
         try:
             amount = int(inp)

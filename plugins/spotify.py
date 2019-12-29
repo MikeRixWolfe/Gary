@@ -35,7 +35,7 @@ def sptfy(inp, sptfy=False):
 @hook.api_key('spotify')
 @hook.command
 def spotify(inp, api_key=None):
-    """.spotify [-track|-artist|-album] <search term> - Search for specified media via Spotify; defaults to track."""
+    """spotify [-track|-artist|-album] <search term> - Search for specified media via Spotify; defaults to track."""
     if not isinstance(api_key, dict) or any(key not in api_key for key in
                                             ('client_id', 'client_secret')):
         return "error: api keys not set"

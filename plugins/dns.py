@@ -5,7 +5,7 @@ from util import hook
 
 @hook.command
 def dns(inp):
-    """.dns <ip|domain> - Resolves IP of Domain or vice versa."""
+    """dns <ip|domain> - Resolves IP of Domain or vice versa."""
     try:
         socket.setdefaulttimeout(15)
         if not re.match(r'\d+\.\d+\.\d+\.\d+', inp):

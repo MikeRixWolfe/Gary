@@ -37,7 +37,7 @@ def youtube_url(match, say=None, api_key=None):
 @hook.command('yt')
 @hook.command
 def youtube(inp, say=None, api_key=None):
-    """.youtube <query> - Returns the first YouTube search result for <query>."""
+    """youtube <query> - Returns the first YouTube search result for <query>."""
     params = {
         "q": inp,
         "key": api_key['access'],

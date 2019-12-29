@@ -5,7 +5,7 @@ from util import hook, http
 @hook.api_key('giphy')
 @hook.command
 def gif(inp, api_key=None):
-    """.gif/.giphy <query> - Returns first giphy search result."""
+    """gif/giphy <query> - Returns first giphy search result."""
     url = 'http://api.giphy.com/v1/gifs/search'
     try:
         response = http.get_json(url, q=inp, limit=20, api_key=api_key)

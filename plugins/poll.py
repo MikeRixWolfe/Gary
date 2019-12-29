@@ -12,7 +12,7 @@ active_polls = tree()
 
 @hook.command(autohelp=True)
 def poll(inp, nick=None, chan=None, say=None):
-    """.poll <description>[: choice1, choice2, ..., choice n] - Begins a poll if you do not already have an active poll; choices default to [yes|no]; end poll and get results with '.poll close'."""
+    """poll <description>[: choice1, choice2, ..., choice n] - Begins a poll if you do not already have an active poll; choices default to [yes|no]; end poll and get results with '.poll close'."""
     global active_polls
     active_polls[chan]  # init
 
@@ -47,7 +47,7 @@ def poll(inp, nick=None, chan=None, say=None):
 
 @hook.command(autohelp=False)
 def polls(inp, chan=None, say=None):
-    """.polls [user] - Gets a list of active polls, or information on a specific poll."""
+    """polls [user] - Gets a list of active polls, or information on a specific poll."""
     global active_polls
     active_polls[chan]  # init
 
@@ -62,7 +62,7 @@ def polls(inp, chan=None, say=None):
 
 @hook.command(autohelp=True)
 def vote(inp, nick=None, chan=None):
-    """.vote <poll owner> <choice> - Vote on a poll; responds on error and silently records on success."""
+    """vote <poll owner> <choice> - Vote on a poll; responds on error and silently records on success."""
     global active_polls
     active_polls[chan]  # init
 

@@ -12,7 +12,7 @@ def is_int(s):
 
 @hook.command
 def topic(inp, chan=None, conn=None, bot=None):
-    """.topic <add|del> <topic> - Change the topic of a channel."""
+    """topic <add|del> <topic> - Change the topic of a channel."""
     split = inp.split(" ", 1)
 
     if chan.startswith('#') and len(split) == 2:

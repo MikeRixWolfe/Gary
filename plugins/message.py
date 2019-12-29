@@ -42,7 +42,7 @@ def showtells(paraml, say='', nick='', chan='', conn=None, db=None):
 @hook.command('msg')
 @hook.command
 def message(inp, nick='', chan='', conn=None, db=None, input=None, bot=None):
-    """.msg/.message <nick> <message> - Relay <message> to <nick> when <nick> is around."""
+    """msg/message <nick> <message> - Relay <message> to <nick> when <nick> is around."""
     try:
         recip, msg = inp.lower().split(' ', 1)
     except:

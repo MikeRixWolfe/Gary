@@ -8,7 +8,7 @@ api_url = "http://ws.audioscrobbler.com/2.0/?format=json"
 @hook.command('np')
 @hook.command
 def nowplaying(inp, say=None, api_key=None):
-    """.np/.nowplaying <user> - Gets a LastFM user's last played track."""
+    """np/nowplaying <user> - Gets a LastFM user's last played track."""
     try:
         response = http.get_json(api_url, method="user.getrecenttracks",
             api_key=api_key, user=inp, limit=1)
@@ -49,7 +49,7 @@ def nowplaying(inp, say=None, api_key=None):
 @hook.api_key('lastfm')
 @hook.command
 def toptrack(inp, say=None, api_key=None):
-    """.toptrack [overall|7day|1month|3month|6month|12month] <user> - Gets a LastFM user's most played track, specify time period or default to overall."""
+    """toptrack [overall|7day|1month|3month|6month|12month] <user> - Gets a LastFM user's most played track, specify time period or default to overall."""
     period, user = inp.split(' ', 1) if len(inp.split()) > 1 else ("overall", inp)
 
     try:
@@ -70,7 +70,7 @@ def toptrack(inp, say=None, api_key=None):
 @hook.api_key('lastfm')
 @hook.command
 def topartist(inp, nick='', say=None, api_key=None):
-    """.topartist [overall|7day|1month|3month|6month|12month] <user> - Gets a LastFM user's most played artist, specify time period or default to overall."""
+    """topartist [overall|7day|1month|3month|6month|12month] <user> - Gets a LastFM user's most played artist, specify time period or default to overall."""
     period, user = inp.split(' ', 1) if len(inp.split()) > 1 else ("overall", inp)
 
     try:
@@ -91,7 +91,7 @@ def topartist(inp, nick='', say=None, api_key=None):
 @hook.api_key('lastfm')
 @hook.command
 def lfmuser(inp, say=None, api_key=None):
-    """.lfmuser <user> - Gets a LastFM user's data."""
+    """lfmuser <user> - Gets a LastFM user's data."""
     try:
         response = http.get_json(api_url, method="user.getinfo", api_key=api_key, user=inp)["user"]
     except:
@@ -106,7 +106,7 @@ def lfmuser(inp, say=None, api_key=None):
 @hook.api_key('lastfm')
 @hook.command
 def similar(inp, nick='', say=None, api_key=None):
-    """.similar <artist> - Gets similar artists via LastFM."""
+    """similar <artist> - Gets similar artists via LastFM."""
     try:
         response = http.get_json(api_url, method="artist.getsimilar",
             api_key=api_key, artist=inp.strip(), limit=5, autocorrect=1)
@@ -133,7 +133,7 @@ def similar(inp, nick='', say=None, api_key=None):
 @hook.command('genres')
 @hook.command
 def tags(inp, nick='', say=None, api_key=None):
-    """.tags/genres <artist> - Gets genres for artist via LastFM."""
+    """tags/genres <artist> - Gets genres for artist via LastFM."""
     try:
         response = http.get_json(api_url, method="artist.getinfo",
             api_key=api_key, artist=inp.strip(), autocorrect=1)

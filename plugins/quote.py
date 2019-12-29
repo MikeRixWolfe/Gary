@@ -51,7 +51,7 @@ def format_quote(q):
 @hook.command('rq', autohelp=False)
 @hook.command(autohelp=False)
 def randomquote(inp, say=None, db=None, input=None):
-    """.randomquote - Gets a random quote."""
+    """randomquote - Gets a random quote."""
     db_init(db)
     quote = get_random_quote(db)
 
@@ -63,7 +63,7 @@ def randomquote(inp, say=None, db=None, input=None):
 
 @hook.command
 def getquote(inp, say=None, db=None):
-    """.getquote <n> - Gets the <n>th quote."""
+    """getquote <n> - Gets the <n>th quote."""
     db_init(db)
     quote = get_quote_by_id(db, inp)
 
@@ -75,7 +75,7 @@ def getquote(inp, say=None, db=None):
 
 @hook.command
 def searchquote(inp, say=None, db=None):
-    """.searchquote <text> - Returns IDs for quotes matching <text>."""
+    """searchquote <text> - Returns IDs for quotes matching <text>."""
     db_init(db)
     ids = search_quote(db, inp)
 
@@ -88,7 +88,7 @@ def searchquote(inp, say=None, db=None):
 
 @hook.command
 def delquote(inp, chan='', db=None):
-    """.delquote <n> - Deletes the <n>th quote."""
+    """delquote <n> - Deletes the <n>th quote."""
     db_init(db)
     quote = del_quote(db, inp)
 
@@ -100,7 +100,7 @@ def delquote(inp, chan='', db=None):
 
 @hook.command
 def restorequote(inp, chan='', db=None):
-    """.restorequote <n> - Restores the <n>th quote."""
+    """restorequote <n> - Restores the <n>th quote."""
     db_init(db)
     quote = restore_quote(db, inp)
 
@@ -112,7 +112,7 @@ def restorequote(inp, chan='', db=None):
 
 @hook.command
 def quote(inp, nick='', chan='', say=None, db=None):
-    """.quote <msg> - Adds a quote."""
+    """quote <msg> - Adds a quote."""
     db_init(db)
 
     if inp:

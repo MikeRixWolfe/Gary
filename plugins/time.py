@@ -6,7 +6,7 @@ api_url = 'http://api.wolframalpha.com/v2/query?format=plaintext'
 
 @hook.command("time")
 def time_command(inp, say=None, bot=None):
-    """.time <area> - Gets the time in <area>."""
+    """time <area> - Gets the time in <area>."""
     query = "current time in {}".format(inp)
 
     api_key = bot.config.get("api_keys", {}).get("wolframalpha", None)

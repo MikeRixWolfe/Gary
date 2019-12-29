@@ -34,7 +34,7 @@ def get_help(bot, flag=None):
 
 @hook.command(autohelp=False, adminonly=True)
 def ahelp(inp, say=None, bot=None, input=None):
-    """.ahelp [command] - Gives a list of commands or help for a command."""
+    """ahelp [command] - Gives a list of commands or help for a command."""
     commands = get_help(bot, 'admin')
 
     if not inp:
@@ -51,7 +51,7 @@ def ahelp(inp, say=None, bot=None, input=None):
 
 @hook.command(autohelp=False, modonly=True)
 def mhelp(inp, say=None, bot=None, input=None):
-    """.mhelp [command] - Gives a list of commands or help for a command."""
+    """mhelp [command] - Gives a list of commands or help for a command."""
     commands = get_help(bot, 'mod')
 
     if not inp:
@@ -68,14 +68,14 @@ def mhelp(inp, say=None, bot=None, input=None):
 
 @hook.command(autohelp=False)
 def help(inp, say=None, bot=None, input=None):
-    """.help [command] - Gives a list of commands or help for a command."""
+    """help [command] - Gives a list of commands or help for a command."""
     commands = get_help(bot)
 
     if not inp:
         out = sorted([k for k,v in commands.iteritems() if v.__doc__])
         for out in text.chunk_str('Available commands: %s' % ' '.join(out)):
             say(out)
-        say("Tip: .help <command> - Gets more info on that command; " \
+        say("Tip: help <command> - Gets more info on that command; " \
             "arguments in <chevrons> are required, and arguments in " \
             "[brackets] are optional for any command.")
     else:

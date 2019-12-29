@@ -17,7 +17,7 @@ formats = {
 
 @hook.command(autohelp=False)
 def around(inp, nick='', chan='', say='', db=None, input=None):
-    """.around [minutes] - Lists what nicks have been active in the last [minutes] minutes, defaults to 15."""
+    """around [minutes] - Lists what nicks have been active in the last [minutes] minutes, defaults to 15."""
     minutes = 15
     length = 430
 
@@ -54,7 +54,7 @@ def around(inp, nick='', chan='', say='', db=None, input=None):
 
 @hook.command
 def seen(inp, say='', nick='', db=None, input=None):
-    """.seen <nick> - Tell when a nickname was last in active in IRC."""
+    """seen <nick> - Tell when a nickname was last in active in IRC."""
     inp = inp.split(' ')[0]
     if input.conn.nick.lower() == inp.lower():
         return "You need to get your eyes checked."

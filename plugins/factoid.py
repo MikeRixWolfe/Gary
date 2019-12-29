@@ -53,7 +53,7 @@ def set_factoid(inp, nick='', chan='', say=None, db=None):
 
 @hook.command
 def forget(inp, chan='', say=None, db=None):
-    """.forget <word|phrase> - Forgets factoid."""
+    """forget <word|phrase> - Forgets factoid."""
     db_init(db)
     word = inp.strip()
     data = get_factoid(db, chan, word)

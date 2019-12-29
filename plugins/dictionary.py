@@ -10,7 +10,7 @@ WEB_URL = 'https://www.wordnik.com/words/{}'
 @hook.api_key('wordnik')
 @hook.command
 def define(inp, say=None, api_key=None):
-    """.define <word> - Returns a definition for <word> from wordnik.com."""
+    """define <word> - Returns a definition for <word> from wordnik.com."""
     # based on edwardslabs/cloudbot's wordnik.py
     if not api_key:
         return "This command requires an API key from wordnik.com."
@@ -38,7 +38,7 @@ def define(inp, say=None, api_key=None):
 @hook.api_key('wordnik')
 @hook.command("wotd", autohelp=False)
 def wordoftheday(inp, say=None, api_key=None):
-    """.wotd - Returns the word of the day from wordnik.com."""
+    """wotd - Returns the word of the day from wordnik.com."""
     # based on edwardslabs/cloudbot's wordnik.py
     if not api_key:
         return "This command requires an API key from wordnik.com."
@@ -61,7 +61,7 @@ def wordoftheday(inp, say=None, api_key=None):
 
 @hook.command('ud')
 def urban(inp, say=None):
-    """.ud <phrase> - Looks up <phrase> on Urban Dictionary."""
+    """ud <phrase> - Looks up <phrase> on Urban Dictionary."""
     base_url = 'http://api.urbandictionary.com/v0'
     define_url = base_url + "/define"
 
@@ -82,7 +82,7 @@ def urban(inp, say=None):
 
 @hook.command
 def etymology(inp, say=None):
-    """.etymology <word> - Retrieves the etymology of chosen word."""
+    """etymology <word> - Retrieves the etymology of chosen word."""
     url = 'http://www.etymonline.com/search'
     try:
         params = {'q': inp}

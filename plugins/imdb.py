@@ -4,7 +4,7 @@ from util import hook, http, web
 @hook.api_key('omdb')
 @hook.command
 def imdb(inp, api_key=None):
-    """.imdb <movie> [year] - Gets information about a movie from IMDb."""
+    """imdb <movie> [year] - Gets information about a movie from IMDb."""
     year = ""
     if inp.split()[-1].isdigit():
         inp, year = ' '.join(inp.split()[:-1]), inp.split()[-1]

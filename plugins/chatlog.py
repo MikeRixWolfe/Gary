@@ -5,7 +5,7 @@ from util import hook, timesince, text, web
 
 @hook.command(autohelp=False)
 def convo(inp, chan='', server='', say=None, db=None):
-    """.convo [# of lines] - Gets the last number of lines for the channel; defaults to 10."""
+    """convo [# of lines] - Gets the last number of lines for the channel; defaults to 10."""
     num = int(inp) if inp.isdigit() and 1 <= int(inp) <= 50 else 10
     rows = db.execute("select time, nick, msg from log where server = ? "
         " and chan = ? order by uts desc limit ?",
@@ -25,7 +25,7 @@ def convo(inp, chan='', server='', say=None, db=None):
 @hook.command('l')
 @hook.command
 def last(inp, nick='', chan='', input=None, db=None, say=None):
-    """.last <phrase> - Finds the last occurence of a phrase."""
+    """last <phrase> - Finds the last occurence of a phrase."""
     row = db.execute("select time, nick, msg, uts from log where msg like ? "
         "and uts < ? and chan = ? order by uts desc limit 1",
         (('%' + inp.strip() + '%'), (time.time() - 1), chan)).fetchone()
@@ -39,7 +39,7 @@ def last(inp, nick='', chan='', input=None, db=None, say=None):
 
 @hook.command
 def first(inp, chan='', input=None, db=None, say=None):
-    """.first <phrase> - Finds the first occurence of a phrase."""
+    """first <phrase> - Finds the first occurence of a phrase."""
     row = db.execute("select time, nick, msg, uts from log where msg like ? "
         "and chan = ? order by uts asc limit 1",
         (('%' + inp.strip() + '%'), chan)).fetchone()
@@ -53,7 +53,7 @@ def first(inp, chan='', input=None, db=None, say=None):
 
 @hook.command
 def said(inp, chan='', input=None, db=None, say=None):
-    """.said <phrase> - Finds users who has said a phrase."""
+    """said <phrase> - Finds users who has said a phrase."""
     rows = db.execute("select distinct nick from log where msg like ? "
         "and chan = ? order by nick", ('%'+inp.strip()+'%', chan)).fetchall()
     rows = ([row[0] for row in rows] if rows else None)

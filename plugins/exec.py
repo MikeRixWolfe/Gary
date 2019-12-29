@@ -8,7 +8,7 @@ from util import hook, http
 @hook.command('py')
 @hook.command
 def python(inp, say=None):
-    """.py[thon] <code> - Executes Python code on the Google App Engine."""
+    """py[thon] <code> - Executes Python code on the Google App Engine."""
     try:
         heads = {'Referer': 'http://codepad.org/'}
         params = urlencode({"lang": "Python", "code": inp, "run": "True", "submit": "Submit"})
@@ -24,7 +24,7 @@ def python(inp, say=None):
 @hook.command('rb')
 @hook.command
 def ruby(inp, say=None):
-    """.rb/.ruby <code> - Executes Ruby code via Codepad.org."""
+    """rb/ruby <code> - Executes Ruby code via Codepad.org."""
     try:
         heads = {'Referer': 'http://codepad.org/'}
         params = urlencode({"lang": "Ruby", "code": inp, "run": "True", "submit": "Submit"})
@@ -39,7 +39,7 @@ def ruby(inp, say=None):
 
 @hook.command(adminonly=True)
 def ply(inp):
-    """.ply <prog> - Execute local Python."""
+    """ply <prog> - Execute local Python."""
     try:
         out = subprocess.check_output(["python", "-c", inp], stderr=subprocess.STDOUT)
         return re.sub(" +", " ", out.replace("\n", " ")).strip() if out else "No output."

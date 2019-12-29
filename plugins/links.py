@@ -70,7 +70,7 @@ def readtitle(match, say=None, db=None, input=None):
 
 @hook.command
 def shorten(inp, chan='', server='', say=None, db=None):
-    """.shorten <link|that> - Shortens a link, or the last link that was said."""
+    """shorten <link|that> - Shortens a link, or the last link that was said."""
     if inp == 'that':
         try:
             inp = db.execute("select link from links where server = ? and" \
@@ -84,7 +84,7 @@ def shorten(inp, chan='', server='', say=None, db=None):
 
 @hook.command(autohelp=False)
 def linkdump(inp, chan='', server='', say=None, db=None):
-    """.linkdump [-l] - Gets today's links dumped in channel; -l for unshortened links."""
+    """linkdump [-l] - Gets today's links dumped in channel; -l for unshortened links."""
     today = datetime.today()
     period = float(datetime(today.year, today.month, today.day).strftime('%s'))
     rows = get_linkdump(db, server, chan, period, (True if inp == '-l' else False))

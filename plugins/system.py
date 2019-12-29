@@ -17,7 +17,7 @@ def convert_kilobytes(kilobytes):
 
 @hook.command(autohelp=False)
 def system(inp):
-    """.system - Retrieves information about the host system."""
+    """system - Retrieves information about the host system."""
     hostname = platform.node()
     os = platform.platform()
     python_imp = platform.python_implementation()
@@ -32,7 +32,7 @@ def system(inp):
 
 @hook.command(autohelp=False)
 def memory(inp):
-    """.memory - Displays the bot's current memory usage."""
+    """memory - Displays the bot's current memory usage."""
     time.sleep(1)
     if os.name == "posix":
         # get process info
@@ -67,7 +67,7 @@ def memory(inp):
 
 @hook.command(autohelp=False)
 def uptime(inp, bot=None):
-    """.uptime - Shows the bot's uptime."""
+    """uptime - Shows the bot's uptime."""
     uptime_raw = round(time.time() - bot.start_time)
     uptime = timedelta(seconds=uptime_raw)
     return "Uptime: \x02{}\x02".format(uptime)
@@ -75,7 +75,7 @@ def uptime(inp, bot=None):
 
 @hook.command(autohelp=False)
 def sysuptime(inp, bot=None):
-    """.sysuptime - Shows the system's uptime."""
+    """sysuptime - Shows the system's uptime."""
     uptime_string = ""
     with open('/proc/uptime', 'r') as f:
         uptime_seconds = float(f.readline().split()[0])
@@ -85,5 +85,5 @@ def sysuptime(inp, bot=None):
 
 @hook.command(adminonly=True, autohelp=False)
 def pid(inp):
-    """.pid - Prints the bot's PID."""
+    """pid - Prints the bot's PID."""
     return "PID: \x02{}\x02".format(os.getpid())
