@@ -37,6 +37,12 @@ def get_random_quote(db):
         " where active=1 order by random() limit 1").fetchone()
 
 
+def get_random_quote_with_text(db, text):
+    text = '%{}%'.format(text)
+    return db.execute("select id, quote, nick, uts from quotes" \
+        " where active=1 and quote like ? order by random() limit 1", (text,)).fetchone()
+
+
 def get_quote_by_id(db, id):
     return db.execute("select id, quote, nick, uts from quotes where" \
         " id=? and active=1", (id,)).fetchone()
@@ -53,7 +59,11 @@ def format_quote(q):
 def randomquote(inp, say=None, db=None, input=None):
     """randomquote - Gets a random quote."""
     db_init(db)
-    quote = get_random_quote(db)
+
+    if inp:
+        quote = get_random_quote_with_text(db, inp)
+    else:
+        quote = get_random_quote(db)
 
     if quote:
         say(format_quote(quote))

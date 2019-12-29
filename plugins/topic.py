@@ -12,7 +12,7 @@ def is_int(s):
 
 @hook.command
 def topic(inp, chan=None, conn=None, bot=None):
-    """topic <add|del> <topic> - Change the topic of a channel."""
+    """topic <add|del|set #> <topic> - Change the topic of a channel. This is zero indexed."""
     split = inp.split(" ", 1)
 
     if chan.startswith('#') and len(split) == 2:
@@ -32,6 +32,17 @@ def topic(inp, chan=None, conn=None, bot=None):
             try:
                 t = t.split(' | ')
                 t.pop(int(split[1]))
+                bot.config['topics'][chan] = ' | '.join(t)
+
+                json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
+                conn.send("TOPIC {} :{}".format(chan, bot.config['topics'][chan]))
+            except:
+                pass
+        elif split[0] == 'set' and is_int(split[1][0]):
+            try:
+                split = inp.split(" ", 2)
+                t = t.split(' | ')
+                t[int(split[1])] = split[2]
                 bot.config['topics'][chan] = ' | '.join(t)
 
                 json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)

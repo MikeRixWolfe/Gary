@@ -68,7 +68,7 @@ def readtitle(match, say=None, db=None, input=None):
         print(u">>> Link skipped: {}".format(domain))
 
 
-@hook.command
+#@hook.command
 def shorten(inp, chan='', server='', say=None, db=None):
     """shorten <link|that> - Shortens a link, or the last link that was said."""
     if inp == 'that':

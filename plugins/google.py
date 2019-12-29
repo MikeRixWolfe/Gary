@@ -58,10 +58,3 @@ def map(inp):
     """map <place>|<origin to destination> - Gets a Map of place or route from Google Maps."""
     return web.try_googl("https://www.google.com/maps/?q={}".format(http.quote_plus(inp)))
 
-
-@hook.command
-def lmgtfy(inp, say=''):
-    """lmgtfy <query> - Posts a Google link for the specified phrase."""
-    say("{} - Let me Google that for you".format(
-        web.try_googl("http://lmgtfy.com/?q={}".format(http.quote_plus(inp)))))
-
