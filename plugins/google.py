@@ -23,7 +23,7 @@ def custom_get(query, key, is_image=None, num=1):
 
 @hook.api_key('google')
 @hook.command('gis')
-def googleimage(inp, api_key=None):
+def googleimage(inp, say=None, api_key=None):
     """gis <query> - Returns a random image from the first 10 Google Image results for <query>."""
     try:
         parsed = custom_get(inp, api_key, is_image=True, num=1)
@@ -32,13 +32,13 @@ def googleimage(inp, api_key=None):
     if 'items' not in parsed:
         return "No results"
 
-    return web.try_googl(random.choice(parsed['items'])['link'])
+    say(web.try_googl(random.choice(parsed['items'])['link']))
 
 
 @hook.api_key('google')
 @hook.command('g')
 @hook.command
-def google(inp, api_key=None):
+def google(inp, say=None, api_key=None):
     """g[oogle] <query> - Returns first Google search result for <query>."""
     try:
         parsed = custom_get(inp, api_key)
@@ -50,11 +50,11 @@ def google(inp, api_key=None):
     link = web.try_googl(parsed['items'][0]['link'])
     title = text.truncate_str(parsed['items'][0]['title'], 250)
     title = u' '.join(re.sub(u'\r|\n', u' ', title).split()).strip('| ')
-    return u"{} - \x02{}\x02".format(link, title)
+    say(u"{} - \x02{}\x02".format(link, title))
 
 
 @hook.command
-def map(inp):
+def map(inp, say=None):
     """map <place>|<origin to destination> - Gets a Map of place or route from Google Maps."""
-    return web.try_googl("https://www.google.com/maps/?q={}".format(http.quote_plus(inp)))
+    say(web.try_googl("https://www.google.com/maps/?q={}".format(http.quote_plus(inp))))
 
