@@ -28,8 +28,9 @@ def get_name(db, phoneNumber):
 def outputsms(client, api_key, conn, bot, db, chan=None):
     block = bot.config["sms"]["private"]
     messages = []
+    _messages = [msg for msg in client.messages.list() if msg.to == api_key['number']]
 
-    for message in [msg for msg in client.messages.list() if msg.to == api_key['number']]:
+    for message in _messages:
         if message.status != 'received':
             continue
         sender = message.from_.strip('+: ')
