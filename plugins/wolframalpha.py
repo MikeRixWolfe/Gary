@@ -8,10 +8,10 @@ from util import hook, http, text
 def wa(inp, api_key=None):
     """wa <query> - Computes <query> using Wolfram Alpha."""
 
-    url = 'http://api.wolframalpha.com/v2/query?format=plaintext'
+    url = 'http://api.wolframalpha.com/v2/query'
 
     try:
-        params = { 'input': http.quote(inp), 'appid': api_key, 'output': 'json' }
+        params = { 'input': inp, 'appid': api_key, 'output': 'json' }
         result = http.get_json(url, query_params=params)
     except:
         return "WolframAlpha API error, please try again in a few minutes."
