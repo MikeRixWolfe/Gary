@@ -5,7 +5,7 @@ from datetime import datetime
 
 base_url = "https://reddit.com/r/{}/.json"
 short_url = "https://redd.it/{}"
-reddit_re = (r'(https?://(?:www\.)?reddit\.com/[^ ]+)', re.I)
+reddit_re = (r'(https?:\/\/(?:www\.|old\.)?reddit\.com\/[^ ]+)', re.I)
 
 
 @hook.regex(*reddit_re)
