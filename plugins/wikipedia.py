@@ -1,52 +1,32 @@
-'''Searches wikipedia and returns first sentence of article
-Scaevolus 2009'''
+from util import hook, http, text, web
 
-import re
-
-from util import hook, http, web
-
-
-api_prefix = "http://en.wikipedia.org/w/api.php"
-search_url = api_prefix + "?action=opensearch&format=xml"
-
-paren_re = re.compile('\s*\(.*\)$')
+search_api = u'http://en.wikipedia.org/w/api.php'
+page_url = u'https://en.wikipedia.org/wiki/'
 
 
 @hook.command
 def wiki(inp, say=None):
     """wiki <phrase> - Gets first sentence of Wikipedia article on <phrase>."""
-    x = http.get_xml(search_url, search=inp)
+    try:
+        params = { 'action': 'query', 'list': 'search',
+                   'format': 'json', 'srsearch': http.quote(inp) }
+        search = http.get_json(search_api, query_params=params)
+    except:
+        return 'Error accessing Wikipedia API, please try again in a few minutes.'
 
-    ns = '{http://opensearch.org/searchsuggest2}'
-    items = x.findall(ns + 'Section/' + ns + 'Item')
-
-    if items == []:
-        if x.find('error') is not None:
-            return 'error: %(code)s: %(info)s' % x.find('error').attrib
-        else:
-            return 'no results found'
-
-    def extract(item):
-        return [item.find(ns + x).text for x in
-                ('Text', 'Description', 'Url')]
+    if len(search['query']['search']) == 0:
+        return 'Your query returned no results, please check your input and try again.'
 
     try:
-        title, desc, url = extract(items[0])
+        params = { 'format': 'json' , 'action': 'query' , 'prop': 'extracts',
+                   'exintro': True, 'explaintext': True, 'exchars' : 425,
+                   'redirects': 1, 'titles': search['query']['search'][0]['title'] }
+        data = http.get_json(search_api, query_params=params)
     except:
-        return "Couldn't parse Wikipedia, please try again later."
+        return 'Error accessing Wikipedia API, please try again in a few minutes.'
 
-    if 'may refer to' in desc:
-        title, desc, url = extract(items[1])
 
-    title = paren_re.sub('', title)
-
-    if title.lower() not in desc.lower():
-        desc = title + desc
-
-    desc = re.sub('\s+', ' ', desc).strip()  # remove excess spaces
-
-    if len(desc) > 300:
-        desc = desc[:300] + '...'
-
-    say(u'%s - %s' % (web.try_googl(url), desc))
+    data = data['query']['pages'][data['query']['pages'].keys()[0]]
+    data['extract'] = data['extract'].strip('...').rsplit('.', 1)[0] + '.'
+    say(u'{} - {}'.format(web.try_googl(page_url + data['title']), data['extract']))
 
