@@ -68,16 +68,8 @@ def readtitle(match, say=None, db=None, input=None):
         print(u">>> Link skipped: {}".format(domain))
 
 
-#@hook.command
+@hook.command
 def shorten(inp, chan='', server='', say=None, db=None):
-    """shorten <link|that> - Shortens a link, or the last link that was said."""
-    if inp == 'that':
-        try:
-            inp = db.execute("select link from links where server = ? and" \
-                "chan = ? order by uts desc limit 1", (server, chan)).fetchone()[0]
-        except:
-            return "Unable to shorten last link."
-
     url, title = get_info(inp)
     say(url + (u" - {}".format(title) if title else ""))
 

@@ -8,13 +8,14 @@ short_url = "http://youtu.be/"
 
 youtube_re = (r'(?:youtube.*?(?:v=|/v/)|youtu\.be/|yooouuutuuube.*?id=)'
               '([-_a-z0-9]+)', re.I)
+output_format = u'{url} - \x02{title}\x02 - \x02{channelTitle}\x02 [{time}] [{views:,} views]'
 
 
 def get_youtube_info(video_id, api_key=None):
     params = {
         "id": video_id,
         "key": api_key['access'],
-        "part": "snippet,contentDetails"
+        "part": "snippet,contentDetails,statistics"
     }
     result = http.get_json(video_url, query_params=params)
 
@@ -22,8 +23,9 @@ def get_youtube_info(video_id, api_key=None):
         return web.try_googl(short_url+video_id)
 
     playtime = result['items'][0]['contentDetails']['duration'].strip('PT').lower()
-    return u'{} - [{}] \x02{title}\x02 - \x02{channelTitle}\x02'.format(web.try_googl(short_url+video_id),
-        playtime, **result['items'][0]['snippet'])
+    views = int(result['items'][0]['statistics']['viewCount'])
+    return output_format.format(url=web.try_googl(short_url+video_id), time=playtime,
+                                views=views, **result['items'][0]['snippet'])
 
 
 @hook.api_key('google')
