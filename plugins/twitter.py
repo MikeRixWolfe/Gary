@@ -5,12 +5,12 @@ from time import strptime, strftime
 from urllib import quote
 from util import hook, http, web
 
-twitter_re = (r'.*?twitter.com/(.+?)/status/([0-9]+)', re.I)
+twitter_re = (r'https?://twitter.com/(.+?)/status/(\d+)', re.I)
 
 @hook.api_key('twitter')
 @hook.command
 def twitter(inp, say=None, api_key=None):
-    """twitter <user>/<user> <n>/<id>/#<search>/#<search> <n> - Get <user>'s last/<n>th tweet/get tweet <id>/do <search>/get <n>th <search> result."""
+    """twitter <user|user n|id|#search|#search n> - Get <user>'s last/<n>th tweet/get tweet <id>/do <search>/get <n>th <search> result."""
     if not isinstance(api_key, dict) or any(key not in api_key for key in
                                             ('consumer', 'consumer_secret', 'access', 'access_secret')):
         return "error: api keys not set"
@@ -38,7 +38,6 @@ def twitter(inp, say=None, api_key=None):
             doing_search = True
             request_url = "https://api.twitter.com/1.1/search/tweets.json"
             params = {'q': quote(inp)}
-
         else:
             request_url = "https://api.twitter.com/1.1/statuses/user_timeline.json"
             params = {'screen_name': inp, 'exclude_replies': True, 'include_rts': False, 'tweet_mode': 'extended'}
@@ -94,13 +93,14 @@ def twitter_url(match, say=None, api_key=None):
         tweet = http.get_json(request_url, query_params=params, oauth=True, oauth_keys=api_key)
         if 1 <= tweet['full_text'].count('\n') <= 5:
             tweet['full_text'] = re.sub(r'(.*?)(https:\/\/t.co\/.*)', r'\1\n\2', tweet['full_text'])
-            say(u'{} (@{}) on Twitter:'.format(tweet['user']['name'], tweet['user']['screen_name']))
+            say(u'{} - {} (@{}) on Twitter:'.format(web.try_googl(match.group(0)),
+                tweet['user']['name'], tweet['user']['screen_name']))
             for line in tweet['full_text'].split('\n'):
                 if len(line.strip()) > 0:
                     say(u'   {}'.format(line))
         else:
-            say(u'{} (@{}) on Twitter: "{}"'.format(tweet['user']['name'],
-                tweet['user']['screen_name'], tweet['full_text'].replace('\n', ' | ')))
+            say(u'{} - {} (@{}) on Twitter: "{}"'.format(web.try_googl(match.group(0)),
+                tweet['user']['name'], tweet['user']['screen_name'], tweet['full_text'].replace('\n', ' | ')))
     except:
         say("{} - Twitter".format(web.try_googl(match.group(0))))
 

@@ -33,7 +33,7 @@ def config_add(items, name, config):
     json.dump(config, open('config', 'w'), sort_keys=True, indent=2)
 
     if new:
-        out = "{} has been {}. ".format(', '.join(new), name)
+        out = "{} has been {}.".format(', '.join(new), name)
     if skips:
         out += "{} is already {}.".format(', '.join(skips), name)
 
@@ -59,7 +59,7 @@ def config_del(items, name, config):
 
     if new:
         verb = "are" if len(new) > 1 else "is"
-        out = "{} {} no longer {}. ".format(', '.join(new), verb, name)
+        out = "{} {} no longer {}.".format(', '.join(new), verb, name)
     if skips:
         verb = "were" if len(skips) > 1 else "was"
         out += "{} {} not {}.".format(', '.join(skips), verb, name)
