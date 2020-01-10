@@ -89,7 +89,7 @@ def searchquote(inp, say=None, db=None):
     db_init(db)
     ids = search_quote(db, inp)
 
-    if quote:
+    if ids:
         say(text.truncate_str("Quotes: {}".format(
             ', '.join([str(id[0]) for id in ids])), 350))
     else:
