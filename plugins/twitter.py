@@ -5,7 +5,7 @@ from time import strptime, strftime
 from urllib import quote
 from util import hook, http, web
 
-twitter_re = (r'https?://twitter.com/(.+?)/status/(\d+)', re.I)
+twitter_re = (r'https?://(?:mobile.)?twitter.com/(.+?)/status/(\d+)', re.I)
 
 @hook.api_key('twitter')
 @hook.command

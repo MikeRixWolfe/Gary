@@ -55,6 +55,7 @@ def format_quote(q):
 
 
 @hook.command('rq', autohelp=False)
+@hook.command('randquote', autohelp=False)
 @hook.command(autohelp=False)
 def randomquote(inp, say=None, db=None, input=None):
     """randomquote - Gets a random quote."""
@@ -96,6 +97,7 @@ def searchquote(inp, say=None, db=None):
         return "None found."
 
 
+@hook.command('deletequote')
 @hook.command
 def delquote(inp, chan='', db=None):
     """delquote <n> - Deletes the <n>th quote."""

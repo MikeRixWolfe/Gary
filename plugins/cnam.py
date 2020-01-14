@@ -2,6 +2,7 @@ from util import hook, http
 
 
 @hook.api_key('everyoneapi')
+@hook.command('cid')
 @hook.command
 def cnam(inp, api_key=None):
     """cnam <10 digit number> - Get CNAM information for a number via EveryoneAPI."""
