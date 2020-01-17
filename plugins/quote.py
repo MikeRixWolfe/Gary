@@ -50,7 +50,7 @@ def get_quote_by_id(db, id):
 
 def format_quote(q):
     id, quote, nick, uts = q
-    return 'Quote #{}: "{}" set by {} in {}'.format(id, quote, nick,
+    return u'Quote #{}: "{}" set by {} in {}'.format(id, quote, nick,
         time.strftime("%B %Y", time.localtime(uts)))
 
 

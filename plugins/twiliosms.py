@@ -116,9 +116,7 @@ def parseloop(paraml, nick='', api_key=None, conn=None, bot=None, db=None):
 @hook.api_key('twilio')
 @hook.command
 def sms(inp, nick='', chan='', user='', api_key=None, db=None, bot=None):
-    "sms <nick> <message> - Sends a text message to specified <nick> from " \
-    "phonebook via Twilio; users may send 'sms <nick> <message>' or " \
-    "'phonebook <nick>' via mobile to use functions while circumventing channel. "
+    """sms <nick> <message> - Sends a text message via Twilio."""
     if not isinstance(api_key, dict) or any(key not in api_key for key in
             ('account_sid', 'auth_token', 'number')):
         return "Error: API keys not set."

@@ -4,12 +4,12 @@ from datetime import datetime
 from util import hook, timesince, text
 
 formats = {
-    'PRIVMSG': 'in %(chan)s saying "%(msg)s"',
+    'PRIVMSG': 'saying "%(msg)s"',
     'PART': 'leaving %(chan)s with reason "%(msg)s"',
     'JOIN': 'joining %(chan)s',
     'KICK': 'kicking %(who)s from %(chan)s with reason "%(msg)s"',
     'KICKEE': 'being kicked from %(chan)s by %(nick)s with reason "%(msg)s"',
-    'TOPIC': 'in %(chan)s changing the topic to "%(msg)s"',
+    'TOPIC': 'changing %(chan)s\'s topic to "%(msg)s"',
     'QUIT': 'quitting IRC with reason "%(msg)s"',
     'NICK': 'changing nick to %(msg)s'
 }

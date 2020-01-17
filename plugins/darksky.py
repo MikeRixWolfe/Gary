@@ -1,5 +1,4 @@
 from datetime import datetime
-from time import strftime
 from util import hook, http
 
 
@@ -8,6 +7,10 @@ weather_url = 'https://api.darksky.net/forecast/{}/{},{}'
 cards = { 0: "N", 22.5: "NNE", 45: "NE", 67.5: "ENE", 90: "E", 112.5: "ESE",
           135: "SE", 157.5: "SSE", 180: "S", 202.5: "SSW", 225: "SW", 257.5: "WSW",
           270: "W", 292.5: "WNW", 315: "NW", 337.5: "NNW", 360: "N" }
+
+
+def strftime(time):
+    return datetime.fromtimestamp(time).strftime("%p %A").replace('AM', 'early').replace('PM', 'late')
 
 
 def geocode(inp, api_key):
@@ -37,12 +40,13 @@ def weather(inp, say=None, api_key=None):
     try:
         direction = cards.get(float(weather['currently']['windBearing']),
             cards[min(cards.keys(), key=lambda k: abs(k - float(weather['currently']['windBearing'])))])
+        alerts = ', '.join(['\x02{}\x0F until \x02{}\x0F'.format(a['title'], strftime(a['expires'])) for a in weather['alerts']])
 
         say(u"\x02{location}\x0F: {currently[temperature]:.0f}\u00b0F " \
             u"and {currently[summary]}, feels like {currently[apparentTemperature]:.0f}\u00b0F, " \
             u"wind at {currently[windSpeed]:.0f} ({currently[windGust]:.0f} gust) MPH {direction}, " \
-            u"humidity at {currently[humidity]:.0%}.".format(direction=direction,
-            location=geo['formatted_address'], **weather))
+            u"humidity at {currently[humidity]:.0%}. {alert}".format(direction=direction,
+            location=geo['formatted_address'], alert=alerts, **weather))
     except:
         return "Error: unable to find weather data for location."
 

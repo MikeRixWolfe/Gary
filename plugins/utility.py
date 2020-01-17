@@ -46,7 +46,8 @@ def onkick(paraml, conn=None, bot=None):
 
 
 @hook.event('INVITE', adminonly=True)
-def oninvite(paraml, conn=None):
+def oninvite(paraml, conn=None, notice=None):
+    notice("Invited to {}...".format(paraml[-1]))
     conn.join(paraml[-1])
 
 
