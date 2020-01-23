@@ -42,7 +42,7 @@ def cnam(inp, api_key=None):
     if data['data'].get('carrier', {}).get('name', None):
         out.append(u"Carrier: {}".format(data['data']['carrier']['name']))
 
-    if out:
+    if len(out) > 1:
         return u"; ".join(out)
     else:
         return "No caller ID info for {}".format(inp)
