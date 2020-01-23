@@ -1,15 +1,9 @@
 import re
 import requests
 from urllib import urlencode
-
 from util import hook, http, web
 
 gateway = 'http://play.spotify.com/{}/{}'  # http spotify gw address
-spuri = 'spotify:{}:{}'
-
-spotify_re = (r'(spotify:(track|album|artist|user:[^:]+:playlist|user):([a-zA-Z0-9]+))', re.I)
-http_re = (r'https?://((?:open|play)\.spotify\.com\/(track|album|artist|user\/[^\/]+\/playlist|user)\/'
-           '([a-zA-Z0-9]+))', re.I)
 
 
 def sptfy(inp, sptfy=False):
@@ -71,30 +65,4 @@ def spotify(inp, api_key=None):
         return u"\x02{}\x02 by \x02{}\x02 - {}".format(data[kind+"s"]['items'][0]["name"], data[kind+"s"]['items'][0]["artists"][0]["name"], url)
     else:
         return u"\x02{}\x02 - {}".format(data[kind+"s"]['items'][0]["name"], url)
-
-
-#@hook.regex(*spotify_re)
-@hook.regex(*http_re)
-def spotify_url(match, say=None):
-    type = match.group(2)
-    spotify_id = match.group(3)
-    url = spuri.format(type.replace('/', ':'), spotify_id)
-
-    try:
-        data = http.get_json("https://api.spotify.com/v1/{}s/{}".format(type, spotify_id), format='json')
-
-        if type == "track":
-            name = data["name"]
-            artist = data["artists"][0]["name"]
-            album = data["album"]["name"]
-            say(u"{} - \x02{}\x02 by \x02{}\x02 on \x02{}\x02".format(
-                sptfy(gateway.format(type, spotify_id)), name, artist, album))
-        else:  # artists and albums
-            say(u"{} - \x02{}\x02".format(sptfy(gateway.format(type, spotify_id)),
-                data["name"]))
-    except:
-        try:  # anything else that requires an access token
-            say(web.try_googl(match.group(0)) + " - Spotify")
-        except:
-            pass
 

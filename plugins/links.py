@@ -7,9 +7,10 @@ from util import hook, http, web
 link_re = r'https?:\/\/(?:www\.)?([^: \/]+\.[^: \/]+)(?::\d+)?\/?\S*'
 domain_re = r'^.*?([^\/\.]+(?:\.[^\/\.]+)?)$'
 
-skipurls = ["youtube.com", "youtu.be", "reddit.com", "spotify.com", "noxd.co",
-            "steampowered.com", "imgur.com", "j.mp", "goo.gl", "worf.co", "redd.it",
-            "is.gd", "bit.ly", "tinyurl.com", "twitter.com", "hastebin.com", "hasteb.in"]
+skipurls = ["youtube.com", "youtu.be", "twitter.com", "steampowered.com",
+            "noxd.co", "worf.co", "illegalshit.com",
+            "is.gd", "bit.ly", "tinyurl.com", "j.mp", "goo.gl",
+            "redd.it", "imgur.com", "hastebin.com", "hasteb.in"]
 
 
 def db_init(db):
@@ -46,6 +47,7 @@ def get_info(url):
 
         return web.try_googl(url), title or None
     except Exception as e:
+        print(e)
         return web.try_googl(url), None
 
 
