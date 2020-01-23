@@ -1,4 +1,5 @@
 # convenience wrapper for urllib2 & friends
+import base64
 import binascii
 import cookielib
 import hmac
@@ -48,8 +49,8 @@ def get_soup(*args, **kwargs):
     return BeautifulSoup(get(*args, **kwargs), 'lxml')
 
 
-def open(url, query_params=None, headers=None, post_data=None, timeout=10,
-         get_method=None, cookies=False, oauth=False, oauth_keys=None, **kwargs):
+def open(url, query_params=None, headers=None, post_data=None, timeout=10, get_method=None,
+         cookies=False, auth=None, auth_keys=None, oauth=False, oauth_keys=None, **kwargs):
 
     if query_params is None:
         query_params = {}
@@ -69,6 +70,10 @@ def open(url, query_params=None, headers=None, post_data=None, timeout=10,
 
     if 'User-Agent' not in request.headers:
         request.add_header('User-Agent', ua_firefox)
+
+    if auth:
+        base64string = base64.b64encode('%s:%s' % (auth_keys['username'], auth_keys['password']))
+        request.add_header("Authorization", "Basic %s" % base64string)
 
     if oauth:
         nonce = oauth_nonce()

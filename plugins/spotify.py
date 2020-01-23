@@ -1,5 +1,4 @@
 import re
-import requests
 from urllib import urlencode
 from util import hook, http, web
 
@@ -31,7 +30,7 @@ def sptfy(inp, sptfy=False):
 def spotify(inp, api_key=None):
     """spotify [-track|-artist|-album] <search term> - Search for specified media via Spotify; defaults to track."""
     if not isinstance(api_key, dict) or any(key not in api_key for key in
-                                            ('client_id', 'client_secret')):
+                                            ('username', 'password')):
         return "error: api keys not set"
 
     inp = inp.split(' ')
@@ -41,10 +40,9 @@ def spotify(inp, api_key=None):
         kind, query = "track", " ".join(inp)
 
     try:
-        # https://stackoverflow.com/questions/30557409/python-spotify-api-post-call
-        access_token = requests.post('https://accounts.spotify.com/api/token',
-                                     auth=(api_key['client_id'], api_key['client_secret']),
-                                     data={'grant_type': 'client_credentials'}).json()['access_token']
+        params = urlencode({'grant_type': 'client_credentials'})
+        access_token = http.get_json('https://accounts.spotify.com/api/token',
+            auth=True, auth_keys=api_key, get_method='POST', post_data=params)['access_token']
     except Exception as e:
         return "Could not get access token: {}".format(e)
 
