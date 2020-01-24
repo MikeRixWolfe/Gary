@@ -73,12 +73,12 @@ def twitter(inp, say=None, api_key=None):
         except IndexError:
             return 'Error: not that many tweets found'
 
-    if 1 <= tweet['full_text'].count('\n') <= 5:
+    if tweet['full_text'].count('\n') > 0:
         tweet['full_text'] = re.sub(r'(.*?)(https:\/\/t.co\/.*)', r'\1\n\2', tweet['full_text'])
         say(u'{} (@{}) on Twitter:'.format(tweet['user']['name'], tweet['user']['screen_name']))
-        for line in text.split('\n'):
+        for line in tweet['full_text'].split('\n'):
             if len(line.strip()) > 0:
-                say(u'   '.format(line))
+                say(u'   {}'.format(line))
     else:
         say(u'{} (@{}) on Twitter: "{}"'.format(tweet['user']['name'],
             tweet['user']['screen_name'], tweet['full_text'].replace('\n', ' | ')))
@@ -91,7 +91,8 @@ def twitter_url(match, say=None, api_key=None):
         request_url = 'https://api.twitter.com/1.1/statuses/show.json'
         params = {'id': match.group(2), 'tweet_mode': 'extended'}
         tweet = http.get_json(request_url, query_params=params, oauth=True, oauth_keys=api_key)
-        if 1 <= tweet['full_text'].count('\n') <= 5:
+
+        if tweet['full_text'].count('\n') > 0:
             tweet['full_text'] = re.sub(r'(.*?)(https:\/\/t.co\/.*)', r'\1\n\2', tweet['full_text'])
             say(u'{} - {} (@{}) on Twitter:'.format(web.try_googl(match.group(0)),
                 tweet['user']['name'], tweet['user']['screen_name']))

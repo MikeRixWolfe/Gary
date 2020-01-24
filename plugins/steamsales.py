@@ -163,17 +163,17 @@ def steamsales(inp, say='', chan=''):
             "trailerslideshow", "status"]
 
     # Clean input data
-    inp = [line.strip(', ') for line in inp.lower().split()
+    categories = [line.strip(', ') for line in inp.lower().split()
         if line in options.values()]
     if 'all' in inp:
-        inp = [item for item in options.values() if item != 'all']
+        categories = [item for item in options.values() if item != 'all']
 
     # Check for bad input
-    if not inp:
+    if not categories:
         return steamsales.__doc__
 
     # Get Sales
-    mask += [option for option in options.values() if option not in inp]
+    mask += [option for option in options.values() if option not in categories]
     sales, flag = get_sales(mask)
 
     # If sales not returned
@@ -184,7 +184,7 @@ def steamsales(inp, say='', chan=''):
 
     # Prepare sales
     for k, v in options.items():
-        if v in inp and k not in sales:
+        if v in categories and k not in sales:
             sales[k] = []
     sales = OrderedDict(sorted(sales.items()))
 
@@ -195,5 +195,6 @@ def steamsales(inp, say='', chan=''):
             for out in text.chunk_str(u"\x02New {}\x0F: {}".format(category, u"; ".join(items))):
                 say(out)
         else:
-            say(u"\x02{}\x0F: {}".format(category, u"None found"))
+            if 'all' not in inp.lower():
+                say(u"\x02{}\x0F: {}".format(category, u"None found"))
 
