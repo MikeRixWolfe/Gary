@@ -154,7 +154,7 @@ def unrestrict(inp, chan=None, say=None, bot=None):
     say(config_del(inp, "restricted", bot.config))
 
 
-@hook.command(autohelp=False)
+@hook.command(modonly=True, autohelp=False)
 def moded(inp, say=None, bot=None):
     """moded - Lists bot moderators."""
     say(config_list("moded", bot.config))

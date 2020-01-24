@@ -19,7 +19,7 @@ def wa(inp, api_key=None):
     if result['queryresult']['success'] == False:
         return "WolframAlpha query failed."
 
-    data = sorted([pod for pod in result['queryresult']['pods'] if pod['title'] != 'Input interpretation'], key= lambda x: x['position'])
+    data = sorted([pod for pod in result['queryresult']['pods'] if 'Input' not in pod['title']], key= lambda x: x['position'])
 
     if len(data) == 0:
         return "No results."

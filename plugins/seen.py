@@ -52,10 +52,15 @@ def around(inp, nick='', chan='', say='', db=None, input=None):
         say("No one!")
 
 
+@hook.regex(r'^seen (\S+)')
 @hook.command
 def seen(inp, say='', nick='', db=None, input=None):
     """seen <nick> - Tell when a nickname was last in active in IRC."""
-    inp = inp.split(' ')[0]
+    try:
+        inp = inp.split(' ')[0]
+    except:
+        inp = inp.group(1)
+
     if input.conn.nick.lower() == inp.lower():
         return "You need to get your eyes checked."
     if inp.lower() == nick.lower():
