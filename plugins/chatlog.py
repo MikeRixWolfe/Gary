@@ -71,3 +71,23 @@ def said(inp, chan='', input=None, db=None, say=None):
     else:
         say("No one!")
 
+@hook.command
+def rotw(inp, chan='', input=None, db=None, say=None):
+    """rotw <phrase> - Displays the royalty of the word."""
+    total = db.execute('select count(1) from logfts where logfts match ?',
+        ('msg:"{}"* AND chan:{}'.format(inp, chan.strip('#')), )).fetchone()
+    total = total[0] + 1 if total else None
+
+    rows = db.execute('select distinct nick, count(1) from logfts where logfts match ? group by nick order by count(1) desc limit 10',
+        ('msg:"{}"* AND chan:{}'.format(inp, chan.strip('#')), )).fetchall()
+
+    suffixes = {1: 'st', 2: 'nd', 3: 'rd'}
+    if rows:
+        out = []
+        for i, row in enumerate(rows):
+            out.append('{}{}: {} {} uses ({:.2%})'.format(i + 1,
+                suffixes.get(i + 1, 'th'), row[0], row[1], float(row[1])/total))
+        say('There are {} uses of "{}" in {}. {}'.format(total, inp, chan, ', '.join(out)))
+    else:
+        say("No one!")
+
