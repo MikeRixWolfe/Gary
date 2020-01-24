@@ -31,17 +31,16 @@ irc_color_re = re.compile(r'(\x03(\d{1,2}(,\d{1,2})?)|[\x0f\x02\x16\x1f])')
 
 
 def db_init(db):
-    db.execute("create table if not exists log(time, server, chan, nick, user,"
-               " action, msg, uts, primary key(time, server, chan, nick))")
+    db.execute("create virtual table if not exists logfts using FTS5(time,"
+               " server, chan, nick, user, action, msg, uts)")
     db.execute("create table if not exists seen(time, server, chan, nick, user,"
                " action, msg, uts, primary key(server, chan, nick))")
-    db.execute("create index if not exists uts_idx on log(uts)")
     db.commit()
 
 
 def log_chat(db, server, chan, nick, user, host, action, msg):
     mask = user.lower() + "@" + host.lower()
-    db.execute("insert into log(time, server, chan, nick, user, action, msg, uts)"
+    db.execute("insert into logfts(time, server, chan, nick, user, action, msg, uts)"
                " values(?, lower(?), lower(?), lower(?), lower(?), upper(?), ?, ?)",
                (datetime.now(), server, chan, nick, mask, action, msg, time.time()))
     db.commit()
