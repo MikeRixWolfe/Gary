@@ -1,0 +1,111 @@
+{
+  "acls": {}, 
+  "admins": [
+    "bears"
+  ], 
+  "allowed": [
+    "bears"
+  ], 
+  "api_keys": {
+    "alphavantage": "", 
+    "darksky": "", 
+    "domainr": "", 
+    "everyoneapi": {
+      "account_sid": "", 
+      "auth_token": ""
+    }, 
+    "giphy": "", 
+    "google": {
+      "access": "", 
+      "consumer": "", 
+      "consumer_secret": "", 
+      "cx": ""
+    }, 
+    "imgur": {
+      "client_id": "", 
+      "client_secret": ""
+    }, 
+    "ipapi": "", 
+    "lastfm": "", 
+    "mashery": {
+      "consumer": "", 
+      "consumer_secret": ""
+    }, 
+    "noxd": "", 
+    "omdb": "", 
+    "rottentomatoes": "", 
+    "spotify": {
+      "password": "", 
+      "username": ""
+    }, 
+    "steam_key": "", 
+    "tvdb": {
+      "apikey": "", 
+      "userkey": "", 
+      "username": ""
+    }, 
+    "twilio": {
+      "account_sid": "", 
+      "auth_token": "", 
+      "imgur_client_id": "", 
+      "imgur_client_secret": "", 
+      "number": ""
+    }, 
+    "twitter": {
+      "access": "", 
+      "access_secret": "", 
+      "consumer": "", 
+      "consumer_secret": ""
+    }, 
+    "wolframalpha": "", 
+    "wordnik": "", 
+    "worf": "", 
+    "wunder": "", 
+    "yahoo": {
+      "access": "", 
+      "access_secret": "", 
+      "consumer": "", 
+      "consumer_secret": ""
+    }
+  }, 
+  "censored": [
+    "DCC SEND", 
+    "\\0", 
+    "\\x01" 
+  ], 
+  "channels_only": false, 
+  "connections": {
+    "noxd": {
+      "channels": [
+      ], 
+      "nick": "Gary", 
+      "nickserv_password": "", 
+      "port": 6667, 
+      "realname": "Gary", 
+      "server": "localhost", 
+      "server_password": "", 
+      "service_style": "anope", 
+      "user": "Gary"
+    }
+  }, 
+  "disabled": [
+  ], 
+  "ignored": [
+  ], 
+  "moded": [], 
+  "muted": [], 
+  "prefix": "!|;", 
+  "rejoin": true, 
+  "restricted": [], 
+  "sms": {
+    "output_channel": "", 
+    "private": [
+      "", 
+      "", 
+      ""
+    ]
+  }, 
+  "suggestions": false, 
+  "topics": {
+  }
+}
