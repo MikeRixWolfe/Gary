@@ -3,24 +3,6 @@ import time
 from util import hook, timesince, text, web
 
 
-@hook.command(autohelp=False)
-def convo(inp, chan='', server='', say=None, db=None):
-    """convo [# of lines] - Gets the last number of lines for the channel; defaults to 10."""
-    num = int(inp) if inp.isdigit() and 1 <= int(inp) <= 50 else 10
-    rows = db.execute('select time, nick, msg from logfts where logfts match ? order by uts desc limit ?',
-        ('chan:{}'.format(chan.strip('#')), num)).fetchall()
-
-    if rows:
-        out = []
-        for row in reversed(rows):
-            xtime, xnick, xmsg = row
-            out.append(u"{} <{}> {}".format(xtime[:-7], xnick, xmsg))
-        say("The last {} lines of conversation: {}".format(num,
-            web.haste(u'\n'.join(out).encode('utf-8'), 'txt')))
-    else:
-        say("*Silence*")
-
-
 @hook.command('l')
 @hook.command
 def last(inp, nick='', chan='', input=None, db=None, say=None):
@@ -76,14 +58,14 @@ def rotw(inp, chan='', input=None, db=None, say=None):
     """rotw <phrase> - Displays the royalty of the word."""
     total = db.execute('select count(1) from logfts where logfts match ?',
         ('msg:"{}"* AND chan:{}'.format(inp, chan.strip('#')), )).fetchone()
-    total = total[0] + 1 if total else None
+    total = total[0] if total else None
 
     rows = db.execute('select distinct nick, count(1) from logfts where logfts match ? group by nick order by count(1) desc limit 10',
         ('msg:"{}"* AND chan:{}'.format(inp, chan.strip('#')), )).fetchall()
 
-    suffixes = {1: 'st', 2: 'nd', 3: 'rd'}
     if rows:
         out = []
+        suffixes = {1: 'st', 2: 'nd', 3: 'rd'}
         for i, row in enumerate(rows):
             out.append('{}{}: {} {} uses ({:.2%})'.format(i + 1,
                 suffixes.get(i + 1, 'th'), row[0], row[1], float(row[1])/total))
