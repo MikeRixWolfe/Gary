@@ -108,6 +108,7 @@ class Handler(object):
             try:
                 run(self.func, input)
             except:
+                print('handler error')
                 traceback.print_exc()
 
     def stop(self):
