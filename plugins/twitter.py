@@ -73,6 +73,7 @@ def twitter(inp, say=None, api_key=None):
         except IndexError:
             return 'Error: not that many tweets found'
 
+    tweet['full_text'] = http.h.unescape(tweet['full_text'])
     if tweet['full_text'].count('\n') > 0:
         tweet['full_text'] = re.sub(r'(.*?)(https:\/\/t.co\/.*)', r'\1\n\2', tweet['full_text'])
         say(u'{} (@{}) on Twitter:'.format(tweet['user']['name'], tweet['user']['screen_name']))
@@ -92,6 +93,7 @@ def twitter_url(match, say=None, api_key=None):
         params = {'id': match.group(2), 'tweet_mode': 'extended'}
         tweet = http.get_json(request_url, query_params=params, oauth=True, oauth_keys=api_key)
 
+        tweet['full_text'] = http.h.unescape(tweet['full_text'])
         if tweet['full_text'].count('\n') > 0:
             tweet['full_text'] = re.sub(r'(.*?)(https:\/\/t.co\/.*)', r'\1\n\2', tweet['full_text'])
             say(u'{} - {} (@{}) on Twitter:'.format(web.try_googl(match.group(0)),
