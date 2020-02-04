@@ -22,7 +22,7 @@ def stock(inp, api_key=None):
 
     quote = {k.split(' ')[-1]:tryParse(v) for k,v in quote['Global Quote'].items()}
 
-    quote['url'] = web.try_googl(inp)
+    quote['url'] = web.try_googl('https://finance.yahoo.com/quote/' + inp)
 
     try:
         if float(quote['change']) < 0:
