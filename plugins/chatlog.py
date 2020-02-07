@@ -22,7 +22,7 @@ def last(inp, nick='', chan='', input=None, db=None, say=None):
 def first(inp, chan='', input=None, db=None, say=None):
     """first <phrase> - Finds the first occurence of a phrase."""
     row = db.execute('select time, nick, msg, uts from logfts where logfts match ? order by uts asc limit 1',
-        ('msg:"{}"* AND chan:{}'.format(inp, chan.strip('#')), )).fetchone()
+        ('msg:"{}"* AND chan:{} NOT uts:0'.format(inp, chan.strip('#')), )).fetchone()
 
     if row:
         xtime, xnick, xmsg, xuts = row
