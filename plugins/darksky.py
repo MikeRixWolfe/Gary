@@ -52,10 +52,10 @@ def weather(inp, say=None, api_key=None):
 
 
 @hook.api_key('darksky,google')
-@hook.command('f')
+@hook.command('fc')
 @hook.command
 def forecast(inp, say=None, api_key=None):
-    """f[orecast] <zip code|location> - Gets the weather forecast."""
+    """forecast/fc <zip code|location> - Gets the weather forecast."""
     if api_key is None:
         return "Error: API key not set."
 
