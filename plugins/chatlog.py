@@ -7,13 +7,13 @@ from util import hook, timesince, text, web
 @hook.command
 def last(inp, nick='', chan='', input=None, db=None, say=None):
     """last <phrase> - Finds the last occurence of a phrase."""
-    row = db.execute('select time, nick, msg, uts from logfts where logfts match ? and uts < ? order by uts desc limit 1',
+    row = db.execute('select time, chan, nick, msg, uts from logfts where logfts match ? and uts < ? order by cast(uts as decimal) desc limit 1',
         ('msg:"{}"* AND chan:{}'.format(inp, chan.strip('#')), (time.time() - 1))).fetchone()
 
     if row:
-        xtime, xnick, xmsg, xuts = row
-        say("%s last said \"%s\" on %s (%s ago)" %
-            (xnick, xmsg, xtime[:-7], timesince.timesince(xuts)))
+        xtime, xchan, xnick, xmsg, xuts = row
+        say("%s last said \"%s\" in %s on %s (%s ago)" %
+            (xnick, xmsg, xchan, xtime.split('.')[0], timesince.timesince(int(xuts))))
     else:
         say("Never!")
 
@@ -21,13 +21,13 @@ def last(inp, nick='', chan='', input=None, db=None, say=None):
 @hook.command
 def first(inp, chan='', input=None, db=None, say=None):
     """first <phrase> - Finds the first occurence of a phrase."""
-    row = db.execute('select time, nick, msg, uts from logfts where logfts match ? order by uts asc limit 1',
+    row = db.execute('select time, chan, nick, msg, uts from logfts where logfts match ? order by cast(uts as decimal) asc limit 1',
         ('msg:"{}"* AND chan:{} NOT uts:0'.format(inp, chan.strip('#')), )).fetchone()
 
     if row:
-        xtime, xnick, xmsg, xuts = row
-        say("%s first said \"%s\" on %s (%s ago)" %
-            (xnick, xmsg, xtime[:-7], timesince.timesince(xuts)))
+        xtime, xchan, xnick, xmsg, xuts = row
+        say("%s first said \"%s\" in %s on %s (%s ago)" %
+            (xnick, xmsg, xchan, xtime.split('.')[0], timesince.timesince(int(xuts))))
     else:
         say("Never!")
 
