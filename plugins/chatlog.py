@@ -43,8 +43,12 @@ def first(inp, chan='', input=None, db=None, say=None):
 
     if row:
         xtime, xchan, xnick, xmsg, xuts = row
-        say("%s first said \"%s\" in %s on %s (%s ago)" %
-            (xnick, xmsg, xchan, xtime.split(' ')[0], timesince.timesince(float(xuts))))
+        if g:
+            say("%s first said \"%s\" on %s (%s ago)" %
+                (xnick, xmsg, xtime.split(' ')[0], timesince.timesince(float(xuts))))
+        else:
+            say("%s first said \"%s\" in %s on %s (%s ago)" %
+                (xnick, xmsg, xchan, xtime.split(' ')[0], timesince.timesince(float(xuts))))
     else:
         say("Never!")
 
@@ -86,7 +90,7 @@ def rotw(inp, chan='', input=None, db=None, say=None):
         return "Check your input and try again."
 
     if g:
-		total = db.execute('select count(1) from logfts where logfts match ?',
+        total = db.execute('select count(1) from logfts where logfts match ?',
             ('msg:"{}"* '.format(inp), )).fetchone()
         total = total[0] if total else None
 
@@ -106,7 +110,10 @@ def rotw(inp, chan='', input=None, db=None, say=None):
         for i, row in enumerate(rows):
             out.append('{}{}: {} {} uses ({:.2%})'.format(i + 1,
                 suffixes.get(i + 1, 'th'), row[0], row[1], float(row[1])/total))
-        say('There are {} uses of "{}" in {}. {}'.format(total, inp, chan, ', '.join(out)))
+        if g:
+            say('There are {} uses of "{}". {}'.format(total, inp, ', '.join(out)))
+        else:
+            say('There are {} uses of "{}" in {}. {}'.format(total, inp, chan, ', '.join(out)))
     else:
         say("No one!")
 
