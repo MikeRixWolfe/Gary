@@ -28,8 +28,6 @@ def set_factoid(inp, nick='', chan='', say=None, db=None):
 
     if data:
         if replace == "no ":
-            if append == "also ":
-                tail = append + tail
             db.execute("replace into factoids(chan, word, data, set_by, set_time) values"
                        " (lower(?),lower(?),?,lower(?),lower(?))", (chan, head, tail, nick, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
             db.commit()
@@ -43,8 +41,6 @@ def set_factoid(inp, nick='', chan='', say=None, db=None):
         else:
             return 'but, "%s" is "%s"...' % (head, data)
     else:
-        if append == "also ":
-            tail = append + tail
         db.execute("insert into factoids(chan, word, data, set_by, set_time) values"
                    " (lower(?),lower(?),?,lower(?),lower(?))", (chan, head, tail, nick, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
         db.commit()

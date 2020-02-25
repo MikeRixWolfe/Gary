@@ -40,17 +40,19 @@ def db_init(db):
 
 def log_chat(db, server, chan, nick, user, host, action, msg):
     mask = user.lower() + "@" + host.lower()
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     db.execute("insert into logfts(time, server, chan, nick, user, action, msg, uts)"
                " values(?, lower(?), lower(?), lower(?), lower(?), upper(?), ?, ?)",
-               (datetime.now(), server, chan, nick, mask, action, msg, time.time()))
+               (timestamp, server, chan, nick, mask, action, msg, time.time()))
     db.commit()
 
 
 def log_seen(db, server, chan, nick, user, host, action, msg):
     mask = user.lower() + "@" + host.lower()
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     db.execute("insert or replace into seen(time, server, chan, nick, user, action, msg, uts)"
                " values(?, lower(?), lower(?), lower(?), lower(?), upper(?), ?, ?)",
-               (datetime.now(), server, chan, nick, mask, action, msg, time.time()))
+               (timestamp, server, chan, nick, mask, action, msg, time.time()))
     db.commit()
 
 
