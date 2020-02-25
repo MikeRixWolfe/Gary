@@ -115,11 +115,12 @@ def log(paraml, input=None, bot=None, db=None):
         if input.command == 'JOIN':
             input.msg = ''
 
-        log_chat(db, input.server, input.chan, input.nick,
-            input.user, input.host, input.command, input.msg)
-        if input.command not in ('MODE'):
-            log_seen(db, input.server, input.chan, input.nick,
+        if input.chan[0] == '#':
+            log_chat(db, input.server, input.chan, input.nick,
                 input.user, input.host, input.command, input.msg)
+            if input.command not in ('MODE'):
+                log_seen(db, input.server, input.chan, input.nick,
+                    input.user, input.host, input.command, input.msg)
 
         print("{} {} {}".format(timestamp, input.chan, out.encode('ascii', 'ignore')))
 

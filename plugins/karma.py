@@ -88,6 +88,9 @@ def karma(inp, chan='', say=None, db=None, input=None):
         g = False
         inp = ' '.join(inp)
 
+    if not inp:
+        return "Check your input and try again."
+
     if g:
         karma = get_karma(db, inp)
         voters = get_voters(db, inp)
