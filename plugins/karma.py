@@ -59,7 +59,7 @@ def karma_edit(inp, chan='', nick='', say=None, db=None):
             db.commit()
     elif op == "--":
         if karma['neg'] < 0:
-            db.execute("update karma set score=? where chan=lower(?) and nick=lower(?) and op='++' and item=lower(?)", (karma['neg'] - 1, chan, nick, item))
+            db.execute("update karma set score=? where chan=lower(?) and nick=lower(?) and op='--' and item=lower(?)", (karma['neg'] - 1, chan, nick, item))
             db.commit()
         else:
             db.execute("insert into karma (chan, nick, op, item, score) values(lower(?), lower(?), '--', lower(?), -1)", (chan, nick, item))
