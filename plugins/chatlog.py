@@ -23,7 +23,7 @@ def last(inp, nick='', chan='', input=None, db=None, say=None):
 def first(inp, chan='', input=None, db=None, say=None):
     """f[irst] [-G] <phrase> - Finds the first occurence of a phrase. Flag -G includes #geekboy/#geekperson."""
     try:
-        inp = [t for t in inp.split(' ') if t]
+        inp = [t.lower() for t in inp.split(' ') if t]
         inp.remove('-g')
         g = True
         inp = ' '.join(inp)
@@ -78,7 +78,7 @@ def said(inp, chan='', input=None, db=None, say=None):
 def rotw(inp, chan='', input=None, db=None, say=None):
     """rotw [-G] <phrase> - Displays the royalty of the word. Flag -G includes #geekboy/#geekperson."""
     try:
-        inp = [t for t in inp.split(' ') if t]
+        inp = [t.lower() for t in inp.split(' ') if t]
         inp.remove('-g')
         g = True
         inp = ' '.join(inp)

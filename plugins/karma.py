@@ -80,7 +80,7 @@ def karma(inp, chan='', say=None, db=None, input=None):
     inp = inp.strip('() ').lower()
 
     try:
-        inp = [t for t in inp.split(' ') if t]
+        inp = [t.lower() for t in inp.split(' ') if t]
         inp.remove('-g')
         g = True
         inp = ' '.join(inp)

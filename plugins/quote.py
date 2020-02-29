@@ -9,9 +9,10 @@ def db_init(db):
 
 
 def add_quote(db, quote, nick):
-    db.execute("insert into quotes (quote, nick, active, uts)" \
+    new = db.execute("insert into quotes (quote, nick, active, uts)" \
         " values(?,?,?,?)", (quote, nick, 1, time.time()))
     db.commit()
+    return new
 
 
 def del_quote(db, id):
@@ -129,10 +130,10 @@ def quote(inp, nick='', chan='', say=None, db=None):
 
     if inp:
         try:
-            add_quote(db, inp, nick)
+            rowid = add_quote(db, inp, nick)
         except db.IntegrityError:
             return "Error in adding quote."
-        say("Quote added.")
+        say("Quote #{} added.".format(rowid.lastrowid))
     else:
         return "Check your input and try again."
 

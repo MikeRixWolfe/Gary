@@ -33,8 +33,6 @@ irc_color_re = re.compile(r'(\x03(\d{1,2}(,\d{1,2})?)|[\x0f\x02\x16\x1f])')
 def db_init(db):
     db.execute("create virtual table if not exists logfts using FTS5(time,"
                " server, chan, nick, user, action, msg, uts)")
-    db.execute("create table if not exists seen(time, server, chan, nick, user,"
-               " action, msg, uts, primary key(server, chan, nick))")
     db.commit()
 
 
@@ -42,15 +40,6 @@ def log_chat(db, server, chan, nick, user, host, action, msg):
     mask = user.lower() + "@" + host.lower()
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     db.execute("insert into logfts(time, server, chan, nick, user, action, msg, uts)"
-               " values(?, lower(?), lower(?), lower(?), lower(?), upper(?), ?, ?)",
-               (timestamp, server, chan, nick, mask, action, msg, time.time()))
-    db.commit()
-
-
-def log_seen(db, server, chan, nick, user, host, action, msg):
-    mask = user.lower() + "@" + host.lower()
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    db.execute("insert or replace into seen(time, server, chan, nick, user, action, msg, uts)"
                " values(?, lower(?), lower(?), lower(?), lower(?), upper(?), ?, ?)",
                (timestamp, server, chan, nick, mask, action, msg, time.time()))
     db.commit()
@@ -118,9 +107,6 @@ def log(paraml, input=None, bot=None, db=None):
         if input.chan[0] == '#':
             log_chat(db, input.server, input.chan, input.nick,
                 input.user, input.host, input.command, input.msg)
-            if input.command not in ('MODE'):
-                log_seen(db, input.server, input.chan, input.nick,
-                    input.user, input.host, input.command, input.msg)
 
         print("{} {} {}".format(timestamp, input.chan, out.encode('ascii', 'ignore')))
 

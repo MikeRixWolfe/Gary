@@ -37,13 +37,12 @@ def around(inp, nick='', chan='', say='', db=None, input=None):
         period = float(datetime(today.year, today.month, today.day).strftime('%s'))
         out = "Users around today: "
 
-    rows = db.execute("select distinct nick from seen where uts >= ? and "
-        "server = lower(?) and chan = lower(?) order by uts desc", (period,
-        input.server, chan)).fetchall()
+    rows = db.execute("select distinct nick from logfts where chan match ? and cast(uts as decimal) > ?",
+        ("{}".format(chan.strip('#')), period)).fetchall()
     rows = ([row[0] for row in rows] if rows else None)
 
     if rows:
-        out += ', '.join(rows)
+        out += ', '.join(sorted(rows))
         if len(out) >= length:
             truncstr = out[:length].rsplit(' ', 1)[0]
             out = truncstr + " and {} others".format(len(out[len(truncstr):].split()))
@@ -66,12 +65,12 @@ def seen(inp, say='', nick='', db=None, input=None):
     if inp.lower() == nick.lower():
         return "Have you looked in a mirror lately?"
 
-    rows = db.execute("select chan, nick, action, msg, uts from seen where server = lower(?) and chan in (lower(?), 'quit', 'nick') and (nick = lower(?) or (action = 'KICK' and msg = ?)) order by uts desc limit 1",
-        (input.server, input.chan, inp, inp.lower() + "%")).fetchone()
+    rows = db.execute("select chan, nick, action, msg, uts from logfts where logfts match ? order by cast(uts as decimal) desc limit 1",
+        ('(chan:"{}" OR chan:"nick" OR chan:"quit") AND (nick:"{}" OR (action:"kick" and msg:"{}"))'.format(input.chan.strip('#'), inp, inp),)).fetchone()
 
     if rows:
         row = dict(zip(['chan', 'nick', 'action', 'msg', 'uts'], rows))
-        reltime = timesince.timesince(row['uts'])
+        reltime = timesince.timesince(float(row['uts']))
         if row['action'] == 'KICK':
             row['who'] = row['msg'].split(' ')[:1][0]
             row['msg'] = ' '.join(row['msg'].split(' ')[1:]).strip('[]')

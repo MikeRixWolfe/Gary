@@ -97,5 +97,5 @@ def etymology(inp, say=None):
     etym = etym[0].text_content()
     etym = ' '.join(etym.split())
 
-    say(text.truncate_str(etym, 400))
+    say(text.truncate_str(etym, 450))
 

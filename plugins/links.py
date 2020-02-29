@@ -48,7 +48,6 @@ def get_info(url):
 
         return web.try_googl(url), title or None
     except Exception as e:
-        print(e)
         return web.try_googl(url), None
 
 
