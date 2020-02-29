@@ -1,58 +1,60 @@
 import time
-from util import hook, text
+from util import hook, text, tokenize
 
 
 def db_init(db):
-    db.execute("create table if not exists quotes"
-               "(id INTEGER PRIMARY KEY, quote TEXT, nick TEXT, active INTEGER, uts REAL)")
+    db.execute("create virtual table if not exists quotefts" \
+        " using FTS5(id, msg, nick, active, uts)")
     db.commit()
 
 
 def add_quote(db, quote, nick):
-    new = db.execute("insert into quotes (quote, nick, active, uts)" \
-        " values(?,?,?,?)", (quote, nick, 1, time.time()))
+    id = db.execute("select max(cast(id as int)) from quotefts").fetchone()
+    id = id[0] + 1 if id else 1
+    db.execute("insert into quotefts (id, msg, nick, active, uts)" \
+        " values(?,?,?,?,?)", (str(id), quote, nick, '1', str(time.time())))
     db.commit()
-    return new
+    return id
 
 
 def del_quote(db, id):
-    update = db.execute("update quotes set active=0 where id=? and active=1", (id,))
+    update = db.execute("update quotefts set active='0' where id=? and active='1'", (id,))
     db.commit()
     return update
 
 
 def restore_quote(db, id):
-    update = db.execute("update quotes set active=1 where id=? and active=0", (id,))
+    update = db.execute("update quotefts set active='1' where id=? and active='0'", (id,))
     db.commit()
     return update
 
 
 def search_quote(db, text):
-    text = '%{}%'.format(text)
-    ids = db.execute("select id from quotes where quote like ? and active=1", (text,)).fetchall()
+    ids = db.execute("select id from quotefts where quotefts match ?",
+        ('{} AND active:"1"'.format(tokenize.build_query(text)),)).fetchall()
     return ids
 
 
 def get_random_quote(db):
-    return db.execute("select id, quote, nick, uts from quotes" \
-        " where active=1 order by random() limit 1").fetchone()
+    return db.execute("select id, msg, nick, uts from quotefts" \
+        " where active='1' order by random() limit 1").fetchone()
 
 
 def get_random_quote_with_text(db, text):
-    text = '%{}%'.format(text)
-    return db.execute("select id, quote, nick, uts from quotes" \
-        " where active=1 and quote like ? order by random() limit 1", (text,)).fetchone()
+    return db.execute("select id, msg, nick, uts from quotefts" \
+        " where quotefts match ? order by random() limit 1",
+        ('{} AND active:"1"'.format(tokenize.build_query(text)),)).fetchone()
 
 
 def get_quote_by_id(db, id):
-    return db.execute("select id, quote, nick, uts from quotes where" \
-        " id=? and active=1", (id,)).fetchone()
+    return db.execute("select id, msg, nick, uts from quotefts where" \
+        " id=? and active='1'", (id,)).fetchone()
 
 
 def format_quote(q):
     id, quote, nick, uts = q
     return u'Quote #{}: "{}" set by {} in {}'.format(id, quote, nick,
-        time.strftime("%B %Y", time.localtime(uts)))
+        time.strftime("%B %Y", time.localtime(float(uts))))
 
 
 @hook.command('rq', autohelp=False)
@@ -130,10 +132,10 @@ def quote(inp, nick='', chan='', say=None, db=None):
 
     if inp:
         try:
-            rowid = add_quote(db, inp, nick)
+            id = add_quote(db, inp, nick)
         except db.IntegrityError:
             return "Error in adding quote."
-        say("Quote #{} added.".format(rowid.lastrowid))
+        say("Quote #{} added.".format(id))
     else:
         return "Check your input and try again."
 

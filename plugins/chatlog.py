@@ -1,14 +1,14 @@
 import datetime
 import time
-from util import hook, timesince, text, web
+from util import hook, text, timesince, tokenize, web
 
 
 @hook.command('l')
 @hook.command
 def last(inp, nick='', chan='', input=None, db=None, say=None):
     """l[ast] <phrase> - Finds the last occurence of a phrase."""
-    row = db.execute('select time, chan, nick, msg, uts from logfts where logfts match ? and uts < ? order by cast(uts as decimal) desc limit 1',
-        ('msg:"{}"* AND chan:{}'.format(inp, chan.strip('#')), (time.time() - 1))).fetchone()
+    row = db.execute('select time, chan, nick, msg, uts from logfts where logfts match ? and cast(uts as decimal) < ? order by cast(uts as decimal) desc limit 1',
+        ('{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#')), (time.time() - 1))).fetchone()
 
     if row:
         xtime, xchan, xnick, xmsg, xuts = row
@@ -36,10 +36,10 @@ def first(inp, chan='', input=None, db=None, say=None):
 
     if g:
         row = db.execute('select time, chan, nick, msg, uts from logfts where logfts match ? order by cast(uts as decimal) asc limit 1',
-            ('msg:"{}"* NOT uts:0'.format(inp), )).fetchone()
+            (tokenize.build_query(inp), )).fetchone()
     else:
         row = db.execute('select time, chan, nick, msg, uts from logfts where logfts match ? order by cast(uts as decimal) asc limit 1',
-            ('msg:"{}"* AND chan:{} NOT uts:0'.format(inp, chan.strip('#')), )).fetchone()
+            ('{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#')), )).fetchone()
 
     if row:
         xtime, xchan, xnick, xmsg, xuts = row
@@ -57,7 +57,7 @@ def first(inp, chan='', input=None, db=None, say=None):
 def said(inp, chan='', input=None, db=None, say=None):
     """said <phrase> - Finds users who has said a phrase."""
     rows = db.execute('select distinct nick from logfts where logfts match ? order by nick',
-        ('msg:"{}"* AND chan:{}'.format(inp, chan.strip('#')), )).fetchall()
+        ('{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#')), )).fetchall()
     rows = ([row[0] for row in rows] if rows else None)
 
     if rows:
