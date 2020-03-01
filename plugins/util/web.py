@@ -1,5 +1,6 @@
+import http
 import json
-import requests
+from urllib import urlencode
 
 
 with open('config', 'r') as f:
@@ -21,14 +22,9 @@ class ShortenError(Exception):
 
 def googl(url):
     """ shortens a URL with the goo.gl API """
-    postdata = {'api_key': api_key, 'link': url}
+    postdata = urlencode({'api_key': api_key, 'link': url})
 
-
-    try:
-        request = requests.post(short_url, data=postdata).json()
-    except:
-        raise ShortenError("Error", "None returned")
-
+    request = http.get_json(short_url, post_data=postdata, get_method='POST')
     return "{}/{}".format(short_url, request['Id'])
 
 
@@ -42,6 +38,6 @@ def try_googl(url):
 
 def haste(text, ext='txt'):
     """ pastes text to a hastebin server """
-    data = requests.post(paste_url + "/documents", data=text).json()
-    return ("%s/%s.%s" % (paste_url, data['key'], ext))
+    data = http.get_json(paste_url + "/documents", post_data=text, get_method='POST')
+    return "{}/{}.{}".format(paste_url, data['key'], ext)
 
