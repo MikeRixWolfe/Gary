@@ -1,111 +1,99 @@
 {
-  "acls": {}, 
-  "admins": [
-    "bears"
-  ], 
-  "allowed": [
-    "bears"
-  ], 
+  "acls": "",
+  "admins": [],
+  "allowed": [],
   "api_keys": {
-    "alphavantage": "", 
-    "darksky": "", 
-    "domainr": "", 
+    "alphavantage": "",
+    "darksky": "",
+    "domainr": "",
     "everyoneapi": {
-      "account_sid": "", 
+      "account_sid": "",
       "auth_token": ""
-    }, 
-    "giphy": "", 
+    },
+    "giphy": "",
     "google": {
-      "access": "", 
-      "consumer": "", 
-      "consumer_secret": "", 
+      "access": "",
+      "consumer": "",
+      "consumer_secret": "",
       "cx": ""
-    }, 
+    },
     "imgur": {
-      "client_id": "", 
+      "client_id": "",
       "client_secret": ""
-    }, 
-    "ipapi": "", 
-    "lastfm": "", 
+    },
+    "ipapi": "",
+    "lastfm": "",
+    "lastfm_secret": "",
     "mashery": {
-      "consumer": "", 
+      "consumer": "",
       "consumer_secret": ""
-    }, 
-    "noxd": "", 
-    "omdb": "", 
-    "rottentomatoes": "", 
+    },
+    "noxd": "",
+    "omdb": "",
+    "rottentomatoes": "",
     "spotify": {
-      "password": "", 
+      "password": "",
       "username": ""
-    }, 
-    "steam_key": "", 
+    },
+    "steam_key": "",
     "tvdb": {
-      "apikey": "", 
-      "userkey": "", 
+      "apikey": "",
+      "userkey": "",
       "username": ""
-    }, 
+    },
     "twilio": {
-      "account_sid": "", 
-      "auth_token": "", 
-      "imgur_client_id": "", 
-      "imgur_client_secret": "", 
+      "account_sid": "",
+      "auth_token": "",
+      "imgur_client_id": "",
+      "imgur_client_secret": "",
       "number": ""
-    }, 
+    },
     "twitter": {
-      "access": "", 
-      "access_secret": "", 
-      "consumer": "", 
+      "access": "",
+      "access_secret": "",
+      "consumer": "",
       "consumer_secret": ""
-    }, 
-    "wolframalpha": "", 
-    "wordnik": "", 
-    "worf": "", 
-    "wunder": "", 
+    },
+    "wolframalpha": "",
+    "wordnik": "",
+    "worf": "",
+    "wunder": "",
     "yahoo": {
-      "access": "", 
-      "access_secret": "", 
-      "consumer": "", 
+      "access": "",
+      "access_secret": "",
+      "consumer": "",
       "consumer_secret": ""
     }
-  }, 
-  "censored": [
-    "DCC SEND", 
-    "\\0", 
-    "\\x01" 
-  ], 
-  "channels_only": false, 
+  },
+  "censored": [],
+  "channels_only": false,
   "connections": {
     "noxd": {
-      "channels": [
-      ], 
-      "nick": "Gary", 
-      "nickserv_password": "", 
-      "port": 6667, 
-      "realname": "Gary", 
-      "server": "localhost", 
-      "server_password": "", 
-      "service_style": "anope", 
+      "channels": [],
+      "nick": "Gary",
+      "nickserv_password": "",
+      "port": 6667,
+      "realname": "Gary",
+      "server": "localhost",
+      "server_password": "",
+      "service_style": "",
       "user": "Gary"
     }
-  }, 
-  "disabled": [
-  ], 
-  "ignored": [
-  ], 
-  "moded": [], 
-  "muted": [], 
-  "prefix": "!|;", 
-  "rejoin": true, 
-  "restricted": [], 
+  },
+  "disabled": [],
+  "ignored": [],
+  "moded": [],
+  "muted": [],
+  "prefix": "",
+  "rejoin": true,
+  "restricted": [],
   "sms": {
-    "output_channel": "", 
-    "private": [
-      "", 
-      "", 
-      ""
-    ]
-  }, 
-  "suggestions": false, 
+    "output_channel": "",
+    "private": []
+  },
+  "suggestions": false,
   "topics": {
+    "#aluminati": "",
+    "bears": ""
   }
 }
