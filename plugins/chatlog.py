@@ -6,9 +6,25 @@ from util import hook, text, timesince, tokenize, web
 @hook.command('l')
 @hook.command
 def last(inp, nick='', chan='', input=None, db=None, say=None):
-    """l[ast] <phrase> - Finds the last occurence of a phrase."""
-    row = db.execute('select time, chan, nick, msg, uts from logfts where logfts match ? and cast(uts as decimal) < ? order by cast(uts as decimal) desc limit 1',
-        ('{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#')), (time.time() - 1))).fetchone()
+    """l[ast] <phrase> - Finds the last occurence of a phrase. Flag -G to search all channels."""
+    try:
+        inp = [t.lower() for t in inp.split(' ') if t]
+        inp.remove('-g')
+        g = True
+        inp = ' '.join(inp)
+    except:
+        g = False
+        inp = ' '.join(inp)
+
+	if not inp:
+		return "Check your input and try again."
+
+    if g:
+		row = db.execute('select time, chan, nick, msg, uts from logfts where logfts match ? and cast(uts as decimal) < ? order by cast(uts as decimal) desc limit 1',
+			(tokenize.build_query(inp), (time.time() - 1))).fetchone()
+    else:
+		row = db.execute('select time, chan, nick, msg, uts from logfts where logfts match ? and cast(uts as decimal) < ? order by cast(uts as decimal) desc limit 1',
+			('{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#')), (time.time() - 1))).fetchone()
 
     if row:
         xtime, xchan, xnick, xmsg, xuts = row
@@ -21,7 +37,7 @@ def last(inp, nick='', chan='', input=None, db=None, say=None):
 @hook.command('f')
 @hook.command
 def first(inp, chan='', input=None, db=None, say=None):
-    """f[irst] [-G] <phrase> - Finds the first occurence of a phrase. Flag -G includes #geekboy/#geekperson."""
+    """f[irst] [-G] <phrase> - Finds the first occurence of a phrase. Flag -G to search all channels."""
     try:
         inp = [t.lower() for t in inp.split(' ') if t]
         inp.remove('-g')
@@ -43,22 +59,35 @@ def first(inp, chan='', input=None, db=None, say=None):
 
     if row:
         xtime, xchan, xnick, xmsg, xuts = row
-        if g:
-            say("%s first said \"%s\" on %s (%s ago)" %
-                (xnick, xmsg, xtime.split(' ')[0], timesince.timesince(float(xuts))))
-        else:
-            say("%s first said \"%s\" in %s on %s (%s ago)" %
-                (xnick, xmsg, xchan, xtime.split(' ')[0], timesince.timesince(float(xuts))))
+        say("%s first said \"%s\" in %s on %s (%s ago)" %
+            (xnick, xmsg, xchan, xtime.split(' ')[0], timesince.timesince(float(xuts))))
     else:
         say("Never!")
 
 
 @hook.command
 def said(inp, chan='', input=None, db=None, say=None):
-    """said <phrase> - Finds users who has said a phrase."""
-    rows = db.execute('select distinct nick from logfts where logfts match ? order by nick',
-        ('{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#')), )).fetchall()
-    rows = ([row[0] for row in rows] if rows else None)
+    """said <phrase> - Finds users who has said a phrase. Flag -G to search all channels."""
+    try:
+        inp = [t.lower() for t in inp.split(' ') if t]
+        inp.remove('-g')
+        g = True
+        inp = ' '.join(inp)
+    except:
+        g = False
+        inp = ' '.join(inp)
+
+    if not inp:
+        return "Check your input and try again."
+
+    if g:
+        rows = db.execute('select distinct nick from logfts where logfts match ? order by nick',
+            (tokenize.build_query(inp), )).fetchall()
+        rows = ([row[0] for row in rows] if rows else None)
+    else:
+        rows = db.execute('select distinct nick from logfts where logfts match ? order by nick',
+            ('{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#')), )).fetchall()
+        rows = ([row[0] for row in rows] if rows else None)
 
     if rows:
         out = ''
@@ -76,7 +105,7 @@ def said(inp, chan='', input=None, db=None, say=None):
 
 @hook.command
 def rotw(inp, chan='', input=None, db=None, say=None):
-    """rotw [-G] <phrase> - Displays the royalty of the word. Flag -G includes #geekboy/#geekperson."""
+    """rotw [-G] <phrase> - Displays the royalty of the word. Flag -G to search all channels."""
     try:
         inp = [t.lower() for t in inp.split(' ') if t]
         inp.remove('-g')
@@ -91,29 +120,29 @@ def rotw(inp, chan='', input=None, db=None, say=None):
 
     if g:
         total = db.execute('select count(1) from logfts where logfts match ?',
-            ('msg:"{}"* '.format(inp), )).fetchone()
+            (tokenize.build_query(inp), )).fetchone()
         total = total[0] if total else None
 
         rows = db.execute('select distinct lower(nick), count(1) from logfts where logfts match ? group by lower(nick) order by count(1) desc limit 10',
-            ('msg:"{}"*'.format(inp), )).fetchall()
+            (tokenize.build_query(inp), )).fetchall()
     else:
         total = db.execute('select count(1) from logfts where logfts match ?',
-            ('msg:"{}"* AND chan:{}'.format(inp, chan.strip('#')), )).fetchone()
+            ('{} AND chan:{}'.format(tokenize.build_query(inp), chan.strip('#')), )).fetchone()
         total = total[0] if total else None
 
         rows = db.execute('select distinct lower(nick), count(1) from logfts where logfts match ? group by lower(nick) order by count(1) desc limit 10',
-            ('msg:"{}"* AND chan:{}'.format(inp, chan.strip('#')), )).fetchall()
+            ('{} AND chan:{}'.format(tokenize.build_query(inp), chan.strip('#')), )).fetchall()
 
     if rows and total:
         out = []
         suffixes = {1: 'st', 2: 'nd', 3: 'rd'}
         for i, row in enumerate(rows):
-            out.append('{}{}: {} {} uses ({:.2%})'.format(i + 1,
+            out.append('{}{}: {} {:,d} uses ({:.2%})'.format(i + 1,
                 suffixes.get(i + 1, 'th'), row[0], row[1], float(row[1])/total))
         if g:
-            say('There are {} uses of "{}". {}'.format(total, inp, ', '.join(out)))
+            say('There are {:,d} uses of "{}". {}'.format(total, inp, ', '.join(out)))
         else:
-            say('There are {} uses of "{}" in {}. {}'.format(total, inp, chan, ', '.join(out)))
+            say('There are {:,d} uses of "{}" in {}. {}'.format(total, inp, chan, ', '.join(out)))
     else:
         say("No one!")
 

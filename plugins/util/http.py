@@ -174,5 +174,5 @@ def oauth_sign_request(method, url, params, unsigned_request, consumer_secret, t
 
 
 def get_title(url, tag="title"):
-    return h.unescape(get_soup(url).find(tag).text)
+    return h.unescape(get_soup(url, timeout=3).find(tag).text)
 
