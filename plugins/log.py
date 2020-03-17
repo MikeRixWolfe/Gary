@@ -106,7 +106,7 @@ def log(paraml, input=None, bot=None, db=None):
 
         if input.chan[0] == '#':
             log_chat(db, input.server, input.chan, input.nick,
-                input.user, input.host, input.command, input.msg)
+                input.user, input.host, input.command, input.msg.rstrip(' '))
 
         print("{} {} {}".format(timestamp, input.chan, out.encode('ascii', 'ignore')))
 

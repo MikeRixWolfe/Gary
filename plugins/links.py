@@ -54,17 +54,18 @@ def get_info(url):
 @hook.regex(link_re, re.I)
 def readtitle(match, say=None, db=None, input=None):
     db_init(db)
-    url = match.group()
-    surl, title = get_info(url)
+
     domain = re.match(domain_re, match.group(1)).group(1)
-
-    try:
-        log_link(db, input.server, input.chan, input.nick,
-            input.user, url, surl, title or domain)
-    except Exception as e:
-        print(">>> u'Error logging link: {} :{}'".format(e, chan))
-
     if domain not in skipurls:
+        url = match.group()
+        surl, title = get_info(url)
+
+        try:
+            log_link(db, input.server, input.chan, input.nick,
+                input.user, url, surl, title or domain)
+        except Exception as e:
+            print(">>> u'Error logging link: {} :{}'".format(e, chan))
+
         say(surl + (u" - {}".format(title) if title else ""))
     else:
         print(u">>> Link skipped: {}".format(domain))

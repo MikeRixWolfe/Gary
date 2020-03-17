@@ -73,7 +73,7 @@ def forecast(inp, say=None, api_key=None):
         for day in weather['daily']['data']:
             day['day'] = datetime.fromtimestamp(day['time']).strftime("%A")
         say(u"\x02{location}\x0F: ".format(location=geo['formatted_address']) +
-            u"; ".join([u"\x02{day}\x0F: L {temperatureLow:.0f}\u00b0F, H {temperatureHigh:.0f}\u00b0F, {summary}".format(**day)
+            u" ".join([u"\x02{day}\x0F: L {temperatureLow:.0f}\u00b0F, H {temperatureHigh:.0f}\u00b0F, {summary}".format(**day)
             for day in weather['daily']['data'][0:5]]))
     except:
         return "Error: unable to find weather data for location."
@@ -101,7 +101,7 @@ def hourly(inp, say=None, api_key=None):
         for hour in weather['hourly']['data']:
             hour['hour'] = datetime.fromtimestamp(hour['time']).strftime("%-I%p")
         say(u"\x02{location}\x0F: ".format(location=geo['formatted_address']) +
-            u"; ".join([u"\x02{hour}\x0F: {temperature:.0f}\u00b0F ({apparentTemperature:.0f}\u00b0F feel), {summary}".format(**hour)
+            u" ".join([u"\x02{hour}\x0F: {temperature:.0f}\u00b0F ({apparentTemperature:.0f}\u00b0F feel), {summary}".format(**hour)
             for hour in weather['hourly']['data'][0:10]]))
     except:
         return "Error: unable to find weather data for location."

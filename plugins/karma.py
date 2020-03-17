@@ -99,20 +99,20 @@ def karma(inp, chan='', say=None, db=None, input=None):
         voters = get_voters_chan(db, chan, inp)
 
     upvoters = sorted(filter(lambda x: x['pos'] > 0, voters), key=lambda x: x['pos'], reverse=True)[0:5]
-    upvoters = ', '.join(['{nick} {net:+d} ({pos:+d}/{neg:+d})'.format(**voter) for voter in upvoters])
+    upvoters = ', '.join(['{nick} {net:+,d} ({pos:+,d}/{neg:+,d})'.format(**voter) for voter in upvoters])
     downvoters = sorted(filter(lambda x: x['neg'] < 0, voters), key=lambda x: x['neg'])[0:5]
-    downvoters = ', '.join(['{nick} {net:+d} ({pos:+d}/{neg:+d})'.format(**voter) for voter in downvoters])
+    downvoters = ', '.join(['{nick} {net:+,d} ({pos:+,d}/{neg:+,d})'.format(**voter) for voter in downvoters])
 
 
     if karma['net'] == karma['pos'] == karma['neg'] == 0:
         say('"{}" has neutral karma.'.format(inp))
     else:
         if g:
-            say("Karma for '{}': Net karma: {:+d} ({:+d}/{:+d}; {:.1%} like it). Top upvoters: {}. Top downvoters: {}.".format(inp,
+            say("Karma for '{}': Net karma: {:+,d} ({:+,d}/{:+,d}; {:.1%} like it). Top upvoters: {}. Top downvoters: {}.".format(inp,
                 karma['net'], karma['pos'], karma['neg'], float(karma['pos']) / float(karma['pos'] + abs(karma['neg'])),
                 upvoters or "None", downvoters or "None"))
         else:
-            say("Karma for '{}' in {}: Net karma: {:+d} ({:+d}/{:+d}; {:.1%} like it). Top upvoters: {}. Top downvoters: {}.".format(inp,
+            say("Karma for '{}' in {}: Net karma: {:+,d} ({:+,d}/{:+,d}; {:.1%} like it). Top upvoters: {}. Top downvoters: {}.".format(inp,
                 chan, karma['net'], karma['pos'], karma['neg'], float(karma['pos']) / float(karma['pos'] + abs(karma['neg'])),
                 upvoters or "None", downvoters or "None"))
 
