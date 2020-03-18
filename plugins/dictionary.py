@@ -20,7 +20,7 @@ def define(inp, say=None, api_key=None):
     try:
         params = {
             'api_key': api_key,
-            'limit': 1,
+            'limit': 10,
             'useCanonical': 'false'
         }
         json = http.get_json(url, query_params=params)
@@ -28,7 +28,7 @@ def define(inp, say=None, api_key=None):
         return "Wordnik API error; please try again in a few minutes."
 
     if json:
-        data = json[0]
+        data = [j for j in json if j.get('text')][0]
 
         say(u"\x02{word}\x02: {text}".format(**data))
     else:
