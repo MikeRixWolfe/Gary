@@ -23,7 +23,7 @@ def get_karma_chan(db, chan, item):
 def get_karma_user(db, chan, nick, item):
     row = db.execute("select sum(case when score > 0 then score else 0 end) positive, sum(case when score < 0 then score else 0 end) negative from karma where chan=lower(?) and nick=lower(?) and item=lower(?)",
         (chan, nick, item)).fetchone()
-    return {'pos': row[1] or 0, 'neg': row[2] or 0} if row else {}
+    return {'pos': row[0] or 0, 'neg': row[1] or 0} if row else {}
 
 
 def get_voters(db, item):
@@ -48,7 +48,7 @@ def karma_edit(inp, chan='', nick='', say=None, db=None):
     if item == nick.lower():
         return #"Please do not karma yourself."
 
-    karma = get_karma_chan(db, chan, item)
+    karma = get_karma_user(db, chan, nick, item)
 
     if op == "++":
         if karma['pos'] > 0:
