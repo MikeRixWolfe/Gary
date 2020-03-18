@@ -4,7 +4,6 @@ from util import hook, http, text
 
 
 API_URL = 'http://api.wordnik.com/v4/'
-WEB_URL = 'https://www.wordnik.com/words/{}'
 
 
 @hook.api_key('wordnik')
@@ -27,8 +26,9 @@ def define(inp, say=None, api_key=None):
     except:
         return "Wordnik API error; please try again in a few minutes."
 
+    json = [j for j in json if j.get('text')]
     if json:
-        data = [j for j in json if j.get('text')][0]
+        data = json[0]
 
         say(u"\x02{word}\x02: {text}".format(**data))
     else:
