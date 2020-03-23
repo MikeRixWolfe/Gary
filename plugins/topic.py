@@ -27,7 +27,7 @@ def topic(inp, chan=None, conn=None, bot=None):
         t = bot.config['topics'].get(chan, None)
 
         if split[0] == 'add':
-            if t == '':
+            if t in ['', None]:
                 bot.config['topics'][chan] = split[1]
             else:
                 t = t.split(u' | ')
