@@ -1,5 +1,5 @@
 import time
-from util import hook, text, tokenize
+from util import hook, text, tokenize, web
 
 
 def db_init(db):
@@ -51,16 +51,44 @@ def get_quote_by_id(db, id):
         " id=? and active='1'", (id,)).fetchone()
 
 
-def format_quote(q):
+def get_quote_timestamp(db, text):
+    return db.execute("select time from logfts where msg match ?",
+        ("quote" + text)).fetchone()
+
+
+def get_log_link(bot, db, q):
+    if bot.config.get("logviewer_url"):
+        id, quote, nick, uts = q
+        #match_clause = 'time:"{}"* AND msg:"{}"'.format(time.strftime("%Y-%m-%d", time.localtime(float(uts))), quote)
+        match_clause = 'nick:"{}" AND msg:"quote {}"'.format(nick, quote)
+
+        row = db.execute("select chan, time from logfts where logfts match ? order by cast(uts as decimal) asc",
+            (match_clause, )).fetchone()
+
+        try:
+            chan, _datetime = row
+            _date, _time = _datetime.split()
+        except:
+            print(match_clause)
+            return '???'
+
+        return web.try_googl(bot.config["logviewer_url"].format(chan.strip('#'), _date, _time))
+    else:
+        return ""
+
+
+def format_quote(q, link):
     id, quote, nick, uts = q
-    return u'Quote #{}: "{}" set by {} in {}'.format(id, quote, nick,
-        time.strftime("%B %Y", time.localtime(float(uts))))
+    half = "Early" if time.strftime("%d", time.localtime(float(uts))) < 15 else "Late"
+
+    return u'Quote #{}: "{}" set by {} ({} {}) {}'.format(id, quote, nick, half,
+        time.strftime("%B %Y", time.localtime(float(uts))), link).strip()
 
 
 @hook.command('rq', autohelp=False)
 @hook.command('randquote', autohelp=False)
 @hook.command(autohelp=False)
-def randomquote(inp, say=None, db=None, input=None):
+def randomquote(inp, bot=None, db=None, say=None):
     """randomquote - Gets a random quote."""
     db_init(db)
 
@@ -70,19 +98,21 @@ def randomquote(inp, say=None, db=None, input=None):
         quote = get_random_quote(db)
 
     if quote:
-        say(format_quote(quote))
+        link = get_log_link(bot, db, quote)
+        say(format_quote(quote, link))
     else:
         return "No quotes found."
 
 
 @hook.command
-def getquote(inp, say=None, db=None):
+def getquote(inp, bot=None, db=None, say=None):
     """getquote <n> - Gets the <n>th quote."""
     db_init(db)
     quote = get_quote_by_id(db, inp)
 
     if quote:
-        say(format_quote(quote))
+        link = get_log_link(bot, db, quote)
+        say(format_quote(quote, link))
     else:
         return "Quote #{} was not found.".format(inp)
 
@@ -102,7 +132,7 @@ def searchquote(inp, say=None, db=None):
 
 @hook.command('deletequote')
 @hook.command
-def delquote(inp, chan='', db=None):
+def delquote(inp, db=None):
     """delquote <n> - Deletes the <n>th quote."""
     db_init(db)
     quote = del_quote(db, inp)
@@ -114,7 +144,7 @@ def delquote(inp, chan='', db=None):
 
 
 @hook.command
-def restorequote(inp, chan='', db=None):
+def restorequote(inp, db=None):
     """restorequote <n> - Restores the <n>th quote."""
     db_init(db)
     quote = restore_quote(db, inp)
@@ -126,7 +156,7 @@ def restorequote(inp, chan='', db=None):
 
 
 @hook.command
-def quote(inp, nick='', chan='', say=None, db=None):
+def quote(inp, nick='', say=None, db=None):
     """quote <msg> - Adds a quote."""
     db_init(db)
 

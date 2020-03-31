@@ -41,8 +41,10 @@ def outputsms(client, api_key, conn, bot, db, chan=None):
         if sender_nick and all(x not in block for x in [sender, sender_nick.lower()]) \
                 and message.sid not in [m.sid for m in messages]:
             if int(message.num_media) > 0:
-                media_uri = web.try_googl('https://api.twilio.com' +
-                    message.media.list()[0].fetch().uri.strip('.json'))
+                if bot.config.get("gallery_url"):
+                    media_uri = bot.config["gallery_url"] + message.sid
+                else:
+                    media_uri = 'https://api.twilio.com' + message.media.list()[0].fetch().uri.strip('.json')
                 message.out = u"<{}> [MMS] {} - {}".format(sender_nick,
                     web.try_googl(media_uri), message.body or "Presented without comment.")
             else:

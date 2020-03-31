@@ -87,13 +87,13 @@
   "prefix": "",
   "rejoin": true,
   "restricted": [],
+  "gallery_url": "",
+  "logviewer_url": "",
   "sms": {
     "output_channel": "",
     "private": []
   },
   "suggestions": false,
   "topics": {
-    "#aluminati": "",
-    "bears": ""
   }
 }

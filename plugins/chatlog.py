@@ -5,7 +5,7 @@ from util import hook, text, timesince, tokenize, web
 
 @hook.command('l')
 @hook.command
-def last(inp, nick='', chan='', input=None, db=None, say=None):
+def last(inp, nick='', chan='', bot=None, db=None, say=None):
     """l[ast] <phrase> - Finds the last occurence of a phrase. Flag -G to search all channels."""
     try:
         inp = [t.lower() for t in inp.split(' ') if t]
@@ -27,16 +27,22 @@ def last(inp, nick='', chan='', input=None, db=None, say=None):
 			('{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#')), (time.time() - 1))).fetchone()
 
     if row:
-        xtime, xchan, xnick, xmsg, xuts = row
-        say("%s last said \"%s\" in %s on %s (%s ago)" %
-            (xnick, xmsg, xchan, xtime.split(' ')[0], timesince.timesince(float(xuts))))
+        _time, _chan, _nick, _msg, _uts = row
+
+        if bot.config.get("logviewer_url"):
+            log_url = web.try_googl(bot.config["logviewer_url"].format(_chan.strip('#'), *_time.split()))
+        else:
+            log_url = ''
+
+        say('{} last said "{}" in {} on {} ({} ago) {}'.format(_nick, _msg, _chan,
+            _time.split(' ')[0], timesince.timesince(float(_uts)), log_url).strip())
     else:
         say("Never!")
 
 
 @hook.command('f')
 @hook.command
-def first(inp, chan='', input=None, db=None, say=None):
+def first(inp, chan='', bot=None, db=None, say=None):
     """f[irst] [-G] <phrase> - Finds the first occurence of a phrase. Flag -G to search all channels."""
     try:
         inp = [t.lower() for t in inp.split(' ') if t]
@@ -58,15 +64,21 @@ def first(inp, chan='', input=None, db=None, say=None):
             ('{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#')), )).fetchone()
 
     if row:
-        xtime, xchan, xnick, xmsg, xuts = row
-        say("%s first said \"%s\" in %s on %s (%s ago)" %
-            (xnick, xmsg, xchan, xtime.split(' ')[0], timesince.timesince(float(xuts))))
+        _time, _chan, _nick, _msg, _uts = row
+
+        if bot.config.get("logviewer_url"):
+            log_url = web.try_googl(bot.config["logviewer_url"].format(_chan.strip('#'), *_time.split()))
+        else:
+            log_url = ''
+
+        say('{} first said "{}" in {} on {} ({} ago) {}'.format(_nick, _msg, _chan,
+            _time.split(' ')[0], timesince.timesince(float(_uts)), log_url).strip())
     else:
         say("Never!")
 
 
 @hook.command
-def said(inp, chan='', input=None, db=None, say=None):
+def said(inp, chan='', db=None, say=None):
     """said <phrase> - Finds users who has said a phrase. Flag -G to search all channels."""
     try:
         inp = [t.lower() for t in inp.split(' ') if t]
@@ -104,7 +116,7 @@ def said(inp, chan='', input=None, db=None, say=None):
         say("No one!")
 
 @hook.command
-def rotw(inp, chan='', input=None, db=None, say=None):
+def rotw(inp, chan='', db=None, say=None):
     """rotw [-G] <phrase> - Displays the royalty of the word. Flag -G to search all channels."""
     try:
         inp = [t.lower() for t in inp.split(' ') if t]
