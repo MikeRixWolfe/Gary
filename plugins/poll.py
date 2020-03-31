@@ -12,7 +12,7 @@ active_polls = tree()
 
 @hook.command(autohelp=True)
 def poll(inp, nick=None, chan=None, say=None):
-    """poll <description>[: choice1, choice2, ..., choice n] - Begins a poll if you do not already have an active poll; choices default to [yes|no]; end poll and get results with '.poll close'."""
+    """poll <description>[: choice1, choice2, ..., choice n] - Begins a poll if you do not already have an active poll; choices default to [yes|no]; end poll and get results with 'poll close'."""
     global active_polls
     active_polls[chan]  # init
 
@@ -42,7 +42,7 @@ def poll(inp, nick=None, chan=None, say=None):
         active_polls[chan][nick]['description'] = desc
         active_polls[chan][nick]['choices'] = choices
         active_polls[chan][nick]['votes']
-        say("Poll '{1}' started by {0}; to vote use '.vote {0} <{2}>'.".format(nick, desc, "|".join(choices)))
+        say("Poll '{1}' started by {0}; to vote use 'vote {0} <{2}>'.".format(nick, desc, "|".join(choices)))
 
 
 @hook.command(autohelp=False)
@@ -73,7 +73,7 @@ def vote(inp, nick=None, chan=None):
         if vote not in active_polls.get(chan).get(poll).get('choices'):
             return "Invalid vote; valid choices are: {}".format(', '.join(active_polls.get(chan).get(poll).get('choices')))
     else:
-        return "Please use form '.vote <poll owner> <choice>'; check active polls with '.polls'."
+        return "Please use form 'vote <poll owner> <choice>'; check active polls with 'polls'."
 
     active_polls[chan][poll]['votes'][nick] = vote
 
