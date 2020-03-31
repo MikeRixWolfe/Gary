@@ -18,6 +18,14 @@ def is_range(s):
         return False
 
 
+@hook.event('TOPIC')
+def ontopic(paraml, nick='', chan=None, conn=None, bot=None):
+    if nick != conn.nick:
+        bot.config['topics'][chan] = paraml[-1]
+        json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
+        print(">>> u'Manual topic update: {} :{}'".format(paraml[-1], chan))
+
+
 @hook.command
 def topic(inp, chan=None, conn=None, bot=None):
     """topic <add|app|del #|set #> <topic> - Change the topic of a channel. For deletion this may be a #-# range. This is zero indexed."""
