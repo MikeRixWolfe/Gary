@@ -1,4 +1,3 @@
-import random
 import re
 from util import hook, http, text, web
 
@@ -24,7 +23,7 @@ def custom_get(query, key, is_image=None, num=1):
 @hook.api_key('google')
 @hook.command('gis')
 def googleimage(inp, say=None, api_key=None):
-    """gis <query> - Returns a random image from the first 10 Google Image results for <query>."""
+    """gis <query> - Returns an image from Google Image results for <query>."""
     try:
         parsed = custom_get(inp, api_key, is_image=True, num=1)
     except Exception as e:
@@ -32,7 +31,21 @@ def googleimage(inp, say=None, api_key=None):
     if 'items' not in parsed:
         return "No results"
 
-    say(web.try_googl(random.choice(parsed['items'])['link']))
+    say(web.try_googl(parsed['items'][0]['link']))
+
+
+@hook.api_key('google')
+@hook.command('gif')
+def googleimage_gif(inp, say=None, api_key=None):
+    """gif <query> - Returns a gif from Google Image results for <query>."""
+    try:
+        parsed = custom_get('filetype:gif ' + inp, api_key, is_image=True, num=1)
+    except Exception as e:
+        return "Error: {}".format(e)
+    if 'items' not in parsed:
+        return "No results"
+
+    say(web.try_googl(parsed['items'][0]['link']))
 
 
 @hook.api_key('google')
