@@ -1,5 +1,6 @@
 import datetime
 import time
+from sqlite3 import OperationalError
 from util import hook, text, timesince, tokenize, web
 
 
@@ -18,13 +19,15 @@ def last(inp, nick='', chan='', bot=None, db=None, say=None):
 
 	if not inp:
 		return "Check your input and try again."
-
-    if g:
-		row = db.execute('select time, chan, nick, msg, uts from logfts where logfts match ? and cast(uts as decimal) < ? order by cast(uts as decimal) desc limit 1',
-			(tokenize.build_query(inp), (time.time() - 1))).fetchone()
-    else:
-		row = db.execute('select time, chan, nick, msg, uts from logfts where logfts match ? and cast(uts as decimal) < ? order by cast(uts as decimal) desc limit 1',
-			('{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#')), (time.time() - 1))).fetchone()
+    try:
+        if g:
+            row = db.execute('select time, chan, nick, msg, uts from logfts where logfts match ? and cast(uts as decimal) < ? order by cast(uts as decimal) desc limit 1',
+                (tokenize.build_query(inp), (time.time() - 1))).fetchone()
+        else:
+            row = db.execute('select time, chan, nick, msg, uts from logfts where logfts match ? and cast(uts as decimal) < ? order by cast(uts as decimal) desc limit 1',
+                ('{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#')), (time.time() - 1))).fetchone()
+    except OperationalError:
+        return "Error: must contain one inclusive match clause (+/=)."
 
     if row:
         _time, _chan, _nick, _msg, _uts = row
@@ -56,12 +59,15 @@ def first(inp, chan='', bot=None, db=None, say=None):
     if not inp:
         return "Check your input and try again."
 
-    if g:
-        row = db.execute('select time, chan, nick, msg, uts from logfts where logfts match ? order by cast(uts as decimal) asc limit 1',
-            (tokenize.build_query(inp), )).fetchone()
-    else:
-        row = db.execute('select time, chan, nick, msg, uts from logfts where logfts match ? order by cast(uts as decimal) asc limit 1',
-            ('{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#')), )).fetchone()
+    try:
+        if g:
+            row = db.execute('select time, chan, nick, msg, uts from logfts where logfts match ? order by cast(uts as decimal) asc limit 1',
+                (tokenize.build_query(inp), )).fetchone()
+        else:
+            row = db.execute('select time, chan, nick, msg, uts from logfts where logfts match ? order by cast(uts as decimal) asc limit 1',
+                ('{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#')), )).fetchone()
+    except OperationalError:
+        return "Error: must contain one inclusive match clause (+/=)."
 
     if row:
         _time, _chan, _nick, _msg, _uts = row
@@ -92,14 +98,17 @@ def said(inp, chan='', db=None, say=None):
     if not inp:
         return "Check your input and try again."
 
-    if g:
-        rows = db.execute('select distinct nick from logfts where logfts match ? order by nick',
-            (tokenize.build_query(inp), )).fetchall()
-        rows = ([row[0] for row in rows] if rows else None)
-    else:
-        rows = db.execute('select distinct nick from logfts where logfts match ? order by nick',
-            ('{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#')), )).fetchall()
-        rows = ([row[0] for row in rows] if rows else None)
+    try:
+        if g:
+            rows = db.execute('select distinct nick from logfts where logfts match ? order by nick',
+                (tokenize.build_query(inp), )).fetchall()
+            rows = ([row[0] for row in rows] if rows else None)
+        else:
+            rows = db.execute('select distinct nick from logfts where logfts match ? order by nick',
+                ('{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#')), )).fetchall()
+            rows = ([row[0] for row in rows] if rows else None)
+    except OperationalError:
+        return "Error: must contain one inclusive match clause (+/=)."
 
     if rows:
         out = ''
@@ -130,20 +139,23 @@ def rotw(inp, chan='', db=None, say=None):
     if not inp:
         return "Check your input and try again."
 
-    if g:
-        total = db.execute('select count(1) from logfts where logfts match ?',
-            (tokenize.build_query(inp), )).fetchone()
-        total = total[0] if total else None
+    try:
+        if g:
+            total = db.execute('select count(1) from logfts where logfts match ?',
+                (tokenize.build_query(inp), )).fetchone()
+            total = total[0] if total else None
 
-        rows = db.execute('select distinct lower(nick), count(1) from logfts where logfts match ? group by lower(nick) order by count(1) desc limit 10',
-            (tokenize.build_query(inp), )).fetchall()
-    else:
-        total = db.execute('select count(1) from logfts where logfts match ?',
-            ('{} AND chan:{}'.format(tokenize.build_query(inp), chan.strip('#')), )).fetchone()
-        total = total[0] if total else None
+            rows = db.execute('select distinct lower(nick), count(1) from logfts where logfts match ? group by lower(nick) order by count(1) desc limit 10',
+                (tokenize.build_query(inp), )).fetchall()
+        else:
+            total = db.execute('select count(1) from logfts where logfts match ?',
+                ('{} AND chan:{}'.format(tokenize.build_query(inp), chan.strip('#')), )).fetchone()
+            total = total[0] if total else None
 
-        rows = db.execute('select distinct lower(nick), count(1) from logfts where logfts match ? group by lower(nick) order by count(1) desc limit 10',
-            ('{} AND chan:{}'.format(tokenize.build_query(inp), chan.strip('#')), )).fetchall()
+            rows = db.execute('select distinct lower(nick), count(1) from logfts where logfts match ? group by lower(nick) order by count(1) desc limit 10',
+                ('{} AND chan:{}'.format(tokenize.build_query(inp), chan.strip('#')), )).fetchall()
+    except OperationalError:
+        return "Error: must contain one inclusive match clause (+/=)."
 
     if rows and total:
         out = []

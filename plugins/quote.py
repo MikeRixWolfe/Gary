@@ -1,4 +1,5 @@
 import time
+from sqlite3 import OperationalError
 from util import hook, text, tokenize, web
 
 
@@ -58,18 +59,17 @@ def get_quote_timestamp(db, text):
 
 def get_log_link(bot, db, q):
     if bot.config.get("logviewer_url"):
-        id, quote, nick, uts = q
-        #match_clause = 'time:"{}"* AND msg:"{}"'.format(time.strftime("%Y-%m-%d", time.localtime(float(uts))), quote)
-        match_clause = 'nick:"{}" AND msg:"quote {}"'.format(nick, quote)
-
-        row = db.execute("select chan, time from logfts where logfts match ? order by cast(uts as decimal) asc",
-            (match_clause, )).fetchone()
-
         try:
+            id, quote, nick, uts = q
+            match_clause = u'nick:"{}" AND msg:"quote {}"'.format(nick, quote.replace('"', '""'))
+            row = db.execute(u"select chan, time from logfts where logfts match ? order by cast(uts as decimal) asc",
+                (match_clause, )).fetchone()
+
             chan, _datetime = row
             _date, _time = _datetime.split()
-        except:
-            print(match_clause)
+        except Exception as e:
+            print('Error fetching quote #{}'.format(id))
+            print(e)
             return '???'
 
         return web.try_googl(bot.config["logviewer_url"].format(chan.strip('#'), _date, _time))
@@ -79,7 +79,7 @@ def get_log_link(bot, db, q):
 
 def format_quote(q, link):
     id, quote, nick, uts = q
-    half = "Early" if time.strftime("%d", time.localtime(float(uts))) < 15 else "Late"
+    half = "Early" if int(time.strftime("%d", time.localtime(float(uts)))) < 15 else "Late"
 
     return u'Quote #{}: "{}" set by {} ({} {}) {}'.format(id, quote, nick, half,
         time.strftime("%B %Y", time.localtime(float(uts))), link).strip()
@@ -93,7 +93,10 @@ def randomquote(inp, bot=None, db=None, say=None):
     db_init(db)
 
     if inp:
-        quote = get_random_quote_with_text(db, inp)
+        try:
+            quote = get_random_quote_with_text(db, inp)
+        except OperationalError:
+            return "Error: must contain one inclusive match clause (+/=)."
     else:
         quote = get_random_quote(db)
 
@@ -121,7 +124,11 @@ def getquote(inp, bot=None, db=None, say=None):
 def searchquote(inp, say=None, db=None):
     """searchquote <text> - Returns IDs for quotes matching <text>."""
     db_init(db)
-    ids = search_quote(db, inp)
+
+    try:
+        ids = search_quote(db, inp)
+    except OperationalError:
+        return "Error: must contain one inclusive match clause (+/=)."
 
     if ids:
         say(text.truncate_str("Quotes: {}".format(
