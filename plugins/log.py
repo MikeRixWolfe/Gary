@@ -104,7 +104,7 @@ def log(paraml, input=None, bot=None, db=None):
         if input.command == 'JOIN':
             input.msg = ''
 
-        if input.chan[0] == '#':
+        if input.chan[0] == '#' or input.chan in ['quit', 'nick']:
             log_chat(db, input.server, input.chan, input.nick,
                 input.user, input.host, input.command, input.msg.rstrip(' '))
 
