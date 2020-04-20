@@ -32,7 +32,7 @@ def topic(inp, chan=None, conn=None, bot=None):
             _topic[int(idx0)] = clause
         elif op in ['ins', 'insert'] and idx0 and clause:
             _topic.insert(int(idx0), clause)
-        elif op in ['del', 'delete'] and int(idx0) <= len(idx1 or idx0) and int(idx1 or idx0) < len(_topic):
+        elif op in ['del', 'delete'] and int(idx0) <= int(idx1 or idx0) and int(idx1 or idx0) < len(_topic):
             if idx1 is None:
                 _topic.pop(int(idx0))
             else:
