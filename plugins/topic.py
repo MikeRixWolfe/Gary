@@ -3,85 +3,49 @@ import re
 from util import hook
 
 
-def is_int(s):
-    try:
-        int(s)
-        return True
-    except ValueError:
-        return False
-
-
-def is_range(s):
-    try:
-        return re.match('(\d)-?(\d)?', s).groups()
-    except:
-        return False
-
-
 @hook.event('TOPIC')
 def ontopic(paraml, nick='', chan=None, conn=None, bot=None):
     if nick != conn.nick:
         bot.config['topics'][chan] = paraml[-1]
         json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
-        print(">>> u'Manual topic update: {} :{}'".format(paraml[-1], chan))
+        print(">>> u'Manual topic update: '{}' :{}'".format(paraml[-1], chan))
 
 
 @hook.command
 def topic(inp, chan=None, conn=None, bot=None):
-    """topic <add|app|del #|set #> <topic> - Change the topic of a channel. For deletion this may be a #-# range. This is zero indexed."""
-    split = inp.split(" ", 1)
+    """topic <add|app|del #|set #|ins #> <topic> - Change the topic of a channel. For deletion this may be a #-# range. This is zero indexed."""
+    if chan.startswith('#') and len(inp.split()) > 1:
+        _topic = bot.config['topics'].get(chan, u'').split(u' | ')
+        op, idx0, idx1, clause = re.match(r'^(\S+)(?: (\d)-?(\d)?)?(?: (.*))?$', inp).groups()
 
-    if chan.startswith('#') and len(split) == 2:
-        t = bot.config['topics'].get(chan, None)
-
-        if split[0] == 'add':
-            if t in ['', None]:
-                bot.config['topics'][chan] = split[1]
+        if op == 'add' and clause:
+            if len(_topic) == 0:
+                bot.config['topics'][chan] = clause
             else:
-                t = t.split(u' | ')
-                t.insert(0, split[1])
-                bot.config['topics'][chan] = u' | '.join(t)
-
-            json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
-            conn.send(u"TOPIC {} :{}".format(chan, bot.config['topics'][chan]))
-        elif split[0] in ['app', 'append']:
-            if t == '':
-                bot.config['topics'][chan] = split[1]
+                _topic.insert(0, clause)
+                bot.config['topics'][chan] = u' | '.join(_topic)
+        elif op in ['app', 'append'] and clause:
+            if len(_topic) == 0:
+                bot.config['topics'][chan] = clause
             else:
-                t = t.split(u' | ')
-                t.append(split[1])
-                bot.config['topics'][chan] = u' | '.join(t)
-
-            json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
-            conn.send(u"TOPIC {} :{}".format(chan, bot.config['topics'][chan]))
-        elif split[0] in ['del', 'delete'] and is_range(split[1]):
-            try:
-                t = t.split(u' | ')
-                ops = is_range(split[1])
-
-                if ops[1] is None:
-                    t.pop(int(ops[0]))
-                else:
-                    for i in range(int(ops[0]), int(ops[1]) + 1):
-                        t.pop(int(ops[0]))
-
-                bot.config['topics'][chan] = u' | '.join(t)
-
-                json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
-                conn.send(u"TOPIC {} :{}".format(chan, bot.config['topics'][chan]))
-            except:
-                pass
-        elif split[0] == 'set' and is_int(split[1][0]):
-            try:
-                split = inp.split(" ", 2)
-                t = t.split(u' | ')
-                t[int(split[1])] = split[2]
-                bot.config['topics'][chan] = u' | '.join(t)
-
-                json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
-                conn.send(u"TOPIC {} :{}".format(chan, bot.config['topics'][chan]))
-            except:
-                pass
+                _topic.append(clause)
+                bot.config['topics'][chan] = u' | '.join(_topic)
+        elif op in ['del', 'delete'] and idx0:
+            if idx1 is None:
+                _topic.pop(int(idx0))
+            else:
+                for i in range(int(idx0), int(idx1) + 1):
+                    _topic.pop(int(idx0))
+            bot.config['topics'][chan] = u' | '.join(_topic)
+        elif op == 'set' and idx0 and clause:
+            _topic[int(idx0)] = clause
+            bot.config['topics'][chan] = u' | '.join(_topic)
+        elif op in ['ins', 'insert'] and idx0 and clause:
+            _topic.insert(int(idx0), clause)
+            bot.config['topics'][chan] = u' | '.join(_topic)
         else:
             return "Check your input and try again."
+
+        json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
+        conn.send(u"TOPIC {} :{}".format(chan, bot.config['topics'][chan]))
 
