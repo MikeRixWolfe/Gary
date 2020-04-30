@@ -29,8 +29,8 @@ def define(inp, say=None, api_key=None):
     json = [j for j in json if j.get('text')]
     if json:
         data = json[0]
-
-        say(u"\x02{word}\x02: {text}".format(**data))
+        text = re.sub('<[^<]+>', "", data['text'])
+        say(u"\x02{}\x02: {}".format(data['word'], text))
     else:
         return "I could not find a definition for \x02{}\x02.".format(word)
 
@@ -53,7 +53,7 @@ def wordoftheday(inp, say=None, api_key=None):
         word = json['word']
         note = json['note']
         pos = json['definitions'][0]['partOfSpeech']
-        definition = json['definitions'][0]['text']
+        definition = re.sub('<[^<]+>', "", json['definitions'][0]['text'])
         say(u"The word the day is \x02{}\x0F: ({}) {} {}".format(word, pos, definition, note))
     else:
         return "Sorry I couldn't find the word of the day."
