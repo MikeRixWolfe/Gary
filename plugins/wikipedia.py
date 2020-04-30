@@ -18,15 +18,15 @@ def wiki(inp, say=None):
         return 'Your query returned no results, please check your input and try again.'
 
     try:
-        params = { 'format': 'json' , 'action': 'query' , 'prop': 'extracts',
+        params = { 'format': 'json' , 'action': 'query' , 'prop': 'info|extracts',
                    'exintro': True, 'explaintext': True, 'exchars' : 425,
-                   'redirects': 1, 'titles': search['query']['search'][0]['title'] }
+                   'pageids': search['query']['search'][0]['pageid'],
+                   'inprop': 'url', 'redirects': 1 }
         data = http.get_json(search_api, query_params=params)
     except:
         return 'Error accessing Wikipedia API, please try again in a few minutes.'
 
-
     data = data['query']['pages'][data['query']['pages'].keys()[0]]
     data['extract'] = data['extract'].strip('...').rsplit('.', 1)[0] + '.'
-    say(u'{} - {}'.format(web.try_googl(page_url + data['title']), data['extract']))
+    say(u'{} - {}'.format(web.try_googl(data['fullurl']), data['extract']))
 
