@@ -1,13 +1,11 @@
 from util import hook, http, text, web
 
-search_api = u'http://en.wikipedia.org/w/api.php'
-page_url = u'https://en.wikipedia.org/wiki/'
-
 
 @hook.command
 def wiki(inp, say=None):
     """wiki <phrase> - Gets first sentence of Wikipedia article on <phrase>."""
     try:
+        search_api = u'http://en.wikipedia.org/w/api.php'
         params = { 'action': 'query', 'list': 'search',
                    'format': 'json', 'srsearch': http.quote(inp) }
         search = http.get_json(search_api, query_params=params)
