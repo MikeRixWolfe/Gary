@@ -5,6 +5,7 @@ from util import hook, timesince, text
 
 formats = {
     'PRIVMSG': 'saying "%(msg)s"',
+    'ACTION': 'saying "%(msg)s"',
     'PART': 'leaving %(chan)s with reason "%(msg)s"',
     'JOIN': 'joining %(chan)s',
     'KICK': 'kicking %(who)s from %(chan)s with reason "%(msg)s"',

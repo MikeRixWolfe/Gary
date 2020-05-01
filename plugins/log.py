@@ -97,6 +97,7 @@ def log(paraml, input=None, bot=None, db=None):
             input.msg = irc_color_re.sub('',
                 input.msg.split('\x01', 2)[1].split(' ', 1)[1])
             input.msg = u"* {} {}".format(input.nick, input.msg)
+            input.command = 'ACTION'
         if input.command == 'KICK':
             input.msg = u"{} [{}]".format(paraml[1], input.msg)
         if input.command == 'MODE':
