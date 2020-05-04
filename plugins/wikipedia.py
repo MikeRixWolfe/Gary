@@ -7,7 +7,7 @@ def wiki(inp, say=None):
     try:
         search_api = u'http://en.wikipedia.org/w/api.php'
         params = { 'action': 'query', 'list': 'search',
-                   'format': 'json', 'srsearch': http.quote(inp) }
+                   'format': 'json', 'srsearch': http.quote_plus(inp) }
         search = http.get_json(search_api, query_params=params)
     except:
         return 'Error accessing Wikipedia API, please try again in a few minutes.'
