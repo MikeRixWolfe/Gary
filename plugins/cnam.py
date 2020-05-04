@@ -10,7 +10,7 @@ def cnam(inp, api_key=None):
         url = 'https://api.everyoneapi.com/v1/phone/{}'.format(inp)
         data = http.get_json(url, account_sid=api_key["account_sid"],
             auth_token=api_key["auth_token"],
-            data="carrier,location,linetype")['data']
+            data="line_provider,location,linetype")['data']
     except Exception as e:
         return "EveryoneAPI error, please try again in a few minutes."
 
@@ -25,20 +25,25 @@ def cnam(inp, api_key=None):
     data.update(data2)
     out = [u"Caller ID info for {number}".format(**data)]
 
+    # name or wire center
     if data.get('name'):
         out.append(u"Name: {}".format(data['name']))
 
+    # rate center
     if data.get('location', {}).get('city') or data.get('location', {}).get('state'):
         locs = [x for x in [data.get('location', {}).get('city'),
             data.get('location', {}).get('state')] if x != None]
         if locs:
             out.append(u"Location: {}".format(', '.join(locs)))
 
-    if data.get('linetype'):
-        out.append(u"Type: {}".format(data['linetype']))
+    if data.get('line_provider') and data['line_provider'].get('name'):
+        out.append(u"Provider: {}".format(data['line_provider']['name']))
 
     if data.get('carrier', {}).get('name'):
         out.append(u"Carrier: {}".format(data['carrier']['name']))
+
+    if data.get('linetype'):
+        out.append(u"Type: {}".format(data['linetype']))
 
     if len(out) > 1:
         return u"; ".join(out)
