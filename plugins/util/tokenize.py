@@ -7,6 +7,7 @@ def tokenize(text):
     active_token_type = None
 
     text = sub(r'([\@\+\=\-]) +', r'\1', text)
+    text = sub(r'(.* +\@\S+|^\@\S+) +((?![\@\+\-\=]).+)', r'\1 +\2', text)
     text = [t for t in text.split(' ') if t]
 
     for word in text:
