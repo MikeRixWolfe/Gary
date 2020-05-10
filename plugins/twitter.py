@@ -6,6 +6,7 @@ from urllib import quote
 from util import hook, http, web
 
 twitter_re = (r'https?://(?:mobile.)?twitter.com/(.+?)/status/(\d+)', re.I)
+nitter_re = (r'https?://(?:mobile.)?nitter.net/(.+?)/status/(\d+)', re.I)
 
 @hook.api_key('twitter')
 @hook.command
@@ -86,6 +87,7 @@ def twitter(inp, say=None, api_key=None):
 
 @hook.api_key('twitter')
 @hook.regex(*twitter_re)
+@hook.regex(*nitter_re)
 def twitter_url(match, say=None, api_key=None):
     try:
         request_url = 'https://api.twitter.com/1.1/statuses/show.json'

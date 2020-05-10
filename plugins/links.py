@@ -7,7 +7,7 @@ from util import hook, http, web
 link_re = r'https?:\/\/(?:www\.)?([^: \/]+\.[^: \/]+)(?::\d+)?\/?\S*'
 domain_re = r'^.*?([^\/\.]+(?:\.[^\/\.]+)?)$'
 
-skipurls = ["youtube.com", "youtu.be", "twitter.com", "steampowered.com",
+skipurls = ["youtube.com", "youtu.be", "twitter.com", "steampowered.com", "nitter.net",
             "noxd.co", "worf.co", "illegalshit.com",
             "is.gd", "bit.ly", "tinyurl.com", "j.mp", "goo.gl",
             "gfycat.com", "giphy.com",
