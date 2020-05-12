@@ -144,7 +144,7 @@ def tags(inp, nick='', say=None, api_key=None):
         return response["message"]
 
     try:
-        tags = [x["name"] for x in response["artist"]["tags"]["tag"]]
+        tags = [x["name"] for x in response["artist"]["tags"]["tag"] if x['name'] != 'seen live']
     except:
         tags = ["None found"]
     artist = response["artist"]["name"]

@@ -67,7 +67,7 @@ def seen(inp, say='', nick='', db=None, input=None):
         return "Have you looked in a mirror lately?"
 
     rows = db.execute("select chan, nick, action, msg, uts from logfts where logfts match ? order by cast(uts as decimal) desc limit 1",
-        ('(chan:"{}" OR chan:"nick" OR chan:"quit") AND (nick:"{}" OR (action:"kick" and msg:"{}"))'.format(input.chan.strip('#'), inp, inp),)).fetchone()
+        ('((chan:"{}" OR chan:"nick" OR chan:"quit") AND nick:"{}") OR (chan:"{}" AND action:"kick" AND msg:"{}")'.format(input.chan.strip('#'), inp, input.chan.strip('#'), inp),)).fetchone()
 
     if rows:
         row = dict(zip(['chan', 'nick', 'action', 'msg', 'uts'], rows))
@@ -75,7 +75,7 @@ def seen(inp, say='', nick='', db=None, input=None):
         if row['action'] == 'KICK':
             row['who'] = row['msg'].split(' ')[:1][0]
             row['msg'] = ' '.join(row['msg'].split(' ')[1:]).strip('[]')
-            if inp.lower() != row['who'].lower():
+            if inp.lower() != row['nick'].lower():
                 row['action'] = 'KICKEE'
 
         format = formats.get(row['action'])
