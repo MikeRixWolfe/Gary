@@ -8,8 +8,8 @@ formats = {
     'ACTION': 'saying "%(msg)s"',
     'PART': 'leaving %(chan)s with reason "%(msg)s"',
     'JOIN': 'joining %(chan)s',
-    'KICK': 'kicking %(who)s from %(chan)s with reason "%(msg)s"',
-    'KICKEE': 'being kicked from %(chan)s by %(nick)s with reason "%(msg)s"',
+    'KICK': 'kicking %(who)s from %(chan)s with reason %(msg)s',
+    'KICKEE': 'being kicked from %(chan)s by %(nick)s with reason %(msg)s',
     'TOPIC': 'changing %(chan)s\'s topic to "%(msg)s"',
     'QUIT': 'quitting IRC with reason "%(msg)s"',
     'NICK': 'changing nick to %(msg)s'
@@ -73,8 +73,7 @@ def seen(inp, say='', nick='', db=None, input=None):
         row = dict(zip(['chan', 'nick', 'action', 'msg', 'uts'], rows))
         reltime = timesince.timesince(float(row['uts']))
         if row['action'] == 'KICK':
-            row['who'] = row['msg'].split(' ')[:1][0]
-            row['msg'] = ' '.join(row['msg'].split(' ')[1:]).strip('[]')
+            row['who'], row['msg'] = row['msg'].split(' ', 1)
             if inp.lower() != row['nick'].lower():
                 row['action'] = 'KICKEE'
 

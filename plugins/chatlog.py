@@ -61,7 +61,7 @@ def first(inp, chan='', bot=None, db=None, say=None):
         match_clause = '{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#'))
 
     try:
-        row = db.execute('select time, chan, nick, msg, uts from logfts where logfts match ? limit 1',
+        row = db.execute("select time, chan, nick, msg, uts from logfts where logfts match ?  and (msg not like '!%' and msg not like ';%' and msg not like '.%') limit 1",
             (match_clause, )).fetchone()
     except OperationalError:
         return "Error: must contain one inclusive match clause (+/=)."
@@ -94,7 +94,7 @@ def said(inp, chan='', db=None, say=None):
         match_clause = '{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#'))
 
     try:
-        rows = db.execute('select distinct nick from logfts where logfts match ? order by nick',
+        rows = db.execute("select distinct nick from logfts where logfts match ? and (msg not like '!%' and msg not like ';%' and msg not like '.%') order by nick",
             (match_clause, )).fetchall()
         rows = ([row[0] for row in rows] if rows else None)
     except OperationalError:
@@ -132,7 +132,7 @@ def rotw(inp, chan='', db=None, say=None):
             (match_clause, )).fetchone()
         total = total[0] if total else None
 
-        rows = db.execute('select distinct lower(nick), count(1) from logfts where logfts match ? group by lower(nick) order by count(1) desc limit 10',
+        rows = db.execute("select distinct lower(nick), count(1) from logfts where logfts match ?  group by lower(nick) order by count(1) desc limit 10",
             (match_clause, )).fetchall()
     except OperationalError:
         return "Error: must contain one inclusive match clause (+/=)."

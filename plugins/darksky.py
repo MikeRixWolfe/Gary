@@ -40,7 +40,9 @@ def weather(inp, say=None, api_key=None):
     try:
         direction = cards.get(float(weather['currently']['windBearing']),
             cards[min(cards.keys(), key=lambda k: abs(k - float(weather['currently']['windBearing'])))])
-        alerts = ', '.join(['\x02{}\x0F until \x02{}\x0F'.format(a['title'], strftime(a['expires'])) for a in weather.get('alerts', [])])
+        alerts = ', '.join(['\x02{}\x0F until \x02{}\x0F'.format(a['title'], strftime(a['expires'])) for a in
+            [min(filter(lambda x: x['title'] == t, weather.get('alerts', [])), key=lambda x: x['time']) for t in
+                set(a['title'] for a in weather.get('alerts', []))]])
 
         say(u"\x02{location}\x0F: {currently[temperature]:.0f}\u00b0F " \
             u"and {currently[summary]}, feels like {currently[apparentTemperature]:.0f}\u00b0F, " \
