@@ -4,27 +4,11 @@ from sqlite3 import OperationalError
 from util import hook, text, timesince, tokenize, web
 
 
-def is_global(inp):
-    _inp = ' '.join([t for t in inp.split(' ') if t not in ['-g', '-G']])
-    if inp == _inp:
-        return inp, False
-    else:
-        return _inp, True
-
-
 @hook.command('l')
 @hook.command
 def last(inp, nick='', chan='', bot=None, db=None, say=None):
-    """l[ast] <phrase> - Finds the last occurence of a phrase. Flag -G to search all channels."""
-    inp, _global = is_global(inp)
-
-    if not inp:
-        return "Check your input and try again."
-
-    if _global:
-        match_clause = tokenize.build_query(inp)
-    else:
-        match_clause = '{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#'))
+    """l[ast] <phrase> - Finds the last occurence of a phrase."""
+    match_clause = tokenize.build_query(inp)
 
     try:
         row = db.execute("select time, chan, nick, msg, uts from logfts where logfts match ? and (msg not like '!%' and msg not like ';%' and msg not like '.%') and cast(uts as decimal) < ? order by cast(uts as decimal) desc limit 1",
@@ -49,19 +33,11 @@ def last(inp, nick='', chan='', bot=None, db=None, say=None):
 @hook.command('f')
 @hook.command
 def first(inp, chan='', bot=None, db=None, say=None):
-    """f[irst] [-G] <phrase> - Finds the first occurence of a phrase. Flag -G to search all channels."""
-    inp, _global = is_global(inp)
-
-    if not inp:
-        return "Check your input and try again."
-
-    if _global:
-        match_clause = tokenize.build_query(inp)
-    else:
-        match_clause = '{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#'))
+    """f[irst] <phrase> - Finds the first occurence of a phrase."""
+    match_clause = tokenize.build_query(inp)
 
     try:
-        row = db.execute("select time, chan, nick, msg, uts from logfts where logfts match ?  and (msg not like '!%' and msg not like ';%' and msg not like '.%') limit 1",
+        row = db.execute("select time, chan, nick, msg, uts from logfts where logfts match ? and (msg not like '!%' and msg not like ';%' and msg not like '.%') limit 1",
             (match_clause, )).fetchone()
     except OperationalError:
         return "Error: must contain one inclusive match clause (+/=)."
@@ -82,16 +58,8 @@ def first(inp, chan='', bot=None, db=None, say=None):
 
 @hook.command
 def said(inp, chan='', db=None, say=None):
-    """said <phrase> - Finds users who has said a phrase. Flag -G to search all channels."""
-    inp, _global = is_global(inp)
-
-    if not inp:
-        return "Check your input and try again."
-
-    if _global:
-        match_clause = tokenize.build_query(inp)
-    else:
-        match_clause = '{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#'))
+    """said <phrase> - Finds users who has said a phrase."""
+    match_clause = tokenize.build_query(inp)
 
     try:
         rows = db.execute("select distinct nick from logfts where logfts match ? and (msg not like '!%' and msg not like ';%' and msg not like '.%') order by nick",
@@ -116,23 +84,15 @@ def said(inp, chan='', db=None, say=None):
 
 @hook.command
 def rotw(inp, chan='', db=None, say=None):
-    """rotw [-G] <phrase> - Displays the royalty of the word. Flag -G to search all channels."""
-    inp, _global = is_global(inp)
-
-    if not inp:
-        return "Check your input and try again."
-
-    if _global:
-        match_clause = tokenize.build_query(inp)
-    else:
-        match_clause = '{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#'))
+    """rotw <phrase> - Displays the royalty of the word."""
+    match_clause = tokenize.build_query(inp)
 
     try:
         total = db.execute('select count(1) from logfts where logfts match ?',
             (match_clause, )).fetchone()
         total = total[0] if total else None
 
-        rows = db.execute("select distinct lower(nick), count(1) from logfts where logfts match ?  group by lower(nick) order by count(1) desc limit 10",
+        rows = db.execute("select distinct lower(nick), count(1) from logfts where logfts match ? group by lower(nick) order by count(1) desc limit 10",
             (match_clause, )).fetchall()
     except OperationalError:
         return "Error: must contain one inclusive match clause (+/=)."

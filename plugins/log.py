@@ -31,8 +31,7 @@ irc_color_re = re.compile(r'(\x03(\d{1,2}(,\d{1,2})?)|[\x00\x02\x03\x04\x05\x06\
 
 
 def db_init(db):
-    db.execute("create virtual table if not exists logfts using FTS5(time,"
-               " server, chan, nick, user, action, msg, uts)")
+    db.execute("create virtual table if not exists logfts using FTS5(uts, time, server, chan, nick, user, action, msg)")
     db.commit()
 
 

@@ -41,7 +41,7 @@ def weather(inp, say=None, api_key=None):
         direction = cards.get(float(weather['currently']['windBearing']),
             cards[min(cards.keys(), key=lambda k: abs(k - float(weather['currently']['windBearing'])))])
         alerts = ', '.join(['\x02{}\x0F until \x02{}\x0F'.format(a['title'], strftime(a['expires'])) for a in
-            [min(filter(lambda x: x['title'] == t, weather.get('alerts', [])), key=lambda x: x['time']) for t in
+            [min(filter(lambda x: x['title'] == t, weather.get('alerts', [])), key=lambda x: x['expires']) for t in
                 set(a['title'] for a in weather.get('alerts', []))]])
 
         say(u"\x02{location}\x0F: {currently[temperature]:.0f}\u00b0F " \
@@ -85,7 +85,7 @@ def forecast(inp, say=None, api_key=None):
 @hook.command('h')
 @hook.command
 def hourly(inp, say=None, api_key=None):
-    """h[ourly] <zip code|location> - Gets the 12 hour weather forecast."""
+    """h[ourly] <zip code|location> - Gets the 10 hour weather forecast."""
     if api_key is None:
         return "Error: API key not set."
 

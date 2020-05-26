@@ -2,12 +2,12 @@ from re import sub
 
 
 def tokenize(text):
-    tokens = { '@': [], '+': [], '-': [], '=': [] }
+    tokens = { '#': [], '@': [], '+': [], '-': [], '=': [] }
     active_token = None
     active_token_type = None
 
-    text = sub(r'([\@\+\=\-]) +', r'\1', text)
-    text = sub(r'(.* +\@\S+|^\@\S+) +((?![\@\+\-\=]).+)', r'\1 +\2', text)
+    text = sub(r'([\#\@\+\=\-]) +', r'\1', text)
+    text = sub(r'(.* +[\#\@]\S+|^[\#\@]\S+) +((?![\#\@\+\-\=]).+)', r'\1 +\2', text)
     text = [t for t in text.split(' ') if t]
 
     for word in text:
@@ -29,6 +29,7 @@ def tokenize(text):
 
 
 def format(tokens):
+    chan = next(iter(['chan:"{}"'.format(t) for t in tokens['#']]), None)
     nick = next(iter(['nick:"{}"'.format(t) for t in tokens['@']]), None)
 
     include = ' AND '.join(['msg:"{}"*'.format(t) for t in tokens['+']])
@@ -38,15 +39,16 @@ def format(tokens):
     exclude = ' NOT '.join(['msg:"{}"'.format(t) for t in tokens['-']])
     exclude = 'NOT ' + exclude if exclude else exclude
 
-    msgs = [m for m in [include, exclude] if m]
+    singles = ' AND '.join([s for s in [chan, nick] if s])
+    msgs = ' '.join([m for m in [include, exclude] if m])
 
-    if nick:
+    if singles:
         if msgs:
-            return "{} AND ({})".format(nick, ' '.join(msgs))
+            return '{} AND ({})'.format(singles, msgs)
         else:
-            return nick
+            return singles
     else:
-        return "({})".format(' '.join(msgs))
+        return '({})'.format(msgs)
 
 
 def build_query(text):
