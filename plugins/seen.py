@@ -16,42 +16,6 @@ formats = {
 }
 
 
-@hook.command(autohelp=False)
-def around(inp, nick='', chan='', say='', db=None, input=None):
-    """around [minutes] - Lists what nicks have been active in the last [minutes] minutes, defaults to 15."""
-    minutes = 15
-    length = 430
-
-    if inp.isdigit():
-        minutes = int(inp)
-
-    try:  # prevent int overflow
-        period = time() - (minutes * 60)
-    except:
-        minutes = 15
-        period = time() - (minutes * 60)
-
-    out = "Users around in the last {} minutes: ".format(minutes)
-
-    if inp == 'today':
-        today = datetime.today()
-        period = float(datetime(today.year, today.month, today.day).strftime('%s'))
-        out = "Users around today: "
-
-    rows = db.execute("select distinct nick from logfts where chan match ? and cast(uts as decimal) > ?",
-        ("{}".format(chan.strip('#')), period)).fetchall()
-    rows = ([row[0] for row in rows] if rows else None)
-
-    if rows:
-        out += ', '.join(sorted(rows))
-        if len(out) >= length:
-            truncstr = out[:length].rsplit(' ', 1)[0]
-            out = truncstr + " and {} others".format(len(out[len(truncstr):].split()))
-        say(out)
-    else:
-        say("No one!")
-
-
 @hook.regex(r'^seen (\S+)')
 @hook.command
 def seen(inp, say='', nick='', db=None, input=None):
@@ -83,3 +47,4 @@ def seen(inp, say='', nick='', db=None, input=None):
         say(out + format % row)
     else:
         return "I've never seen %s" % inp
+

@@ -81,39 +81,6 @@ def first(inp, chan='', bot=None, db=None, say=None):
 
 
 @hook.command
-def said(inp, chan='', db=None, say=None):
-    """said [-G] <phrase> - Finds users who has said a phrase. Flag -G to search all channels."""
-    inp, _global = is_global(inp)
-
-    if not inp:
-        return "Check your input and try again."
-
-    if _global:
-        match_clause = tokenize.build_query(inp)
-    else:
-        match_clause = '{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#'))
-
-    try:
-        rows = db.execute("select distinct nick from logfts where logfts match ? and (msg not like '!%' and msg not like ';%' and msg not like '.%') order by nick",
-            (match_clause, )).fetchall()
-        rows = ([row[0] for row in rows] if rows else None)
-    except OperationalError:
-        return "Error: must contain one inclusive match clause (+/=)."
-
-    if rows:
-        out = 'Said by '
-        while rows:
-            if len(out) + len(rows[0]) + len(str(len(rows))) < 440:
-                out += rows.pop(0) + ", "
-            else:
-                break
-        if rows:
-            out += "{:,d} others".format(len(rows))
-        say(text.rreplace(out.strip(', '), ', ', ', and ', 1))
-    else:
-        say("No one!")
-
-@hook.command
 def rotw(inp, chan='', db=None, say=None):
     """rotw [-G] <phrase> - Displays the royalty of the word. Flag -G to search all channels."""
     inp, _global = is_global(inp)
@@ -148,5 +115,4 @@ def rotw(inp, chan='', db=None, say=None):
             say('There are {:,d} uses of "{}" in {}. {}'.format(total, inp, chan, ', '.join(out)))
     else:
         say("No one!")
-
 
