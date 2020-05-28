@@ -86,21 +86,21 @@ def noticed(paraml, chan='', conn=None):
                     user = str(paraml[1].split()[1]).lower()
                     if paraml[1].split()[2] == '3':
                         conn.users[user] = True
-                        print(">> {} identified.".format(user))
+                        print(">>> {} identified.".format(user))
                     else:
                         conn.users[user] = False
-                        print(">> {} not identified.".format(user))
+                        print(">>> {} not identified.".format(user))
             elif conn.conf.get('service_style') == 'hybserv':
                 if "Nickname:" in paraml[1]:
                     if "ONLINE" in paraml[1]:
                         user = str(paraml[1].split()[1]).lower()
                         conn.users[user] = True
-                        print(">> {} identified.".format(user))
+                        print(">>> {} identified.".format(user))
                     else:
                         conn.users[user] = False
-                        print(">> {} not identified.".format(user))
+                        print(">>> {} not identified.".format(user))
                 elif "not registered" in paraml[1] or "is private" in paraml[1]:
                     user = str(paraml[1].split()[2]).lower()[2:-2]
                     conn.users[user] = False
-                    print(">> {} not identified.".format(user))
+                    print(">>> {} not identified.".format(user))
 
