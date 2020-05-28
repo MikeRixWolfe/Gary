@@ -69,7 +69,6 @@ def get_log_link(bot, db, q):
             _date, _time = _datetime.split()
         except Exception as e:
             print('Error fetching quote #{}'.format(id))
-            print(e)
             return '???'
 
         return web.try_googl(bot.config["logviewer_url"].format(chan.strip('#'), _date, _time))
