@@ -136,7 +136,7 @@ def searchquote(inp, say=None, db=None):
         return "None found."
 
 
-@hook.command('deletequote')
+@hook.command('dq')
 @hook.command
 def delquote(inp, db=None):
     """delquote <n> - Deletes the <n>th quote."""
