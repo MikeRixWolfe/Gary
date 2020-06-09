@@ -4,57 +4,8 @@ from util import hook, text, tokenize, web
 
 
 def db_init(db):
-    db.execute("create virtual table if not exists quotefts" \
-        " using FTS5(id, msg, nick, active, uts)")
+    db.execute("create virtual table if not exists quotefts using FTS5(id, msg, nick, active, uts)")
     db.commit()
-
-
-def add_quote(db, quote, nick):
-    id = db.execute("select max(cast(id as int)) from quotefts").fetchone()
-    id = id[0] + 1 if id else 1
-    db.execute("insert into quotefts (id, msg, nick, active, uts)" \
-        " values(?,?,?,?,?)", (str(id), quote, nick, '1', str(time.time())))
-    db.commit()
-    return id
-
-
-def del_quote(db, id):
-    update = db.execute("update quotefts set active='0' where id=? and active='1'", (id,))
-    db.commit()
-    return update
-
-
-def restore_quote(db, id):
-    update = db.execute("update quotefts set active='1' where id=? and active='0'", (id,))
-    db.commit()
-    return update
-
-
-def search_quote(db, text):
-    ids = db.execute("select id from quotefts where quotefts match ?",
-        ('{} AND active:"1"'.format(tokenize.build_query(text)),)).fetchall()
-    return ids
-
-
-def get_random_quote(db):
-    return db.execute("select id, msg, nick, uts from quotefts" \
-        " where active='1' order by random() limit 1").fetchone()
-
-
-def get_random_quote_with_text(db, text):
-    return db.execute("select id, msg, nick, uts from quotefts" \
-        " where quotefts match ? order by random() limit 1",
-        ('{} AND active:"1"'.format(tokenize.build_query(text)),)).fetchone()
-
-
-def get_quote_by_id(db, id):
-    return db.execute("select id, msg, nick, uts from quotefts where" \
-        " id=? and active='1'", (id,)).fetchone()
-
-
-def get_quote_timestamp(db, text):
-    return db.execute("select time from logfts where msg match ?",
-        ("quote" + text)).fetchone()
 
 
 def get_log_link(bot, db, q):
@@ -93,11 +44,12 @@ def randomquote(inp, bot=None, db=None, say=None):
 
     if inp:
         try:
-            quote = get_random_quote_with_text(db, inp)
+            quote = db.execute("select id, msg, nick, uts from quotefts where quotefts match ? order by random() limit 1",
+                ('{} AND active:"1"'.format(tokenize.build_query(inp)),)).fetchone()
         except OperationalError:
             return "Error: must contain one inclusive match clause (+/=)."
     else:
-        quote = get_random_quote(db)
+        quote = db.execute("select id, msg, nick, uts from quotefts where active='1' order by random() limit 1").fetchone()
 
     if quote:
         link = get_log_link(bot, db, quote)
@@ -110,7 +62,8 @@ def randomquote(inp, bot=None, db=None, say=None):
 def getquote(inp, bot=None, db=None, say=None):
     """getquote <n> - Gets the <n>th quote."""
     db_init(db)
-    quote = get_quote_by_id(db, inp)
+    quote = db.execute("select id, msg, nick, uts from quotefts where id=? and active='1'",
+        (inp,)).fetchone()
 
     if quote:
         link = get_log_link(bot, db, quote)
@@ -125,7 +78,8 @@ def searchquote(inp, say=None, db=None):
     db_init(db)
 
     try:
-        ids = search_quote(db, inp)
+        ids = db.execute("select id from quotefts where quotefts match ?",
+            ('{} AND active:"1"'.format(tokenize.build_query(inp)),)).fetchall()
     except OperationalError:
         return "Error: must contain one inclusive match clause (+/=)."
 
@@ -141,7 +95,8 @@ def searchquote(inp, say=None, db=None):
 def delquote(inp, db=None):
     """delquote <n> - Deletes the <n>th quote."""
     db_init(db)
-    quote = del_quote(db, inp)
+    quote = db.execute("update quotefts set active='0' where id=? and active='1'", (inp,))
+    db.commit()
 
     if quote.rowcount > 0:
         return "Quote #{} deleted.".format(inp)
@@ -153,7 +108,8 @@ def delquote(inp, db=None):
 def restorequote(inp, db=None):
     """restorequote <n> - Restores the <n>th quote."""
     db_init(db)
-    quote = restore_quote(db, inp)
+    quote = db.execute("update quotefts set active='1' where id=? and active='0'", (inp,))
+    db.commit()
 
     if quote.rowcount > 0:
         return "Quote #{} restored.".format(inp)
@@ -168,7 +124,11 @@ def quote(inp, nick='', say=None, db=None):
 
     if inp:
         try:
-            id = add_quote(db, inp, nick)
+            id = db.execute("select max(cast(id as int)) from quotefts").fetchone()
+            id = id[0] + 1 if id else 1
+            db.execute("insert into quotefts (id, msg, nick, active, uts) values(?,?,?,?,?)",
+                (str(id), inp, nick, '1', str(time.time())))
+            db.commit()
         except db.IntegrityError:
             return "Error in adding quote."
         say("Quote #{} added.".format(id))
