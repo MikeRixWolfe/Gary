@@ -5,15 +5,15 @@ from util import hook, text, timesince, tokenize, web
 
 
 formats = {
-    'PRIVMSG': '{nick} {context} on {date} ({timesince} ago) in {chan} saying "{msg}"',
-    'ACTION': '{nick} {context} on {date} ({timesince} ago) in {chan} saying "{msg}"',
-    'PART': '{nick} {context} on {date} ({timesince} ago) leaving {chan} with reason "{msg}"',
-    'JOIN': '{nick} {context} on {date} ({timesince} ago) joining {chan}',
-    'KICK': '{nick} {context} on {date} ({timesince} ago) kicking {who} from {chan} with reason {msg}',
-    'KICKEE': '{nick} {context} on {date} ({timesince} ago) being kicked from {chan} by {nick} with reason {msg}',
-    'TOPIC': '{nick} {context} on {date} ({timesince} ago) changing {chan}\'s topic to "{msg}"',
-    'QUIT': '{nick} {context} on {date} ({timesince} ago) quitting IRC with reason "{msg}"',
-    'NICK': '{nick} {context} on {date} ({timesince} ago) in {chan} changing nick to {msg}'
+    'PRIVMSG': '{nick} {context} on {date} ({timesince} ago) in {chan} with message "{msg}" {log_url}',
+    'ACTION': '{nick} {context} on {date} ({timesince} ago) in {chan} with message "{msg}" {log_url}',
+    'PART': '{nick} {context} on {date} ({timesince} ago) leaving {chan} with reason "{msg}" {log_url}',
+    'JOIN': '{nick} {context} on {date} ({timesince} ago) joining {chan} {log_url}',
+    'KICK': '{nick} {context} on {date} ({timesince} ago) kicking {who} from {chan} with reason {msg} {log_url}',
+    'KICKEE': '{nick} {context} on {date} ({timesince} ago) being kicked from {chan} by {nick} with reason {msg} {log_url}',
+    'TOPIC': '{nick} {context} on {date} ({timesince} ago) changing {chan}\'s topic to "{msg}" {log_url}',
+    'QUIT': '{nick} {context} on {date} ({timesince} ago) quitting IRC with reason "{msg}" {log_url}',
+    'NICK': '{nick} {context} on {date} ({timesince} ago) in {chan} changing nick to {msg} {log_url}'
 }
 
 
@@ -55,7 +55,7 @@ def last(inp, nick='', chan='', bot=None, db=None, say=None):
         else:
             row['log_url'] = ''
 
-        say(formats[row['action']].format(context='last said "{}"'.format(inp), **row).strip())
+        say(formats[row['action']].format(context='last said that', **row).strip())
     else:
         say("Never!")
 
@@ -90,14 +90,14 @@ def first(inp, chan='', bot=None, db=None, say=None):
         else:
             row['log_url'] = ''
 
-        say(formats[row['action']].format(context='first said "{}"'.format(inp), **row).strip())
+        say(formats[row['action']].format(context='first said that', **row).strip())
     else:
         say("Never!")
 
 
 @hook.regex(r'^seen (\S+)')
 @hook.command
-def seen(inp, chan='', nick='', db=None, say=None, input=None):
+def seen(inp, chan='', nick='', bot=None, db=None, say=None, input=None):
     """seen <nick> - Tell when a nickname was last in active in IRC."""
     try:
         inp = inp.split(' ')[0]
@@ -117,6 +117,11 @@ def seen(inp, chan='', nick='', db=None, say=None, input=None):
 
         row['date'] = row['time'].split(' ')[0]
         row['timesince'] = timesince.timesince(float(row['uts']))
+        if bot.config.get("logviewer_url"):
+            row['log_url'] = web.try_googl(bot.config["logviewer_url"].format(row['chan'].strip('#'), *row['time'].split()))
+        else:
+            row['log_url'] = ''
+
         if row['action'] == 'KICK':
             row['who'], row['msg'] = row['msg'].split(' ', 1)
             if inp.lower() != row['nick'].lower():
