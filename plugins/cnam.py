@@ -10,7 +10,7 @@ def cnam(inp, api_key=None):
         url = 'https://api.everyoneapi.com/v1/phone/{}'.format(inp)
         data = http.get_json(url, account_sid=api_key["account_sid"],
             auth_token=api_key["auth_token"],
-            data="line_provider,carrier,location,linetype")['data']
+            data="carrier,location,linetype")['data']
     except Exception as e:
         return "EveryoneAPI error, please try again in a few minutes."
 

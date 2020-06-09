@@ -240,13 +240,13 @@ def block(inp, nick='', conn=None, bot=None, say=None):
             else:
                 private.append(contact)
                 private.sort()
-                json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
+                json.dump(bot.config, open('config.json', 'w'), sort_keys=True, indent=2)
                 return "{} has been blocked.".format(contact)
         else:
             if contact in private:
                 private.remove(contact)
                 private.sort()
-                json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
+                json.dump(bot.config, open('config.json', 'w'), sort_keys=True, indent=2)
                 return "{} has been removed from the block.".format(contact)
             else:
                 return "{} is not blocked.".format(contact)

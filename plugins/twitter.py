@@ -77,11 +77,11 @@ def twitter(inp, say=None, api_key=None):
     tweet['full_text'] = http.h.unescape(tweet['full_text'])
     if 1 < len([t.strip() for t in tweet['full_text'].split('\n') if len(t.strip()) > 0]) < 5:
         tweet['full_text'] = re.sub(r'(.*?)(https:\/\/t.co\/.*)', r'\1\n\2', tweet['full_text'])
-        say(u'{} (@{}) on Twitter:'.format(tweet['user']['name'], tweet['user']['screen_name']))
+        say(u'{} (@{}) on Twitter:'.format(tweet['user']['name'].encode('ascii', 'ignore'), tweet['user']['screen_name']))
         for line in [t.strip() for t in tweet['full_text'].split('\n') if len(t.strip()) > 0]:
             say(u'   {}'.format(line))
     else:
-        say(u'{} (@{}) on Twitter: "{}"'.format(tweet['user']['name'], tweet['user']['screen_name'],
+        say(u'{} (@{}) on Twitter: "{}"'.format(tweet['user']['name'].encode('ascii', 'ignore'), tweet['user']['screen_name'],
             ' | '.join([t.strip() for t in tweet['full_text'].split('\n') if len(t.strip()) > 0])))
 
 
@@ -98,12 +98,12 @@ def twitter_url(match, say=None, api_key=None):
         if 1 < len([t.strip() for t in tweet['full_text'].split('\n') if len(t.strip()) > 0]) < 5:
             tweet['full_text'] = re.sub(r'(.*?)(https:\/\/t.co\/.*)', r'\1\n\2', tweet['full_text'])
             say(u'{} - {} (@{}) on Twitter:'.format(web.try_googl(match.group(0)),
-                tweet['user']['name'], tweet['user']['screen_name']))
+                tweet['user']['name'].encode('ascii', 'ignore'), tweet['user']['screen_name']))
             for line in [t.strip() for t in tweet['full_text'].split('\n') if len(t.strip()) > 0]:
                 say(u'   {}'.format(line))
         else:
             say(u'{} - {} (@{}) on Twitter: "{}"'.format(web.try_googl(match.group(0)),
-                tweet['user']['name'], tweet['user']['screen_name'],
+                tweet['user']['name'].encode('ascii', 'ignore'), tweet['user']['screen_name'],
                 ' | '.join([t.strip() for t in tweet['full_text'].split('\n') if len(t.strip()) > 0])))
     except:
         say("{} - Twitter".format(web.try_googl(match.group(0))))

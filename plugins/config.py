@@ -7,11 +7,11 @@ def suggestions(inp, bot=None):
     """.suggestions - Toggles fuzzy matching suggestions for mistyped commands."""
     if bot.config.get("suggestions", True):
         bot.config["suggestions"] = False
-        json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
+        json.dump(bot.config, open('config.json', 'w'), sort_keys=True, indent=2)
         return "Command suggestions are now disabled."
     else:
         bot.config["suggestions"] = True
-        json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
+        json.dump(bot.config, open('config.json', 'w'), sort_keys=True, indent=2)
         return "Command suggestions are now enabled."
 
 
@@ -30,7 +30,7 @@ def config_add(items, name, config):
             skips.append(item)
 
     section.sort()
-    json.dump(config, open('config', 'w'), sort_keys=True, indent=2)
+    json.dump(config, open('config.json', 'w'), sort_keys=True, indent=2)
 
     if new:
         out = "{} has been {}.".format(', '.join(new), name)
@@ -55,7 +55,7 @@ def config_del(items, name, config):
             skips.append(item)
 
     section.sort()
-    json.dump(config, open('config', 'w'), sort_keys=True, indent=2)
+    json.dump(config, open('config.json', 'w'), sort_keys=True, indent=2)
 
     if new:
         verb = "are" if len(new) > 1 else "is"

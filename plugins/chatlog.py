@@ -1,11 +1,24 @@
-import datetime
-import time
+import re
+from time import time
 from sqlite3 import OperationalError
 from util import hook, text, timesince, tokenize, web
 
 
+formats = {
+    'PRIVMSG': '{nick} {context} on {date} ({timesince} ago) in {chan} saying "{msg}"',
+    'ACTION': '{nick} {context} on {date} ({timesince} ago) in {chan} saying "{msg}"',
+    'PART': '{nick} {context} on {date} ({timesince} ago) leaving {chan} with reason "{msg}"',
+    'JOIN': '{nick} {context} on {date} ({timesince} ago) joining {chan}',
+    'KICK': '{nick} {context} on {date} ({timesince} ago) kicking {who} from {chan} with reason {msg}',
+    'KICKEE': '{nick} {context} on {date} ({timesince} ago) being kicked from {chan} by {nick} with reason {msg}',
+    'TOPIC': '{nick} {context} on {date} ({timesince} ago) changing {chan}\'s topic to "{msg}"',
+    'QUIT': '{nick} {context} on {date} ({timesince} ago) quitting IRC with reason "{msg}"',
+    'NICK': '{nick} {context} on {date} ({timesince} ago) in {chan} changing nick to {msg}'
+}
+
+
 def is_global(inp):
-    _inp = ' '.join([t for t in inp.split(' ') if t not in ['-g', '-G']])
+    _inp = ' '.join([t for t in inp.split(' ') if t.lower() != '-g'])
     if inp == _inp:
         return inp, False
     else:
@@ -27,21 +40,22 @@ def last(inp, nick='', chan='', bot=None, db=None, say=None):
         match_clause = '{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#'))
 
     try:
-        row = db.execute("select time, chan, nick, msg, uts from logfts where logfts match ? and (msg not like '!%' and msg not like ';%' and msg not like '.%') and cast(uts as decimal) < ? order by cast(uts as decimal) desc limit 1",
-            (match_clause, (time.time() - 1))).fetchone()
+        row = db.execute("select uts, time, chan, nick, action, msg from logfts where logfts match ? and (msg not like '!%' and msg not like ';%' and msg not like '.%') and cast(uts as decimal) < ? and action = 'PRIVMSG' order by cast(uts as decimal) desc limit 1",
+            (match_clause, (time() - 1))).fetchone()
     except OperationalError:
         return "Error: must contain one inclusive match clause (+/=)."
 
     if row:
-        _time, _chan, _nick, _msg, _uts = row
+        row = dict(zip(['uts', 'time', 'chan', 'nick', 'action', 'msg'], row))
 
+        row['date'] = row['time'].split(' ')[0]
+        row['timesince'] = timesince.timesince(float(row['uts']))
         if bot.config.get("logviewer_url"):
-            log_url = web.try_googl(bot.config["logviewer_url"].format(_chan.strip('#'), *_time.split()))
+            row['log_url'] = web.try_googl(bot.config["logviewer_url"].format(row['chan'].strip('#'), *row['time'].split()))
         else:
-            log_url = ''
+            row['log_url'] = ''
 
-        say('{} last said "{}" in {} on {} ({} ago) {}'.format(_nick, _msg, _chan,
-            _time.split(' ')[0], timesince.timesince(float(_uts)), log_url).strip())
+        say(formats[row['action']].format(context='last said "{}"'.format(inp), **row).strip())
     else:
         say("Never!")
 
@@ -61,23 +75,56 @@ def first(inp, chan='', bot=None, db=None, say=None):
         match_clause = '{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#'))
 
     try:
-        row = db.execute("select time, chan, nick, msg, uts from logfts where logfts match ? and (msg not like '!%' and msg not like ';%' and msg not like '.%') limit 1",
+        row = db.execute("select uts, time, chan, nick, action, msg from logfts where logfts match ? and (msg not like '!%' and msg not like ';%' and msg not like '.%') and action = 'PRIVMSG' limit 1",
             (match_clause, )).fetchone()
     except OperationalError:
         return "Error: must contain one inclusive match clause (+/=)."
 
     if row:
-        _time, _chan, _nick, _msg, _uts = row
+        row = dict(zip(['uts', 'time', 'chan', 'nick', 'action', 'msg'], row))
 
+        row['date'] = row['time'].split(' ')[0]
+        row['timesince'] = timesince.timesince(float(row['uts']))
         if bot.config.get("logviewer_url"):
-            log_url = web.try_googl(bot.config["logviewer_url"].format(_chan.strip('#'), *_time.split()))
+            row['log_url'] = web.try_googl(bot.config["logviewer_url"].format(row['chan'].strip('#'), *row['time'].split()))
         else:
-            log_url = ''
+            row['log_url'] = ''
 
-        say('{} first said "{}" in {} on {} ({} ago) {}'.format(_nick, _msg, _chan,
-            _time.split(' ')[0], timesince.timesince(float(_uts)), log_url).strip())
+        say(formats[row['action']].format(context='first said "{}"'.format(inp), **row).strip())
     else:
         say("Never!")
+
+
+@hook.regex(r'^seen (\S+)')
+@hook.command
+def seen(inp, chan='', nick='', db=None, say=None, input=None):
+    """seen <nick> - Tell when a nickname was last in active in IRC."""
+    try:
+        inp = inp.split(' ')[0]
+    except:
+        inp = inp.group(1)
+
+    if input.conn.nick.lower() == inp.lower():
+        return "You need to get your eyes checked."
+    if inp.lower() == nick.lower():
+        return "Have you looked in a mirror lately?"
+
+    row = db.execute("select uts, time, chan, nick, action, msg from logfts where logfts match ? order by cast(uts as decimal) desc limit 1",
+        ('((chan:"{}" OR chan:"nick" OR chan:"quit") AND nick:^"{}") OR (chan:"{}" AND action:"kick" AND msg:^"{}")'.format(chan.strip('#'), inp, chan.strip('#'), inp),)).fetchone()
+
+    if row:
+        row = dict(zip(['uts', 'time', 'chan', 'nick', 'action', 'msg'], row))
+
+        row['date'] = row['time'].split(' ')[0]
+        row['timesince'] = timesince.timesince(float(row['uts']))
+        if row['action'] == 'KICK':
+            row['who'], row['msg'] = row['msg'].split(' ', 1)
+            if inp.lower() != row['nick'].lower():
+                row['action'] = 'KICKEE'
+
+        say(formats[row['action']].format(context='was last seen', **row).strip())
+    else:
+        return "I've never seen {}".format(inp)
 
 
 @hook.command

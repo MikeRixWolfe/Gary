@@ -8,7 +8,7 @@ def ontopic(paraml, nick='', chan=None, conn=None, bot=None):
     if nick != conn.nick:
         bot.config['topics'][chan + '_bak'] = bot.config['topics'].get(chan, '')
         bot.config['topics'][chan] = paraml[-1]
-        json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
+        json.dump(bot.config, open('config.json', 'w'), sort_keys=True, indent=2)
         print(">>> u'Manual topic update: '{}' :{}'".format(paraml[-1], chan))
 
 
@@ -37,6 +37,6 @@ def topic(inp, chan=None, conn=None, bot=None):
 
         bot.config['topics'][chan + '_bak'] = bot.config['topics'].get(chan, '')
         bot.config['topics'][chan] = u' | '.join(_topic)
-        json.dump(bot.config, open('config', 'w'), sort_keys=True, indent=2)
+        json.dump(bot.config, open('config.json', 'w'), sort_keys=True, indent=2)
         conn.send(u"TOPIC {} :{}".format(chan, bot.config['topics'][chan]))
 

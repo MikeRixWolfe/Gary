@@ -3,7 +3,7 @@ import json
 from urllib import urlencode
 
 
-with open('config', 'r') as f:
+with open('config.json', 'r') as f:
     api_key = json.loads(f.read())['api_keys']['noxd']
 
 short_url = "https://noxd.co"
