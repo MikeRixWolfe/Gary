@@ -13,7 +13,8 @@ formats = {
     'KICKEE': '{nick} {context} on {date} ({timesince} ago) being kicked from {chan} by {nick} with reason {msg} {log_url}',
     'TOPIC': '{nick} {context} on {date} ({timesince} ago) changing {chan}\'s topic to "{msg}" {log_url}',
     'QUIT': '{nick} {context} on {date} ({timesince} ago) quitting IRC with reason "{msg}" {log_url}',
-    'NICK': '{nick} {context} on {date} ({timesince} ago) in {chan} changing nick to {msg} {log_url}'
+    'NICK': '{nick} {context} on {date} ({timesince} ago) changing nick to {msg} {log_url}',
+    'NICKEE': '{msg} {context} on {date} ({timesince} ago) changing nick from {nick} {log_url}'
 }
 
 
@@ -95,22 +96,28 @@ def first(inp, chan='', bot=None, db=None, say=None):
         say("Never!")
 
 
-@hook.regex(r'^seen (\S+)')
+@hook.regex(r'^seen (?P<global>-[gG] )?(?P<nick>\S+)')
 @hook.command
 def seen(inp, chan='', nick='', bot=None, db=None, say=None, input=None):
-    """seen <nick> - Tell when a nickname was last in active in IRC."""
+    """seen [-G] <nick> - Tell when a nickname was last in active in IRC. Flag -G to search all channels."""
     try:
-        inp = inp.split(' ')[0]
+        _global = bool(inp.group('global'))
+        inp = inp.group('nick')
     except:
-        inp = inp.group(1)
+        inp, _global = is_global(inp)
+        inp = inp.split(' ')[0]
 
     if input.conn.nick.lower() == inp.lower():
         return "You need to get your eyes checked."
     if inp.lower() == nick.lower():
         return "Have you looked in a mirror lately?"
 
-    row = db.execute("select uts, time, chan, nick, action, msg from logfts where logfts match ? order by cast(uts as decimal) desc limit 1",
-        ('((chan:"{}" OR chan:"nick" OR chan:"quit") AND nick:^"{}") OR (chan:"{}" AND action:"kick" AND msg:^"{}")'.format(chan.strip('#'), inp, chan.strip('#'), inp),)).fetchone()
+    if _global:
+        row = db.execute("select uts, time, chan, nick, action, msg from logfts where logfts match ? order by cast(uts as decimal) desc limit 1",
+            ('nick:^"{}" OR (action:"kick" AND msg:^"{}") OR (chan:"nick" AND msg:^"{}")'.format(inp, inp, inp),)).fetchone()
+    else:
+        row = db.execute("select uts, time, chan, nick, action, msg from logfts where logfts match ? order by cast(uts as decimal) desc limit 1",
+            ('((chan:"{}" OR chan:"nick" OR chan:"quit") AND nick:^"{}") OR (chan:"{}" AND action:"kick" AND msg:^"{}") OR (chan:"nick" AND msg:^"{}")'.format(chan.strip('#'), inp, chan.strip('#'), inp, inp),)).fetchone()
 
     if row:
         row = dict(zip(['uts', 'time', 'chan', 'nick', 'action', 'msg'], row))
@@ -126,6 +133,10 @@ def seen(inp, chan='', nick='', bot=None, db=None, say=None, input=None):
             row['who'], row['msg'] = row['msg'].split(' ', 1)
             if inp.lower() != row['nick'].lower():
                 row['action'] = 'KICKEE'
+
+        if row['action'] == 'NICK':
+            if inp.lower() != row['nick'].lower():
+                row['action'] = 'NICKEE'
 
         say(formats[row['action']].format(context='was last seen', **row).strip())
     else:
