@@ -10,7 +10,7 @@ formats = {
     'PART': '{nick} {context} on {date} ({timesince} ago) leaving {chan} with reason "{msg}" {log_url}',
     'JOIN': '{nick} {context} on {date} ({timesince} ago) joining {chan} {log_url}',
     'KICK': '{nick} {context} on {date} ({timesince} ago) kicking {who} from {chan} with reason {msg} {log_url}',
-    'KICKEE': '{nick} {context} on {date} ({timesince} ago) being kicked from {chan} by {nick} with reason {msg} {log_url}',
+    'KICKEE': '{who} {context} on {date} ({timesince} ago) being kicked from {chan} by {nick} with reason {msg} {log_url}',
     'TOPIC': '{nick} {context} on {date} ({timesince} ago) changing {chan}\'s topic to "{msg}" {log_url}',
     'QUIT': '{nick} {context} on {date} ({timesince} ago) quitting IRC with reason "{msg}" {log_url}',
     'NICK': '{nick} {context} on {date} ({timesince} ago) changing nick to {msg} {log_url}',
