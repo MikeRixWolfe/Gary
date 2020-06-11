@@ -96,16 +96,16 @@ def first(inp, chan='', bot=None, db=None, say=None):
         say("Never!")
 
 
-@hook.regex(r'^seen (?P<global>-[gG] )?(?P<nick>\S+)')
+@hook.regex(r'^seen ((?:-[gG] )?(?:\S+))')
 @hook.command
 def seen(inp, chan='', nick='', bot=None, db=None, say=None, input=None):
     """seen [-G] <nick> - Tell when a nickname was last in active in IRC. Flag -G to search all channels."""
     try:
-        _global = bool(inp.group('global'))
-        inp = inp.group('nick')
+        inp = inp.group(1)
     except:
-        inp, _global = is_global(inp)
-        inp = inp.split(' ')[0]
+        pass
+
+    inp, _global = is_global(inp)
 
     if input.conn.nick.lower() == inp.lower():
         return "You need to get your eyes checked."
