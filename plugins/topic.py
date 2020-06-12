@@ -16,8 +16,8 @@ def ontopic(paraml, nick='', chan=None, conn=None, bot=None):
 def topic(inp, chan=None, conn=None, bot=None):
     """topic <add|app|set #|ins #|del #|restore> <topic> - Change the topic of a channel. For deletion this may be a #-# range. This is zero indexed."""
     if chan.startswith('#'):
-        _topic = [t for t in bot.config['topics'].get(chan, u'').split(u' | ') if t]
-        op, idx0, idx1, clause = re.match(r'^(\S+)(?: (\d)-?(\d)?)?(?: (.*))?$', inp).groups()
+        _topic = bot.config['topics'].get(chan, u'').split(u' | ')
+        op, idx0, idx1, clause = re.match(r'^(\S+)(?: (\d)-?(\d)?)?(?: +(.*))?$', inp).groups()
 
         if op == 'add' and clause:
             _topic.insert(0, clause)
