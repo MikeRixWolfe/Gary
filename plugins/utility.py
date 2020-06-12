@@ -19,7 +19,8 @@ def get_version(nick):
         revnumber = len(revs)
         shorthash = revs[0]
 
-    http.ua_bot = '{}/r{} ({})'.format(nick, revnumber, shorthash)
+    http.ua_bot = '{}/r{} ({}; {})'.format(nick, revnumber, shorthash,
+        'https://github.com/MikeRixWolfe/Gary')
 
     return shorthash, revnumber
 

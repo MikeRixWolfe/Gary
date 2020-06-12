@@ -83,12 +83,8 @@ def cycle(inp, conn=None, chan=None, notice=None):
         target, delay = chan, 1
 
     notice("Attempting to cycle {}...".format(target))
-    if chan in conn.channels:
-        conn.channels.remove(chan)
     conn.cmd("PART {}".format(target), ["Rejoining in {} seconds".format(delay)])
     time.sleep(int(delay))
-    if chan not in conn.channels:
-        conn.channels.append(chan)
     conn.send("JOIN {}".format(target))
 
 

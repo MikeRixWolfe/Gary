@@ -42,7 +42,7 @@ def weather(inp, say=None, api_key=None):
             cards[min(cards.keys(), key=lambda k: abs(k - float(weather['currently']['windBearing'])))])
         alerts = ', '.join(['\x02{}\x0F until \x02{}\x0F'.format(a['title'], strftime(a['expires'])) for a in
             [min(filter(lambda x: x['title'] == t, weather.get('alerts', [])), key=lambda x: x['expires']) for t in
-                set(a['title'] for a in weather.get('alerts', []))]])
+                set(a['title'] for a in weather.get('alerts', []) if "Statement" not in a['title'])]])
 
         say(u"\x02{location}\x0F: {currently[temperature]:.0f}\u00b0F " \
             u"and {currently[summary]}, feels like {currently[apparentTemperature]:.0f}\u00b0F, " \
@@ -57,7 +57,7 @@ def weather(inp, say=None, api_key=None):
 @hook.command('fc')
 @hook.command
 def forecast(inp, say=None, api_key=None):
-    """forecast/fc <zip code|location> - Gets the weather forecast."""
+    """forecast/fc <zip code|location> - Gets the 5 day weather forecast."""
     if api_key is None:
         return "Error: API key not set."
 
@@ -73,7 +73,8 @@ def forecast(inp, say=None, api_key=None):
 
     try:
         for day in weather['daily']['data']:
-            day['day'] = datetime.fromtimestamp(day['time']).strftime("%A")
+            day['day'] = datetime.fromtimestamp(day['time'] + 3600).strftime("%A")
+
         say(u"\x02{location}\x0F: ".format(location=geo['formatted_address']) +
             u" ".join([u"\x02{day}\x0F: L {temperatureLow:.0f}\u00b0F, H {temperatureHigh:.0f}\u00b0F, {summary}".format(**day)
             for day in weather['daily']['data'][0:5]]))
