@@ -13,7 +13,7 @@ def get_log_link(bot, db, q):
         try:
             id, quote, nick, uts = q
             match_clause = u'nick:"{}" AND msg:"quote {}"'.format(nick, quote.replace('"', '""'))
-            row = db.execute(u"select chan, time from logfts where logfts match ? and substr(msg, 2, 5) = 'quote' order by cast(uts as decimal) asc",
+            row = db.execute(u"select chan, time from logfts where logfts match ? and substr(msg, 2, 5) = 'quote'",
                 (match_clause, )).fetchone()
 
             chan, _datetime = row
