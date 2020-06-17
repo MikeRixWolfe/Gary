@@ -29,7 +29,7 @@ def topic(inp, chan=None, conn=None, bot=None):
             _topic = bot.config['topics'].get(chan + '_bak', u'').split(u' | ')
         elif op in ['ins', 'insert'] and idx0 and int(idx0) < len(_topic) and clause:
             _topic.insert(int(idx0), clause)
-        elif op in ['del', 'delete'] and idx0 and int(idx0) <= int(idx1 or idx0) and int(idx1 or idx0) < len(_topic):
+        elif op in ['del', 'delete'] and idx0 and int(idx0) <= int(idx1 or idx0) < len(_topic):
             for i in range(int(idx0), int(idx1 or idx0) + 1):
                 _topic.pop(int(idx0))
         else:
