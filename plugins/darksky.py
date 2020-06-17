@@ -54,6 +54,34 @@ def weather(inp, say=None, api_key=None):
 
 
 @hook.api_key('darksky,google')
+@hook.command('h')
+@hook.command
+def hourly(inp, say=None, api_key=None):
+    """h[ourly] <zip code|location> - Gets the 10 hour weather forecast."""
+    if api_key is None:
+        return "Error: API key not set."
+
+    try:
+        geo = geocode(inp, api_key['google']['access'])
+    except:
+        return "Google Geocoding API error, please try again in a few minutes."
+
+    try:
+        weather = http.get_json(weather_url.format(api_key['darksky'], geo['geometry']['location']['lat'], geo['geometry']['location']['lng']))
+    except:
+        return "DarkSky API error, please try again in a few minutes."
+
+    try:
+        for hour in weather['hourly']['data']:
+            hour['hour'] = datetime.fromtimestamp(hour['time']).strftime("%-I%p")
+        say(u"\x02{location}\x0F: ".format(location=geo['formatted_address']) +
+            u" ".join([u"\x02{hour}\x0F: {temperature:.0f}\u00b0F ({apparentTemperature:.0f}\u00b0F feel), {summary}".format(**hour)
+            for hour in weather['hourly']['data'][0:10]]))
+    except:
+        return "Error: unable to find weather data for location."
+
+
+@hook.api_key('darksky,google')
 @hook.command('fc')
 @hook.command
 def forecast(inp, say=None, api_key=None):
@@ -83,10 +111,9 @@ def forecast(inp, say=None, api_key=None):
 
 
 @hook.api_key('darksky,google')
-@hook.command('h')
-@hook.command
-def hourly(inp, say=None, api_key=None):
-    """h[ourly] <zip code|location> - Gets the 10 hour weather forecast."""
+@hook.command('ltfc')
+def longtermforecast(inp, say=None, api_key=None):
+    """ltfc <zip code|location> - Gets the 8 day weather forecast."""
     if api_key is None:
         return "Error: API key not set."
 
@@ -101,11 +128,12 @@ def hourly(inp, say=None, api_key=None):
         return "DarkSky API error, please try again in a few minutes."
 
     try:
-        for hour in weather['hourly']['data']:
-            hour['hour'] = datetime.fromtimestamp(hour['time']).strftime("%-I%p")
+        for day in weather['daily']['data']:
+            day['day'] = datetime.fromtimestamp(day['time'] + 3600).strftime("%a")
+
         say(u"\x02{location}\x0F: ".format(location=geo['formatted_address']) +
-            u" ".join([u"\x02{hour}\x0F: {temperature:.0f}\u00b0F ({apparentTemperature:.0f}\u00b0F feel), {summary}".format(**hour)
-            for hour in weather['hourly']['data'][0:10]]))
+            u". ".join([u"\x02{day}\x0F: L {temperatureLow:.0f}\u00b0F, H {temperatureHigh:.0f}\u00b0F".format(**day)
+            for day in weather['daily']['data'][0:10]]))
     except:
         return "Error: unable to find weather data for location."
 
