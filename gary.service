@@ -1,0 +1,10 @@
+[Unit]
+Description=Gary IRC Bot
+After=ircd.service
+
+[Service]
+Restart=always
+ExecStart=/home/mike/repos/gary/bot.py
+
+[Install]
+WantedBy=multi-user.target
