@@ -116,35 +116,3 @@ def forecast(inp, say=None, api_key=None):
     except:
         return "Error: unable to find weather data for location."
 
-
-@hook.api_key('google,openweather')
-#@hook.command('ltfc')
-def longtermforecast(inp, say=None, api_key=None):
-    """ltfc <zip code|location> - Gets the weather forecast."""
-    if api_key is None:
-        return "Error: API key not set."
-
-    try:
-        geo_url = 'https://maps.googleapis.com/maps/api/geocode/json'
-        params = {'key': api_key['google']['access'], 'address': inp}
-        geo = http.get_json(geo_url, query_params=params)['results'][0]
-    except:
-        return "Google Geocoding API error, please try again in a few minutes."
-
-    try:
-        owm_url = 'https://api.openweathermap.org/data/2.5/onecall'
-        params = {'lat': geo['geometry']['location']['lat'], 'lon': geo['geometry']['location']['lng'],
-            'appid': api_key['openweather'], 'exclude': 'minutely', 'units': 'imperial'}
-        weather = http.get_json(owm_url, query_params=params)
-    except:
-        return "OpenWeather API error, please try again in a few minutes."
-
-    try:
-        for day in weather['daily']:
-            day['day'] = (datetime.utcfromtimestamp(day['dt']) + timedelta(seconds=weather['timezone_offset'])).strftime("%A")
-        say(u"\x02{location}\x0F: ".format(location=geo['formatted_address']) +
-            u". ".join([u"\x02{day}\x0F: L {temp[min]:.0f}\u00b0F, H {temp[max]:.0f}\u00b0F".format(**day)
-            for day in weather['daily']]))
-    except:
-        return "Error: unable to find weather data for location."
-
