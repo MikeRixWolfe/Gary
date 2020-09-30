@@ -31,6 +31,7 @@
     "noaa": "",
     "noxd": "",
     "omdb": "",
+    "openweather": "",
     "rottentomatoes": "",
     "spotify": {
       "password": "",
@@ -78,7 +79,7 @@
       "realname": "Gary",
       "server": "localhost",
       "server_password": "",
-      "service_style": "",
+      "service_style": "anope",
       "user": "Gary"
     }
   },
