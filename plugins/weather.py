@@ -40,7 +40,7 @@ def weather(inp, say=None, api_key=None):
         alerts = ', '.join(['\x02{}\x0F until \x02{}\x0F'.format(a['event'], strftime(a['end'])) for a in
             [min(filter(lambda x: x['event'] == t, weather.get('alerts', [])), key=lambda x: x['end']) for t in
                 set(a['event'] for a in weather.get('alerts', []))]])
-        weather['current']['wind_gust'] = weather['current'].get('wind_gust', 'wind_speed')
+        weather['current']['wind_gust'] = weather['current'].get('wind_gust', weather['current']['wind_speed'])
 
         say(u"\x02{location}\x0F: {current[temp]:.0f}\u00b0F " \
             u"and {current[weather][0][description]}, feels like {current[feels_like]:.0f}\u00b0F, " \
