@@ -184,8 +184,8 @@ def phonebook(inp, chan='', nick='', user='', input=None, db=None, bot=None):
         if any(x in block for x in [inp, nick.lower(), user.lower()]): return "Nope."
         if len(inp) < 10:
             return "Please check your input and try again."
-        db.execute("insert or replace into phonebook(name, phonenumber, private, mms)"
-                   "values(?, ?, ?, ?)", (nick.lower(), inp, 0, 1))
+        db.execute("insert or replace into phonebook(name, phonenumber, private)"
+                   "values(?, ?, ?)", (nick.lower(), inp, 0))
         db.commit()
         return "Number saved!"
     elif inp in ['delete', 'private']:
