@@ -39,7 +39,7 @@ def weather(inp, say=None, api_key=None):
             cards[min(cards.keys(), key=lambda k: abs(k - float(weather['current']['wind_deg'])))])
         alerts = ', '.join(['\x02{}\x0F until \x02{}\x0F'.format(a['event'], strftime(a['end'])) for a in
             [min(filter(lambda x: x['event'] == t, weather.get('alerts', [])), key=lambda x: x['end']) for t in
-                set(a['event'] for a in weather.get('alerts', []))]])
+                set(a['event'] for a in weather.get('alerts', []) if 'Statement' not in a['event'])]])
         weather['current']['wind_gust'] = weather['current'].get('wind_gust', weather['current']['wind_speed'])
 
         say(u"\x02{location}\x0F: {current[temp]:.0f}\u00b0F " \
