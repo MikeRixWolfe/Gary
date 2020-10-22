@@ -7,7 +7,7 @@ from util import hook, http
 def cnam(inp, api_key=None):
     """cnam <10 digit number> - Get CNAM information for a number via EveryoneAPI."""
     try:
-        url = 'https://api.everyoneapi.com/v1/phone/{}'.format(inp)
+        url = 'https://api.everyoneapi.com/v1/phone/{}'.format('+1' + inp[-10:])
         data = http.get_json(url, account_sid=api_key["account_sid"],
             auth_token=api_key["auth_token"],
             data="name,address,carrier,location,linetype")['data']
