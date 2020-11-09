@@ -2,9 +2,11 @@ import json
 import re
 import time
 from json import dumps
-from twilio.base.exceptions import TwilioRestException
 from twilio.rest import Client
 from util import hook, http, text, web
+
+
+twilio_cache = None
 
 
 def db_init(db):
@@ -25,38 +27,48 @@ def get_name(db, phoneNumber):
     return row[0] if row else None
 
 
-def outputsms(client, api_key, conn, bot, db, chan=None):
+def cache_messages():
+    global twilio_cache
+    if twilio_cache is None:
+        with open('persist/twilio_cache', 'r') as f:
+            twilio_cache = [l.strip('\n') for l in f.readlines() if l.strip('\n')]
+
+
+def log_and_cache(message):
+    global twilio_cache
+    twilio_cache.append(message['MessageSid'])
+    with open('persist/twilio_cache', 'w') as f:
+        f.writelines([l + '\n' for l in twilio_cache])
+
+
+def outputsms(api_key, conn, bot, db, chan=None):
+    global twilio_cache
     block = bot.config["sms"]["private"]
     messages = []
-    _messages = [msg for msg in client.messages.list() if msg.to == api_key['number']]
+    _messages = http.get_json(bot.config["messages_url"].format(api_key['account_sid'], api_key['number']))
 
     for message in _messages:
-        if message.status != 'received':
+        if message['MessageSid'] in twilio_cache:
             continue
-        sender = message.from_.strip('+: ')
-        if not sender or not sender.isdigit():  # Errors, warnings
-            continue
-        sender = sender[-10:]  # Force number to fit our model
+
+        sender = message['From'][-10:]  # Force number to fit our model
         sender_nick = get_name(db, sender)
         if sender_nick and all(x not in block for x in [sender, sender_nick.lower()]) \
-                and message.sid not in [m.sid for m in messages]:
-            if int(message.num_media) > 0:
-                if bot.config.get("gallery_url"):
-                    media_uri = bot.config["gallery_url"] + message.sid
-                else:
-                    media_uri = 'https://api.twilio.com' + message.media.list()[0].fetch().uri.strip('.json')
-                message.out = u"<{}> [MMS] {} - {}".format(sender_nick,
-                    web.try_googl(media_uri), message.body or "Presented without comment.")
+                and message['MessageSid'] not in [m['MessageSid'] for m in messages]:
+            if message['MediaUrl']:
+                media_uri = bot.config["gallery_url"].format(message['MessageSid'])
+                message['out'] = u"<{}> [MMS] {} - {}".format(sender_nick,
+                    web.try_googl(media_uri), message['Body'] or "Presented without comment.")
             else:
-                message.out = u"<{}> {}".format(sender_nick, message.body)
+                message['out'] = u"<{}> {}".format(sender_nick, message['Body'])
             messages.append(message)
 
     for message in messages:
-        conn.send(u"PRIVMSG {} :{}".format(chan or bot.config['sms']['output_channel'], message.out))
+        conn.send(u"PRIVMSG {} :{}".format(chan or bot.config['sms']['output_channel'], message['out']))
+        log_and_cache(message)  # Mark all as read
         time.sleep(1)
-        message.delete()  # Mark all as read
 
-    return client, len(messages)
+    return len(messages)
 
 
 @hook.api_key('twilio')
@@ -68,18 +80,14 @@ def parsesms(inp, say='', api_key=None, chan=None, conn=None, bot=None, db=None)
         return "Error: API keys not set."
 
     db_init(db)
+    cache_messages()
     say("Checking for unread SMS...")
 
-    try:
-        client = Client(api_key['account_sid'], api_key['auth_token'])
-        client, sms_count = outputsms(client, api_key, conn, bot, db, chan)
-        if sms_count:
-            say("Processing {} message(s) complete.".format(sms_count))
-        else:
-            say("No new SMS found.")
-    except Exception as e:
-        say("Ouch! I've encountered an unexpected error (and it hurt).")
-        print(">>> u'Twilio parse error: {} :{}'".format(e, chan))
+    sms_count = outputsms(api_key, conn, bot, db, chan)
+    if sms_count:
+        say("Processing {} message(s) complete.".format(sms_count))
+    else:
+        say("No new SMS found.")
 
 
 @hook.api_key('twilio')
@@ -91,27 +99,21 @@ def parseloop(paraml, nick='', api_key=None, conn=None, bot=None, db=None):
         return "Error: API keys not set."
 
     db_init(db)
+    cache_messages()
     if paraml[0] != bot.config['sms']['output_channel']:
         return
 
-    client = Client(api_key['account_sid'], api_key['auth_token'])
     time.sleep(1)  # Allow chan list time to update
     print(">>> u'Beginning SMS parse loop :{}'".format(paraml[0]))
 
     while paraml[0] in conn.channels:
         time.sleep(3)
         try:
-            client, sms_count = outputsms(client, api_key, conn, bot, db)
+            sms_count = outputsms(api_key, conn, bot, db)
             if sms_count:
                 print(">>> u'Processing {} message(s) complete :{}'".format(sms_count, paraml[0]))
-        except TwilioRestException as e:
-            print(">>> u'Twilio API error: {} :{}'".format(e.msg, paraml[0]))
-            time.sleep(3)
-            client = Client(api_key['account_sid'], api_key['auth_token'])
         except Exception as e:
             print(">>> u'Twilio loop error: {} :{}'".format(e, paraml[0]))
-            time.sleep(3)
-            client = Client(api_key['account_sid'], api_key['auth_token'])
     print(">>> u'Ending SMS parse loop :{}'".format(paraml[0]))
 
 
