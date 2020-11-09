@@ -92,16 +92,17 @@ def searchquote(inp, say=None, db=None):
 
 @hook.command('dq')
 @hook.command
-def delquote(inp, db=None):
+def delquote(inp, chan=None, db=None):
     """delquote <n> - Deletes the <n>th quote."""
-    db_init(db)
-    quote = db.execute("update quotefts set active='0' where id=? and active='1'", (inp,))
-    db.commit()
+    if chan[0] == '#':
+        db_init(db)
+        quote = db.execute("update quotefts set active='0' where id=? and active='1'", (inp,))
+        db.commit()
 
-    if quote.rowcount > 0:
-        return "Quote #{} deleted.".format(inp)
-    else:
-        return "Quote #{} was not found.".format(inp)
+        if quote.rowcount > 0:
+            return "Quote #{} deleted.".format(inp)
+        else:
+            return "Quote #{} was not found.".format(inp)
 
 
 @hook.command

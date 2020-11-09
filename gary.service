@@ -3,6 +3,8 @@ Description=Gary IRC Bot
 After=ircd.service
 
 [Service]
+User=mike
+Group=mike
 Restart=always
 ExecStart=/home/mike/repos/gary/bot.py
 
