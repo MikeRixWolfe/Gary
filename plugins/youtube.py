@@ -21,7 +21,7 @@ def get_youtube_info(video_id, api_key, timestamp=None):
         return web.googl(short_url+video_id+(timestamp if timestamp else '')) + " - \x02Youtube\x0f"
 
     playtime = result['items'][0]['contentDetails']['duration'].strip('PT').lower()
-    views = int(result['items'][0]['statistics']['viewCount'])
+    views = int(result['items'][0]['statistics'].get('viewCount', 0))
     return output_format.format(url=web.try_googl(short_url+video_id+(timestamp if timestamp else '')),
                                 time=playtime, views=views, **result['items'][0]['snippet'])
 
