@@ -1,7 +1,6 @@
 import json
 import re
 import time
-from json import dumps
 from twilio.rest import Client
 from util import hook, http, text, web
 
@@ -147,8 +146,6 @@ def sms(inp, nick='', chan='', user='', api_key=None, db=None, bot=None):
         client = Client(api_key['account_sid'], api_key['auth_token'])
         msg = client.messages.create(to=recip_number, from_=api_key['number'], body=text)
         return "SMS sent."
-    except TwilioRestException as e:
-        return e.msg
     except Exception as e:
         print(e)
         return "Twilio API error, please try again in a few minutes."
@@ -164,8 +161,6 @@ def smsusage(inp, say=None, api_key=None):
         months = ["{month} ${0.price} ({0.count} messages)".format(item,
             month=time.strftime("%B", time.strptime(str(item.start_date), "%Y-%m-%d"))) for item in results]
         say("Usage by month: {}".format(", ".join(months)))
-    except TwilioRestException as e:
-        return e.msg
     except Exception as e:
         print(e)
         return "Twilio API error, please try again in a few minutes."
