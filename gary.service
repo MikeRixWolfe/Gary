@@ -6,6 +6,7 @@ After=ircd.service
 User=mike
 Group=mike
 Restart=always
+WorkingDirectory=/home/mike/repos/gary
 ExecStart=/home/mike/repos/gary/bot.py
 
 [Install]

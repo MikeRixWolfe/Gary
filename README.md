@@ -31,7 +31,7 @@
 Gary is **licensed** under the **GPL v3** license. The terms are as follows:
      
      Gary - A Python IRC Bot
-     Copyright (C) 2014-2020  Mike Rix Wolfe
+     Copyright (C) 2013-2021  Mike Rix Wolfe
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
