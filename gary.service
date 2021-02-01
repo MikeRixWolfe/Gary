@@ -2,12 +2,20 @@
 Description=Gary IRC Bot
 After=ircd.service
 
+StartLimitIntervalSec=500
+StartLimitBurst=5
+
 [Service]
 User=mike
 Group=mike
-Restart=always
+
+Environment=PYTHONUNBUFFERED=1
+
 WorkingDirectory=/home/mike/repos/gary
-ExecStart=/home/mike/repos/gary/bot.py
+ExecStart=/usr/bin/python2.7 /home/mike/repos/gary/bot.py
+
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
