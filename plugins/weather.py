@@ -11,6 +11,23 @@ def strftime(time):
     return datetime.fromtimestamp(time).strftime("%p %A").replace('AM', 'early').replace('PM', 'late')
 
 
+def get_snow(weather):
+    snow = 0
+    for day in weather['daily']:
+        if day.get('snow'):
+            snow += day['snow']
+        else:
+            break
+
+    snow = max(snow, 2) / 25.4
+
+    if weather['current'].get('snow', {}).get('1h'):
+        current = max(weather['current']['snow']['1h'], 2) / 25.4
+        return u"{:.1f}\" ({:.1f}\"/hr) of snow acc, ".format(snow, current)
+    else:
+        return u"{:.1f}\" of snow acc, ".format(snow)
+
+
 @hook.api_key('google,openweather')
 @hook.command('w')
 @hook.command
@@ -37,16 +54,26 @@ def weather(inp, say=None, api_key=None):
     try:
         direction = cards.get(float(weather['current']['wind_deg']),
             cards[min(cards.keys(), key=lambda k: abs(k - float(weather['current']['wind_deg'])))])
-        alerts = ', '.join(['\x02{}\x0F until \x02{}\x0F'.format(a['event'], strftime(a['end'])) for a in
-            [min(filter(lambda x: x['event'] == t, weather.get('alerts', [])), key=lambda x: x['end']) for t in
-                set(a['event'] for a in weather.get('alerts', []) if 'Statement' not in a['event'])]])
-        weather['current']['wind_gust'] = weather['current'].get('wind_gust', weather['current']['wind_speed'])
 
-        say(u"\x02{location}\x0F: {current[temp]:.0f}\u00b0F " \
-            u"and {current[weather][0][description]}, feels like {current[feels_like]:.0f}\u00b0F, " \
-            u"wind at {current[wind_speed]:.0f} ({current[wind_gust]:.0f} gust) MPH {direction}, " \
-            u"humidity at {current[humidity]:.0f}%. {alert}".format(direction=direction,
-            location=geo['formatted_address'], alert=alerts, **weather))
+        alerts = [a for a in weather.get('alerts', []) if 'Watch' in a['event'] or ('Warning' in a['event'] and
+            a['event'].replace('Warning', 'Watch') not in [x['event'] for x in weather.get('alerts', [])])]
+        alerts = sorted([min(filter(lambda x: x['event'] == t, alerts), key=lambda x: x['start']) for t in
+            set(a['event'] for a in alerts)], key=lambda x: x['start'])
+        alerts = ', '.join(['\x02{}\x0F until \x02{}\x0F'.format(a['event'], strftime(a['end'])) for a in alerts])
+
+        out = u"\x02{location}\x0F: {current[temp]:.0f}\u00b0F with {daily[0][weather][0][description]}, "
+
+        if weather['daily'][0].get('snow', 0) > 0:
+            out += get_snow(weather)
+
+        out += u"feels like {current[feels_like]:.0f}\u00b0F, wind at {current[wind_speed]:.0f} "
+
+        if weather['current'].get('wind_gust'):
+            out += u"({current[wind_gust]:.0f} gust) "
+
+        out += u"MPH {direction}, humidity at {current[humidity]:.0f}%. {alert}"
+
+        say(out.format(location=geo['formatted_address'], direction=direction, alert=alerts, **weather))
     except:
         return "Error: unable to find weather data for location."
 
