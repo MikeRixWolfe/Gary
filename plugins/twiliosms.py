@@ -36,6 +36,7 @@ def cache_messages():
 def log_and_cache(message):
     global twilio_cache
     twilio_cache.append(message['MessageSid'])
+    twilio_cache = twilio_cache[-50:]
     with open('persist/twilio_cache', 'w') as f:
         f.writelines([l + '\n' for l in twilio_cache])
 
