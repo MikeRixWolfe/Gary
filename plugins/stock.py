@@ -30,7 +30,7 @@ def stock(inp, api_key=None):
         return "{symbol} - ${price:.2f} " \
             "\x03{color}{change:+.2f} ({percent:.2f}%)\x0F " \
             "H:${high:.2f} L:${low:.2f} O:${open:.2f} " \
-            "Volume:{volume:,} - {url}".format(**quote)
+            "Volume:{volume:,.0f} - {url}".format(**quote)
     except:
         return "Error parsing return data, please try again later."
 
