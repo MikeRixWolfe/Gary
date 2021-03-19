@@ -38,7 +38,7 @@ def weather(inp, say=None, api_key=None):
         direction = cards.get(float(weather['current']['wind_deg']),
             cards[min(cards.keys(), key=lambda k: abs(k - float(weather['current']['wind_deg'])))])
 
-        weather['current']['wind_gust'] = weather['current'].get('wind_gust', weather['current']['wind_speed'])
+        weather['current']['wind_gust'] = weather['current'].get('wind_gust', weather['current']['wind_speed'] + 1)
 
         alerts = [a for a in weather.get('alerts', []) if 'Watch' in a['event'] or ('Warning' in a['event'] and
             a['event'].replace('Warning', 'Watch') not in [x['event'] for x in weather.get('alerts', [])])]
