@@ -5,16 +5,16 @@ from util import hook, text, timesince, tokenize, web
 
 
 formats = {
-    'PRIVMSG': '{nick} {context} on {date} ({timesince} ago) in {chan} with message "{msg}" {log_url}',
-    'ACTION': '{nick} {context} on {date} ({timesince} ago) in {chan} with message "{msg}" {log_url}',
-    'PART': '{nick} {context} on {date} ({timesince} ago) leaving {chan} with reason "{msg}" {log_url}',
-    'JOIN': '{nick} {context} on {date} ({timesince} ago) joining {chan} {log_url}',
-    'KICK': '{nick} {context} on {date} ({timesince} ago) kicking {who} from {chan} with reason {msg} {log_url}',
-    'KICKEE': '{who} {context} on {date} ({timesince} ago) being kicked from {chan} by {nick} with reason {msg} {log_url}',
-    'TOPIC': '{nick} {context} on {date} ({timesince} ago) changing {chan}\'s topic to "{msg}" {log_url}',
-    'QUIT': '{nick} {context} on {date} ({timesince} ago) quitting IRC with reason "{msg}" {log_url}',
-    'NICK': '{nick} {context} on {date} ({timesince} ago) changing nick to {msg} {log_url}',
-    'NICKEE': '{msg} {context} on {date} ({timesince} ago) changing nick from {nick} {log_url}'
+    'PRIVMSG': u'{nick} {context} on {date} ({timesince} ago) in {chan} with message "{msg}" {log_url}',
+    'ACTION': u'{nick} {context} on {date} ({timesince} ago) in {chan} with message "{msg}" {log_url}',
+    'PART': u'{nick} {context} on {date} ({timesince} ago) leaving {chan} with reason "{msg}" {log_url}',
+    'JOIN': u'{nick} {context} on {date} ({timesince} ago) joining {chan} {log_url}',
+    'KICK': u'{nick} {context} on {date} ({timesince} ago) kicking {who} from {chan} with reason {msg} {log_url}',
+    'KICKEE': u'{who} {context} on {date} ({timesince} ago) being kicked from {chan} by {nick} with reason {msg} {log_url}',
+    'TOPIC': u'{nick} {context} on {date} ({timesince} ago) changing {chan}\'s topic to "{msg}" {log_url}',
+    'QUIT': u'{nick} {context} on {date} ({timesince} ago) quitting IRC with reason "{msg}" {log_url}',
+    'NICK': u'{nick} {context} on {date} ({timesince} ago) changing nick to {msg} {log_url}',
+    'NICKEE': u'{msg} {context} on {date} ({timesince} ago) changing nick from {nick} {log_url}'
 }
 
 
@@ -38,7 +38,7 @@ def last(inp, nick='', chan='', bot=None, db=None, say=None):
     if _global:
         match_clause = tokenize.build_query(inp)
     else:
-        match_clause = '{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#'))
+        match_clause = u'{} AND chan:"{}"'.format(tokenize.build_query(inp), chan.strip('#'))
 
     try:
         row = db.execute("select uts, time, chan, nick, action, msg from logfts where logfts match ? and (msg not like '!%' and msg not like ';%' and msg not like '.%') and cast(uts as decimal) < ? and action = 'PRIVMSG' order by cast(uts as decimal) desc limit 1",
@@ -54,9 +54,9 @@ def last(inp, nick='', chan='', bot=None, db=None, say=None):
         if bot.config.get("logviewer_url"):
             row['log_url'] = web.try_googl(bot.config["logviewer_url"].format(row['chan'].strip('#'), *row['time'].split()))
         else:
-            row['log_url'] = ''
+            row['log_url'] = u''
 
-        say(formats[row['action']].format(context='last said that', **row).strip())
+        say(formats[row['action']].format(context=u'last said that', **row).strip())
     else:
         say("Never!")
 
