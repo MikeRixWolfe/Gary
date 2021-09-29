@@ -40,6 +40,7 @@ def weather(inp, say=None, api_key=None):
 
         weather['current']['wind_gust'] = weather['current'].get('wind_gust', weather['current']['wind_speed'] + 1)
 
+        # unique alerts, preferring the highest priority, and nearest in the future
         alerts = [a for a in weather.get('alerts', []) if 'Watch' in a['event'] or ('Warning' in a['event'] and
             a['event'].replace('Warning', 'Watch') not in [x['event'] for x in weather.get('alerts', [])])]
         alerts = sorted([min(filter(lambda x: x['event'] == t, alerts), key=lambda x: x['start']) for t in

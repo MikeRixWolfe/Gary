@@ -38,11 +38,10 @@ def showtells(paraml, say='', nick='', chan='', conn=None, db=None):
         db.commit()
 
 
-@hook.command('rmsg')
-@hook.command('msg')
-@hook.command
-def message(inp, nick='', chan='', conn=None, db=None, input=None, bot=None):
-    """msg/message <nick> <message> - Relay <message> to <nick> when <nick> is around."""
+@hook.command('rtell')
+@hook.command('tell')
+def tell(inp, nick='', chan='', conn=None, db=None, input=None, bot=None):
+    """tell <nick> <message> - Relay <message> to <nick> when <nick> is around."""
     try:
         recip, msg = inp.lower().split(' ', 1)
     except:
@@ -57,7 +56,7 @@ def message(inp, nick='', chan='', conn=None, db=None, input=None, bot=None):
     if recip == input.conn.nick.lower():
         return "You need to get your eyes checked."
 
-    if input.trigger == 'rmsg':
+    if input.trigger == 'rtell':
         msg = text.rainbow(msg)
 
     db_init(db)
