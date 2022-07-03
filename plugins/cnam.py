@@ -12,7 +12,7 @@ def cnam(inp, api_key=None):
             auth_token=api_key["auth_token"],
             data="name,carrier,line_provider,location,linetype")['data']
     except Exception as e:
-        return "EveryoneAPI error, please try again in a few minutes."
+        return "EveryoneAPI (now Neustar) shut down its API for non-enterprise customers 12/21/21. If you know of an alternative that doesn't suck let bears know"
 
     out = [u"Caller ID info for {}".format(inp)]
 
