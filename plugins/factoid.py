@@ -15,7 +15,7 @@ def get_factoid(db, chan, word):
     return (row[0] if row else None)
 
 
-@hook.regex(r'^(no )?Gary(?::|, )([^\(].+?[^\)]|\(.+\)) is (also )?(.+)', re.I)
+@hook.regex(r'^(no )?Gary(?::|,) ([^\(\)]|[^\(].*?[^\)]|\(.+\)) is (also )?(.+)', re.I)
 def set_factoid(inp, nick='', chan='', say=None, db=None):
     db_init(db)
 
@@ -23,6 +23,9 @@ def set_factoid(inp, nick='', chan='', say=None, db=None):
     head = inp.group(2).strip('() ')
     append = inp.group(3)
     tail = inp.group(4).strip()
+
+    if not head:
+        return
 
     data = get_factoid(db, chan, head)
 
