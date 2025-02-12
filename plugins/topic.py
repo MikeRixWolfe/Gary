@@ -40,3 +40,11 @@ def topic(inp, chan=None, conn=None, bot=None):
         json.dump(bot.config, open('config.json', 'w'), sort_keys=True, indent=2)
         conn.send(u"TOPIC {} :{}".format(chan, bot.config['topics'][chan]))
 
+
+@hook.command(adminonly=True)
+def atopic(inp, chan=None, conn=None, bot=None):
+    """atopic [#channel] op clause"""
+    chan, inp = inp.split(' ', 1) if inp[0] == '#' else (chan, inp)
+    topic(inp, chan, conn, bot)
+    return "Done."
+

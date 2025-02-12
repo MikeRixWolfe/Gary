@@ -29,7 +29,7 @@ def is_global(inp):
 @hook.command('l')
 @hook.command
 def last(inp, nick='', chan='', bot=None, db=None, say=None):
-    """l[ast] [-G] <phrase> - Finds the last occurence of a phrase. Flag -G to search all channels."""
+    """l[ast] [-g] <phrase> - Finds the last occurence of a phrase. Flag -g to search all channels."""
     inp, _global = is_global(inp)
 
     if not inp:
@@ -64,7 +64,7 @@ def last(inp, nick='', chan='', bot=None, db=None, say=None):
 @hook.command('f')
 @hook.command
 def first(inp, chan='', bot=None, db=None, say=None):
-    """f[irst] [-G] <phrase> - Finds the first occurence of a phrase. Flag -G to search all channels."""
+    """f[irst] [-g] <phrase> - Finds the first occurence of a phrase. Flag -g to search all channels."""
     inp, _global = is_global(inp)
 
     if not inp:
@@ -99,7 +99,7 @@ def first(inp, chan='', bot=None, db=None, say=None):
 @hook.regex(r'^seen ((?:-[gG] )?(?:\S+))')
 @hook.command
 def seen(inp, chan='', nick='', bot=None, db=None, say=None, input=None):
-    """seen [-G] <nick> - Tell when a nickname was last in active in IRC. Flag -G to search all channels."""
+    """seen [-g] <nick> - Tell when a nickname was last in active in IRC. Flag -g to search all channels."""
     try:
         inp = inp.group(1)
     except:
@@ -145,7 +145,7 @@ def seen(inp, chan='', nick='', bot=None, db=None, say=None, input=None):
 
 @hook.command
 def rotw(inp, chan='', db=None, say=None):
-    """rotw [-G] <phrase> - Displays the royalty of the word. Flag -G to search all channels."""
+    """rotw [-g] <phrase> - Displays the royalty of the word. Flag -g to search all channels."""
     inp, _global = is_global(inp)
 
     if not inp:

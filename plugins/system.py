@@ -3,7 +3,7 @@ import re
 import time
 import platform
 from util import hook
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 
 def convert_kilobytes(kilobytes):
@@ -63,6 +63,12 @@ def memory(inp):
 
     else:
         return "Sorry, this command is not supported on your OS."
+
+
+@hook.command('date', autohelp=False)
+@hook.command('time', autohelp=False)
+def _time(inp):
+    return "The current system time is \x02{}\x02".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 
 @hook.command(autohelp=False)
