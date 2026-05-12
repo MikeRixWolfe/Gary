@@ -26,7 +26,7 @@ def echo(inp):
 
 usage:
 
-    <MikeFightsBears> .echo hots
+    <bears> .echo hots
     <Gary> Bears: hotshots
 
 
